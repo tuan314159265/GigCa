@@ -1,6 +1,13 @@
 # Snapshot mẫu đã crawl
 
-File JSON: [`hcmc_demo_snapshot.json`](hcmc_demo_snapshot.json)
+Các JSON được tách theo nguồn để xem response từng phần; file tổng hợp vẫn giữ để thử tích hợp.
+
+| File | Nội dung |
+|---|---|
+| [`open_meteo_weather_hcmc.json`](open_meteo_weather_hcmc.json) | Forecast Open-Meteo theo giờ, kèm đơn vị, attribution và vị trí grid provider trả về. |
+| [`osm_overpass_pois_hcmc.json`](osm_overpass_pois_hcmc.json) | POI OpenStreetMap trong bán kính mẫu, kèm tags và provenance. |
+| [`osrm_route_hcmc.json`](osrm_route_hcmc.json) | Một route OSRM với profile `driving`, chỉ để xem schema/API. |
+| [`hcmc_demo_snapshot.json`](hcmc_demo_snapshot.json) | Weather + POI đã chuẩn hóa trong một snapshot để thử trao đổi giữa Data/Engine/Backend. |
 
 Tạo/cập nhật bằng:
 
@@ -8,9 +15,9 @@ Tạo/cập nhật bằng:
 python3 scripts/fetch_sample_data.py
 ```
 
-Mặc định script lấy forecast theo giờ của Open-Meteo và các POI OSM trong bán kính 1 km quanh tọa độ trung tâm demo tại TP.HCM. Có thể đổi tọa độ/bán kính qua `--lat`, `--lon`, `--radius-m`; xem `python3 scripts/fetch_sample_data.py --help`.
+Mặc định script lấy forecast theo giờ Open-Meteo, POI OSM trong bán kính 1 km, và một route OSRM `driving` giữa hai điểm demo ở TP.HCM. Có thể đổi tâm/bán kính qua `--lat`, `--lon`, `--radius-m`; xem `python3 scripts/fetch_sample_data.py --help`.
 
-JSON lưu `generated_at`, vị trí/phạm vi, nguồn, attribution/license, thời gian dự báo và các trường chuẩn hóa. Đây chỉ là snapshot hẹp để kiểm tra luồng data/schema; không phải phủ toàn thành phố, không xác nhận POI được dừng/đỗ, không phải traffic realtime và không thể hiện xác suất/giá trị cuốc. Dữ liệu thay đổi theo thời gian.
+Mỗi JSON lưu `generated_at`, vị trí/phạm vi, nguồn, attribution/license, thời gian dự báo và giới hạn. Đây chỉ là sample để kiểm tra luồng data/schema; không phải phủ toàn thành phố, không xác nhận POI được dừng/đỗ, route `driving` không xác nhận tuyến xe máy, không phải traffic realtime và không thể hiện xác suất/giá trị cuốc. Dữ liệu thay đổi theo thời gian.
 
 ## Attribution và điều kiện nguồn
 

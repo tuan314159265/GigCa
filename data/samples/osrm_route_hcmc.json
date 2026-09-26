@@ -1,0 +1,249 @@
+{
+  "schema_version": "1.0",
+  "dataset_id": "gigca_hcmc_demo_osrm_route",
+  "generated_at": "2026-09-26T09:49:15+00:00",
+  "request": {
+    "origin": {
+      "latitude": 10.7769,
+      "longitude": 106.7009
+    },
+    "destination": {
+      "latitude": 10.7796,
+      "longitude": 106.6932
+    },
+    "profile": "driving"
+  },
+  "source": {
+    "provider": "OSRM public demo server",
+    "endpoint": "https://router.project-osrm.org/route/v1/driving/106.7009,10.7769;106.6932,10.7796?overview=full&geometries=geojson&steps=false",
+    "documentation": "https://project-osrm.org/docs/v5.24.0/api/",
+    "profile": "driving",
+    "license": "OSRM software is open source; route data is based on OpenStreetMap. Verify server and data terms before reuse.",
+    "attribution": "© OpenStreetMap contributors"
+  },
+  "response": {
+    "code": "Ok",
+    "routes": [
+      {
+        "legs": [
+          {
+            "steps": [],
+            "weight": 122.1,
+            "summary": "",
+            "duration": 122.1,
+            "distance": 1307.6
+          }
+        ],
+        "weight_name": "routability",
+        "geometry": {
+          "coordinates": [
+            [
+              106.701252,
+              10.776608
+            ],
+            [
+              106.70122,
+              10.776571
+            ],
+            [
+              106.701122,
+              10.776458
+            ],
+            [
+              106.700979,
+              10.776294
+            ],
+            [
+              106.700633,
+              10.775898
+            ],
+            [
+              106.700534,
+              10.775784
+            ],
+            [
+              106.700429,
+              10.775664
+            ],
+            [
+              106.700409,
+              10.775712
+            ],
+            [
+              106.700398,
+              10.775737
+            ],
+            [
+              106.700213,
+              10.776175
+            ],
+            [
+              106.700067,
+              10.776491
+            ],
+            [
+              106.699923,
+              10.776802
+            ],
+            [
+              106.699882,
+              10.77684
+            ],
+            [
+              106.699675,
+              10.777034
+            ],
+            [
+              106.699631,
+              10.777075
+            ],
+            [
+              106.699603,
+              10.777101
+            ],
+            [
+              106.699538,
+              10.777162
+            ],
+            [
+              106.699509,
+              10.777189
+            ],
+            [
+              106.699477,
+              10.77722
+            ],
+            [
+              106.699432,
+              10.777261
+            ],
+            [
+              106.699273,
+              10.77741
+            ],
+            [
+              106.699249,
+              10.777433
+            ],
+            [
+              106.698872,
+              10.777776
+            ],
+            [
+              106.698459,
+              10.778152
+            ],
+            [
+              106.69836,
+              10.778238
+            ],
+            [
+              106.698019,
+              10.778546
+            ],
+            [
+              106.697909,
+              10.778647
+            ],
+            [
+              106.697798,
+              10.778748
+            ],
+            [
+              106.697633,
+              10.7789
+            ],
+            [
+              106.697578,
+              10.77895
+            ],
+            [
+              106.697556,
+              10.778971
+            ],
+            [
+              106.697378,
+              10.779138
+            ],
+            [
+              106.697245,
+              10.779254
+            ],
+            [
+              106.696942,
+              10.779529
+            ],
+            [
+              106.696816,
+              10.779641
+            ],
+            [
+              106.696344,
+              10.78009
+            ],
+            [
+              106.696206,
+              10.780215
+            ],
+            [
+              106.695865,
+              10.780524
+            ],
+            [
+              106.694833,
+              10.781467
+            ],
+            [
+              106.694698,
+              10.781324
+            ],
+            [
+              106.694323,
+              10.78093
+            ],
+            [
+              106.693951,
+              10.780542
+            ],
+            [
+              106.693419,
+              10.779944
+            ],
+            [
+              106.693151,
+              10.779642
+            ]
+          ],
+          "type": "LineString"
+        },
+        "weight": 122.1,
+        "duration": 122.1,
+        "distance": 1307.6
+      }
+    ],
+    "waypoints": [
+      {
+        "hint": "yQhcjf___38CAAAACAAAAAwAAAAAAAAAct9CQGdSrECsbFBBAAAAAAIAAAAIAAAADAAAAAAAAAB6JwEAxCFcBiBwpABkIFwGRHGkAAIAzw0AAAAA",
+        "location": [
+          106.701252,
+          10.776608
+        ],
+        "name": "Lê Thánh Tôn",
+        "distance": 50.25266828
+      },
+      {
+        "hint": "WqgUi____38dAAAANQAAAAAAAAAAAAAAC8QxQus-EkIAAAAAAAAAAB0AAAA1AAAAAAAAAAAAAAB6JwEAHwJcBvp7pABQAlwG0HukAAAA3w0AAAAA",
+        "location": [
+          106.693151,
+          10.779642
+        ],
+        "name": "Võ Văn Tần",
+        "distance": 7.09246495
+      }
+    ]
+  },
+  "limitations": [
+    "This sample uses the public OSRM driving profile, not a verified motorcycle profile.",
+    "Route duration is not live traffic and must not be treated as motorcycle navigation advice."
+  ]
+}

@@ -55,6 +55,8 @@ POI là mô tả nơi chốn. POI không xác nhận chỗ được phép dừng
 | `traffic_confidence` | number/null | Confidence của provider nếu được định nghĩa. Không tự diễn giải thành xác suất cuốc. |
 | `observed_at` | ISO 8601 datetime | Thời điểm traffic observation có hiệu lực. |
 
+Route mẫu OSRM giữ response provider để đối chiếu. Các trường tổng hợp có thể chuẩn hóa thành `route_distance_m` (m), `route_duration_s` (s), `route_geometry` (GeoJSON LineString), `snapped_origin` và `snapped_destination`. Không đặt `traffic_confidence` hoặc `current_speed_kmh` từ response routing thông thường nếu provider không trả các giá trị đó.
+
 ## Sự kiện, báo cáo, nhu cầu (chưa có nguồn xác nhận)
 
 | Tên biến đề xuất | Mô tả/trạng thái |

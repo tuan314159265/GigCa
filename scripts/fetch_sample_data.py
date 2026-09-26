@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fetch a small Open-Meteo + OSM/Overpass sample into a provenance-rich JSON file."""
+"""Fetch small weather, POI, and routing samples into separate JSON files."""
 
 from __future__ import annotations
 
@@ -16,8 +16,10 @@ from urllib.request import Request, urlopen
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT = ROOT / "data" / "samples" / "hcmc_demo_snapshot.json"
+DEFAULT_SAMPLES_DIR = ROOT / "data" / "samples"
 OPEN_METEO_URL = "https://api.open-meteo.com/v1/forecast"
 OVERPASS_URL = "https://overpass-api.de/api/interpreter"
+OSRM_URL = "https://router.project-osrm.org/route/v1/driving"
 USER_AGENT = "GigCaDataProbe/0.1 (sample data; https://github.com/tuan314159265/GigCa)"
 WEATHER_FIELDS = (
     "precipitation,precipitation_probability,apparent_temperature,"
@@ -171,12 +173,36 @@ def fetch_pois(lat: float, lon: float, radius_m: int) -> tuple[dict[str, Any], l
     return metadata, pois
 
 
+def fetch_route(
+    origin_lat: float,
+    origin_lon: float,
+    destination_lat: float,
+    destination_lon: float,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    coordinates = f"{origin_lon},{origin_lat};{destination_lon},{destination_lat}"
+    params = urlencode({"overview": "full", "geometries": "geojson", "steps": "false"})
+    endpoint = f"{OSRM_URL}/{coordinates}?{params}"
+    response = fetch_json(endpoint)
+    if response.get("code") != "Ok":
+        raise RuntimeError(f"OSRM could not route sample coordinates: {response.get('code')}")
+    metadata = {
+        "provider": "OSRM public demo server",
+        "endpoint": endpoint,
+        "documentation": "https://project-osrm.org/docs/v5.24.0/api/",
+        "profile": "driving",
+        "license": "OSRM software is open source; route data is based on OpenStreetMap. Verify server and data terms before reuse.",
+        "attribution": "© OpenStreetMap contributors",
+    }
+    return metadata, response
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--lat", type=float, default=10.7769, help="Sample center latitude (default: central Ho Chi Minh City)")
     parser.add_argument("--lon", type=float, default=106.7009, help="Sample center longitude (default: central Ho Chi Minh City)")
     parser.add_argument("--radius-m", type=int, default=1000, help="OSM POI search radius in meters (default: 1000; max: 5000)")
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT, help="Output JSON path")
+    parser.add_argument("--samples-dir", type=Path, default=DEFAULT_SAMPLES_DIR, help="Directory for per-source JSON files")
     args = parser.parse_args()
     if not -90 <= args.lat <= 90:
         parser.error("--lat must be between -90 and 90")
@@ -193,6 +219,12 @@ def main() -> int:
     try:
         weather_source, weather = fetch_weather(args.lat, args.lon)
         poi_source, pois = fetch_pois(args.lat, args.lon, args.radius_m)
+        route_source, route_response = fetch_route(
+            args.lat,
+            args.lon,
+            10.7796,
+            106.6932,
+        )
     except RuntimeError as exc:
         print(f"Fetch failed; no snapshot written: {exc}", file=sys.stderr)
         return 1
@@ -214,6 +246,63 @@ def main() -> int:
         ],
     }
 
+    route_dataset = {
+        "schema_version": "1.0",
+        "dataset_id": "gigca_hcmc_demo_osrm_route",
+        "generated_at": collected_at,
+        "request": {
+            "origin": {"latitude": args.lat, "longitude": args.lon},
+            "destination": {"latitude": 10.7796, "longitude": 106.6932},
+            "profile": "driving",
+        },
+        "source": route_source,
+        "response": route_response,
+        "limitations": [
+            "This sample uses the public OSRM driving profile, not a verified motorcycle profile.",
+            "Route duration is not live traffic and must not be treated as motorcycle navigation advice.",
+        ],
+    }
+    weather_dataset = {
+        "schema_version": "1.0",
+        "dataset_id": "gigca_hcmc_demo_open_meteo_weather",
+        "generated_at": collected_at,
+        "requested_location": {"latitude": args.lat, "longitude": args.lon},
+        "source": weather_source,
+        "hourly": weather,
+        "limitations": [
+            "Forecast grid coordinates may differ from requested coordinates; see source.provider_location.",
+            "Weather values are forecasts, not guaranteed observations at every street.",
+        ],
+    }
+    poi_dataset = {
+        "schema_version": "1.0",
+        "dataset_id": "gigca_hcmc_demo_osm_pois",
+        "generated_at": collected_at,
+        "requested_location": {"latitude": args.lat, "longitude": args.lon},
+        "coverage": {"radius_m": args.radius_m},
+        "source": poi_source,
+        "pois": pois,
+        "limitations": [
+            "POI presence does not establish permission to stop or park and is not trip demand.",
+            "Way/relation coordinates may be bounding-box centers, not entrances.",
+        ],
+    }
+
+    samples_dir = args.samples_dir.expanduser().resolve()
+    samples_dir.mkdir(parents=True, exist_ok=True)
+    datasets = {
+        samples_dir / "open_meteo_weather_hcmc.json": weather_dataset,
+        samples_dir / "osm_overpass_pois_hcmc.json": poi_dataset,
+        samples_dir / "osrm_route_hcmc.json": route_dataset,
+    }
+    for path, content in datasets.items():
+        temporary = path.with_suffix(path.suffix + ".tmp")
+        temporary.write_text(
+            json.dumps(content, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        temporary.replace(path)
+
     output_path = args.output.expanduser().resolve()
     output_path.parent.mkdir(parents=True, exist_ok=True)
     temporary_path = output_path.with_suffix(output_path.suffix + ".tmp")
@@ -222,7 +311,9 @@ def main() -> int:
         encoding="utf-8",
     )
     temporary_path.replace(output_path)
-    print(f"Wrote {output_path}")
+    for path in datasets:
+        print(f"Wrote {path}")
+    print(f"Wrote combined snapshot {output_path}")
     print(f"Weather hours: {len(weather)}; POIs: {len(pois)}")
     return 0
 
