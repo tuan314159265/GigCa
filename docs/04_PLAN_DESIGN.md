@@ -27,9 +27,9 @@ POI nghỉ/chờ và lịch sự kiện có thể được thêm làm context n�
 ## Cần chốt trong buổi làm việc
 
 - Nguồn/API và quyền sử dụng cho đường, traffic, thời tiết, POI và event.
+- So sánh nguồn đề xuất tại [`05_DATA_SOURCES_TO_VERIFY.md`](05_DATA_SOURCES_TO_VERIFY.md); chỉ chốt provider sau khi kiểm tra coverage TP.HCM, API/quota, giá, quyền cache/hiển thị và profile xe máy.
 - Định nghĩa “chạy rông”, khu vực ứng viên, giới hạn quãng đường đến điểm chờ và tiêu chí gợi ý nghỉ.
 - Cách cá nhân hóa mục tiêu an toàn/đỡ mệt; ngưỡng mưa, nhiệt, gió và kẹt xe.
 - Tín hiệu nào khả dụng cho giữ vị trí tốt; nếu không có booking data thì giới hạn kết luận.
 - Vai trò của mục tiêu “giá trị/cuốc” cho đến khi có dữ liệu hợp pháp, đủ tin cậy.
 - Định dạng snapshot, schema/API response và cách biểu diễn độ tin cậy.
-

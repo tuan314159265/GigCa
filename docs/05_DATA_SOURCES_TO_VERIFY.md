@@ -1,0 +1,29 @@
+# Nguồn dữ liệu cần kiểm chứng
+
+Ghi nhận các nguồn nhóm đề xuất để đánh giá sau. Link tài liệu là điểm bắt đầu, không phải xác nhận rằng GigCa đã gọi API, có tài khoản/quota, được phép lưu cache, hoặc dữ liệu phủ đủ TP.HCM. Người phụ trách Data cập nhật trạng thái/ngày kiểm tra và kết quả thử nghiệm tại đây.
+
+## Danh sách
+
+| Nhà cung cấp | Dùng để đánh giá | Tài liệu/website | Trạng thái và việc cần kiểm chứng |
+|---|---|---|---|
+| Goong | Bản đồ/tiles, địa điểm/POI, directions và ma trận khoảng cách/thời gian | [Goong REST docs](https://docs.goong.io/rest/), [Distance Matrix](https://docs.goong.io/rest/distance_matrix/) | **Ứng viên routing nội địa.** Xác minh coverage TP.HCM, lựa chọn `vehicle` phù hợp xe máy (`bike`/`hd` nếu có), API key/quota/giá, traffic-aware hay không, quyền cache và attribution. API docs có tham số vehicle nhưng cần thử request thật trên các khu vực/đường đã biết. |
+| OSRM | Routing/ma trận thời gian-khoảng cách trên dữ liệu OpenStreetMap | [OSRM API docs](https://project-osrm.org/docs/v5.24.0/api/), [Profiles](https://project-osrm.org/docs/v26.4.0/profiles) | **Ứng viên baseline routing.** Kết quả phụ thuộc profile của server; public demo thường không phải profile xe máy và không phải live traffic. Kiểm tra server/profile, điều khoản public endpoint, giới hạn sử dụng, coverage, one-way/barrier và sai khác thực địa. |
+| OpenWeather | Thời tiết hiện tại/dự báo: nhiệt độ, cảm giác nhiệt, mưa, gió, mây | [Current Weather API](https://openweathermap.org/api/current), [API plans](https://openweathermap.org/api) | **Ứng viên thời tiết; chưa tích hợp.** Cần API key; xác minh endpoint/plan cần dùng, forecast horizon, quota/giá, coverage/độ trễ, attribution và quyền lưu/chia sẻ dữ liệu. |
+| Open-Meteo | Dự báo theo giờ: mưa/xác suất mưa, cảm giác nhiệt, bức xạ, gió giật, weather code | [Forecast API docs](https://open-meteo.com/en/docs), [Terms](https://open-meteo.com/en/terms) | **Đang dùng làm nguồn tạo snapshot mẫu.** Free API không cần key nhưng chỉ dành cho non-commercial use theo terms; dữ liệu CC BY 4.0 cần attribution. Nếu sản phẩm thương mại, cần xác nhận gói/quyền dùng trước khi tiếp tục. Kiểm tra độ phù hợp của mô hình/khu vực, giờ cập nhật và sai số địa phương. |
+| TomTom | Traffic Flow/Incidents: tốc độ hiện tại, tốc độ thông thoáng, thời gian/độ trễ, sự cố | [TomTom Traffic API](https://developer.tomtom.com/traffic-api/documentation/product-information/introduction), [Market coverage](https://developer.tomtom.com/traffic-api/documentation/product-information/market-coverage) | **Ứng viên traffic realtime; chưa tích hợp.** Xác minh endpoint/credential, coverage đúng tại TP.HCM, road classes, quota/giá, độ mới, license và quyền cache/hiển thị. Không suy ra booking demand từ tốc độ đường. |
+| Cổng Giao thông TP.HCM | Tin điều tiết, tình trạng giao thông, camera và dữ liệu hiển thị trên cổng | [giaothong.hochiminhcity.gov.vn](https://giaothong.hochiminhcity.gov.vn/) | **Nguồn địa phương cần khảo sát.** Website công khai hiển thị trạng thái/tin/camera nhưng repo chưa xác định API công khai, định dạng máy đọc, quyền tự động thu thập/lưu trữ hay SLA. Không scrape/crawl trước khi tìm được API/chính sách rõ ràng; có thể liên hệ đơn vị quản lý. |
+| OpenStreetMap + Overpass | POI/map features; dữ liệu đường nền để chuẩn bị graph | [Overpass API guide](https://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide), [Overpass usage guidance](https://dev.overpass-api.de/overpass-doc/en/preface/commons.html), [OSM license FAQ](https://osmfoundation.org/wiki/Licence_and_Legal_FAQ) | **Dùng trong crawler snapshot POI mẫu.** OSM data theo ODbL; giữ attribution và đánh giá nghĩa vụ share-alike nếu phân phối database dẫn xuất. Overpass public instance phù hợp request vừa phải, không làm backend realtime/khối lượng lớn. Map tiles có chính sách riêng; không mặc định dùng tile server của OSM làm tile production. |
+
+## Tiêu chí chốt provider
+
+1. Coverage TP.HCM và tính đúng cho xe máy: đường một chiều, cấm/rào chắn, cầu/hầm và điểm quay đầu.
+2. Có trường dữ liệu cần thiết, timestamp/độ mới, mô tả confidence và phân biệt forecast với observation.
+3. Phí, quota, rate limits, API key, SLA, cache/retention, attribution, hiển thị và quyền sử dụng trong bài demo/sản phẩm.
+4. Kiểm tra bằng một bộ tọa độ/đoạn đường mẫu tại nhiều khu vực, giờ cao điểm và thấp điểm; ghi lại response đã loại bí mật, lỗi và kết quả so với quan sát.
+5. Có phương án khi API lỗi: snapshot còn hạn hoặc đánh dấu thiếu dữ liệu. Không thay traffic observation bằng routing duration rồi gọi là traffic realtime.
+
+## Trạng thái hiện tại
+
+- **Đã có crawler mẫu:** Open-Meteo hourly forecast + OSM/Overpass POIs, xem [`../data/samples/README.md`](../data/samples/README.md).
+- **Chưa có:** routing thực tế, traffic realtime, sự kiện và nguồn booking/giá/mật độ xe.
+- Snapshot mẫu là ảnh chụp tại một điểm và bán kính nhỏ, không đại diện toàn TP.HCM, không phải kiểm định độ chính xác hay khuyến nghị vận hành.

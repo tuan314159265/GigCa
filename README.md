@@ -13,6 +13,8 @@ GigCa hỗ trợ tài xế chọn khu vực nên chờ hoặc nghỉ dựa trên
 
 Chi tiết cấu trúc, quy ước, API và schema nằm trong [`RULES.md`](RULES.md) và [`docs/`](docs/).
 
+Danh sách nguồn chờ kiểm chứng và data catalog nằm trong `docs/05_DATA_SOURCES_TO_VERIFY.md` và `docs/06_DATA_CATALOG.md`. Có thể tạo snapshot mẫu bằng `python3 scripts/fetch_sample_data.py`; mô tả và file JSON nằm trong [`data/samples/README.md`](data/samples/README.md).
+
 ## Bắt đầu
 
 Repo hiện là bộ khung phối hợp; các ứng dụng chưa được scaffold. Khi chọn phiên bản runtime và lệnh chạy, cập nhật hướng dẫn tại [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md).
@@ -23,4 +25,3 @@ Repo hiện là bộ khung phối hợp; các ứng dụng chưa được scaffo
 - Dùng mật độ xe, thời tiết, tình trạng đường và sự kiện chỉ khi nguồn có phạm vi, thời điểm cập nhật và quyền sử dụng rõ ràng.
 - Tỷ lệ đoạn đường đông quanh một vị trí không được diễn giải thành xác suất khách đặt cuốc đi qua đoạn đó.
 - Luôn hiển thị thời điểm dữ liệu, nguồn, mức tin cậy, giả định và lý do loại trừ.
-
