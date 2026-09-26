@@ -16,18 +16,16 @@ Tên dưới đây là tên chuẩn hóa nội bộ để các role thống nh�
 | `coverage.radius_m` | number, m | Bán kính vùng POI lấy quanh tâm. |
 | `sources[]` | object list | Provider, URL tài liệu/API, attribution/license và trạng thái của từng nguồn. |
 
-## Thời tiết (`weather.hourly[]`)
+## Mưa (`weather.hourly[]`)
 
 | Tên biến | Kiểu/đơn vị | Mô tả |
 |---|---|---|
 | `valid_time` | ISO 8601 datetime | Giờ dự báo áp dụng; không phải thời điểm tải dữ liệu. |
-| `precipitation_mm` | number, mm | Tổng precipitation của khung thời gian theo định nghĩa provider; với Open-Meteo hourly là lượng của giờ trước. |
-| `precipitation_probability_pct` | number, % | Xác suất có precipitation do provider dự báo; không phải độ tin cậy chắc chắn tại một điểm. |
-| `apparent_temperature_c` | number, °C | Nhiệt độ cảm nhận theo mô hình provider. |
-| `shortwave_radiation_w_m2` | number, W/m² | Bức xạ sóng ngắn trung bình theo khung thời gian; dùng làm tín hiệu nắng, không tự quy đổi thành UV/chỉ số an toàn. |
-| `wind_speed_10m_kmh` | number, km/h | Tốc độ gió tại cao độ chuẩn 10 m theo provider. |
-| `wind_gusts_10m_kmh` | number, km/h | Gió giật cực đại của khung giờ trước theo provider. |
-| `weather_code_wmo` | integer | Mã trạng thái thời tiết WMO từ provider. |
+| `valid_time` | ISO 8601 datetime | Giờ forecast có hiệu lực tại vị trí/grid provider. |
+| `precipitation_mm` | number, mm | Lượng mưa/precipitation của khoảng thời gian theo định nghĩa provider; với hourly Open-Meteo là lượng trong giờ trước. |
+| `precipitation_probability_pct` | number, 0–100% | Xác suất mưa do provider dự báo; không phải độ tin cậy chắc chắn tại một điểm. |
+
+Engine so sánh hai trường mưa này với mức chịu mưa trong request. Nhiệt cảm nhận, nắng/bức xạ, gió, UV và weather code không thuộc input quyết định hiện tại.
 
 ## POI (`pois[]`)
 

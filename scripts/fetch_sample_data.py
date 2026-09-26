@@ -23,8 +23,7 @@ OVERPASS_URL = "https://overpass-api.de/api/interpreter"
 OSRM_URL = "https://router.project-osrm.org/route/v1/driving"
 USER_AGENT = "GigCaDataProbe/0.1 (sample data; https://github.com/tuan314159265/GigCa)"
 WEATHER_FIELDS = (
-    "precipitation,precipitation_probability,apparent_temperature,"
-    "shortwave_radiation,wind_speed_10m,wind_gusts_10m,weather_code"
+    "precipitation,precipitation_probability"
 )
 
 
@@ -58,8 +57,6 @@ def fetch_weather(lat: float, lon: float) -> tuple[dict[str, Any], list[dict[str
             "hourly": WEATHER_FIELDS,
             "forecast_days": 2,
             "timezone": "Asia/Ho_Chi_Minh",
-            "temperature_unit": "celsius",
-            "wind_speed_unit": "kmh",
             "precipitation_unit": "mm",
         }
     )
@@ -71,11 +68,6 @@ def fetch_weather(lat: float, lon: float) -> tuple[dict[str, Any], list[dict[str
     source_names = {
         "precipitation": "precipitation_mm",
         "precipitation_probability": "precipitation_probability_pct",
-        "apparent_temperature": "apparent_temperature_c",
-        "shortwave_radiation": "shortwave_radiation_w_m2",
-        "wind_speed_10m": "wind_speed_10m_kmh",
-        "wind_gusts_10m": "wind_gusts_10m_kmh",
-        "weather_code": "weather_code_wmo",
     }
     observations: list[dict[str, Any]] = []
     for index, valid_time in enumerate(hourly["time"]):
@@ -349,7 +341,7 @@ def main() -> int:
                 "objective": "safety_comfort",
                 "status": "partial",
                 "blocking_datasets": ["traffic", "road_incidents"],
-                "reason": "Weather is available only for a sample point; traffic and incident feeds are missing.",
+                "reason": "Rain forecast is available only for a sample point; traffic and incident feeds are missing. Temperature, sun, and wind comfort factors are out of scope.",
             },
         ],
         "areas": [

@@ -10,6 +10,14 @@
     "snapshot_id": {"type": "string", "minLength": 1},
     "generated_at": {"type": "string", "format": "date-time"},
     "source_dataset_ids": {"type": "array", "items": {"type": "string"}},
+    "driver_preferences": {
+      "type": "object",
+      "description": "User-selected preferences. Rain tolerance is an input, not a weather observation; numeric mappings remain to be agreed.",
+      "properties": {
+        "rain_tolerance_level": {"enum": ["low", "medium", "high"]}
+      },
+      "additionalProperties": true
+    },
     "data_status": {
       "type": "array",
       "description": "Availability per input dataset; the engine must not treat missing data as zero.",
@@ -67,16 +75,11 @@
                 "type": "array",
                 "items": {
                   "type": "object",
-                  "required": ["valid_time", "precipitation_mm", "precipitation_probability_pct", "apparent_temperature_c", "shortwave_radiation_w_m2", "wind_speed_10m_kmh", "wind_gusts_10m_kmh", "weather_code_wmo"],
+                  "required": ["valid_time", "precipitation_mm", "precipitation_probability_pct"],
                   "properties": {
                     "valid_time": {"type": "string"},
                     "precipitation_mm": {"type": ["number", "null"]},
-                    "precipitation_probability_pct": {"type": ["number", "null"], "minimum": 0, "maximum": 100},
-                    "apparent_temperature_c": {"type": ["number", "null"]},
-                    "shortwave_radiation_w_m2": {"type": ["number", "null"]},
-                    "wind_speed_10m_kmh": {"type": ["number", "null"]},
-                    "wind_gusts_10m_kmh": {"type": ["number", "null"]},
-                    "weather_code_wmo": {"type": ["integer", "null"]}
+                    "precipitation_probability_pct": {"type": ["number", "null"], "minimum": 0, "maximum": 100}
                   },
                   "additionalProperties": false
                 }

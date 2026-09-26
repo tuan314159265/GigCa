@@ -5,7 +5,7 @@
 1. **Tối đa giá trị/cuốc:** đi xa hơn một chút để vào khu có cuốc dài/giá tốt hơn thay vì quay vòng nhiều cuốc ngắn. Giá/cuốc và dữ liệu booking hiện chưa có nguồn được xác nhận; giữ đây là hướng mục tiêu/giả thuyết, chưa dùng để chấm điểm vận hành.
 2. **Giữ vị trí tốt:** ưu tiên vị trí mà sau khi trả khách tài xế vẫn có cơ hội ở khu thuận lợi; tránh bị đẩy xa. Cần dữ liệu phù hợp để ước lượng vị trí kế tiếp, không thay bằng tỷ lệ đường đông.
 3. **Gợi ý điểm dừng/nghỉ khi chạy rông:** đề xuất điểm chờ hoặc nghỉ phù hợp khi tài xế chưa nhận cuốc trong một khoảng thời gian; định nghĩa khoảng thời gian và nguồn POI cần chốt.
-4. **An toàn và đỡ mệt:** xét mưa, nắng/nhiệt cảm nhận, gió, kẹt xe và các điều kiện có nguồn dữ liệu tin cậy. Các ngưỡng cần do người dùng/nhóm sản phẩm xác nhận.
+4. **An toàn và mức chịu mưa:** chỉ dùng xác suất/lượng mưa dự báo theo khu vực và giờ, so với mức chịu mưa tài xế chọn. Bỏ phần chấm mệt theo thời tiết; không dùng nắng, nhiệt cảm nhận hay gió. Traffic/sự cố chỉ là tín hiệu an toàn riêng nếu có nguồn được xác minh.
 
 ## Đồ thị mạng đường
 
@@ -29,7 +29,7 @@ POI nghỉ/chờ và lịch sự kiện có thể được thêm làm context n�
 - Nguồn/API và quyền sử dụng cho đường, traffic, thời tiết, POI và event.
 - So sánh nguồn đề xuất tại [`05_DATA_SOURCES_TO_VERIFY.md`](05_DATA_SOURCES_TO_VERIFY.md); chỉ chốt provider sau khi kiểm tra coverage TP.HCM, API/quota, giá, quyền cache/hiển thị và profile xe máy.
 - Định nghĩa “chạy rông”, khu vực ứng viên, giới hạn quãng đường đến điểm chờ và tiêu chí gợi ý nghỉ.
-- Cách cá nhân hóa mục tiêu an toàn/đỡ mệt; ngưỡng mưa, nhiệt, gió và kẹt xe.
+- Cách biểu diễn mức chịu mưa (nhãn hay ngưỡng %/mm) và cách so sánh xác suất/lượng mưa; không thêm nắng/nhiệt/gió vào điểm mệt.
 - Tín hiệu nào khả dụng cho giữ vị trí tốt; nếu không có booking data thì giới hạn kết luận.
 - Vai trò của mục tiêu “giá trị/cuốc” cho đến khi có dữ liệu hợp pháp, đủ tin cậy.
 - Định dạng snapshot, schema/API response và cách biểu diễn độ tin cậy.

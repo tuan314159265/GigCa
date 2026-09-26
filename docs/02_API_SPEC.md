@@ -21,13 +21,13 @@ Recommendation request draft:
   "goals": ["maintain_position", "safety_comfort", "rest_spot"],
   "preferences": {
     "max_reposition_km": 3,
-    "avoid_heavy_rain": true,
-    "prefer_shaded_or_rest_areas": false
+    "rain_tolerance_level": "medium"
   }
 }
 ```
 
+`rain_tolerance_level` is a driver preference (`low`, `medium`, or `high`); the numeric mapping to forecast probability/amount is not agreed yet. Weather input currently includes only rain probability and precipitation amount. Do not score heat, sun, or wind discomfort.
+
 The example coordinates and values are illustrative only. `max_trip_value` must not be presented as an operational recommendation until a legitimate, sufficiently reliable trip-value signal exists. No field should imply access to platform booking, fare, or vehicle-density APIs without verified access.
 
 Response should include `request_id`, `snapshot_id`, `data_as_of`, `status`, ranked recommendations, score explanations, sources/assumptions, and warnings. Exact response schema is pending; keep `contracts/` synchronized when agreed.
-
