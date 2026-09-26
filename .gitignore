@@ -1,0 +1,31 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+**/secrets/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Frontend/build output
+node_modules/
+dist/
+build/
+.vite/
+
+# Local data, caches, and editor/OS files
+data/raw/**
+!data/raw/.gitkeep
+data/processed/**
+!data/processed/.gitkeep
+.cache/
+.DS_Store
+.idea/
+.vscode/
+
