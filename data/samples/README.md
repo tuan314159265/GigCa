@@ -7,7 +7,7 @@ Các JSON được tách theo nguồn để xem response từng phần; file t�
 | [`open_meteo_weather_hcmc.json`](open_meteo_weather_hcmc.json) | Forecast Open-Meteo theo giờ, kèm đơn vị, attribution và vị trí grid provider trả về. |
 | [`osm_overpass_pois_hcmc.json`](osm_overpass_pois_hcmc.json) | POI OpenStreetMap trong bán kính mẫu, kèm tags và provenance. |
 | [`osrm_route_hcmc.json`](osrm_route_hcmc.json) | Một route OSRM với profile `driving`, chỉ để xem schema/API. |
-| [`engine_input/hcmc_demo_snapshot.json`](engine_input/hcmc_demo_snapshot.json) | Dữ liệu ba nguồn đã chuẩn hóa thành bản input draft cho Decision Engine; một sample point, chưa phải các ô khu vực thật. |
+| [`engine_input/hcmc_demo_snapshot.json`](engine_input/hcmc_demo_snapshot.json) | Dữ liệu ba nguồn đã chuẩn hóa thành bản input draft cho Decision Engine; có `data_status` cho cả nhóm đã có và chưa có data, một sample point chứ chưa phải các ô khu vực thật. |
 | [`hcmc_demo_snapshot.json`](hcmc_demo_snapshot.json) | Weather + POI đã chuẩn hóa trong một snapshot để thử trao đổi giữa Data/Engine/Backend. |
 
 Tạo/cập nhật bằng:

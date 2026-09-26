@@ -4,12 +4,42 @@
   "title": "GigCa Decision Engine Input Snapshot",
   "description": "Draft normalized input from Data role to Decision Engine; scores and recommendations are out of scope.",
   "type": "object",
-  "required": ["schema_version", "snapshot_id", "generated_at", "source_dataset_ids", "areas", "limitations"],
+  "required": ["schema_version", "snapshot_id", "generated_at", "source_dataset_ids", "data_status", "objective_readiness", "areas", "limitations"],
   "properties": {
     "schema_version": {"const": "0.1"},
     "snapshot_id": {"type": "string", "minLength": 1},
     "generated_at": {"type": "string", "format": "date-time"},
     "source_dataset_ids": {"type": "array", "items": {"type": "string"}},
+    "data_status": {
+      "type": "array",
+      "description": "Availability per input dataset; the engine must not treat missing data as zero.",
+      "items": {
+        "type": "object",
+        "required": ["dataset", "status", "reason"],
+        "properties": {
+          "dataset": {"type": "string"},
+          "status": {"enum": ["available", "partial", "missing", "stale", "not_integrated"]},
+          "reason": {"type": "string"},
+          "source_dataset_id": {"type": "string"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "objective_readiness": {
+      "type": "array",
+      "description": "Readiness for each product goal based on the data in this snapshot.",
+      "items": {
+        "type": "object",
+        "required": ["objective", "status", "blocking_datasets", "reason"],
+        "properties": {
+          "objective": {"enum": ["max_trip_value", "maintain_position", "rest_spot", "safety_comfort"]},
+          "status": {"enum": ["available", "partial", "insufficient_data"]},
+          "blocking_datasets": {"type": "array", "items": {"type": "string"}},
+          "reason": {"type": "string"}
+        },
+        "additionalProperties": false
+      }
+    },
     "areas": {
       "type": "array",
       "items": {

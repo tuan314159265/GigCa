@@ -1,11 +1,102 @@
 {
   "schema_version": "0.1",
   "snapshot_id": "hcmc_demo_point_01",
-  "generated_at": "2026-09-26T10:02:19+00:00",
+  "generated_at": "2026-09-26T10:10:54+00:00",
   "source_dataset_ids": [
     "gigca_hcmc_demo_open_meteo_weather",
     "gigca_hcmc_demo_osm_pois",
     "gigca_hcmc_demo_osrm_route"
+  ],
+  "data_status": [
+    {
+      "dataset": "weather",
+      "status": "available",
+      "reason": "Forecast sample is available for the provider grid near one requested point; it is not area-wide.",
+      "source_dataset_id": "gigca_hcmc_demo_open_meteo_weather"
+    },
+    {
+      "dataset": "poi",
+      "status": "available",
+      "reason": "OSM/Overpass POI sample is available within the requested radius; parking legality is not verified.",
+      "source_dataset_id": "gigca_hcmc_demo_osm_pois"
+    },
+    {
+      "dataset": "routing",
+      "status": "partial",
+      "reason": "Only one OSRM driving-profile route is sampled; no motorcycle routing graph has been verified.",
+      "source_dataset_id": "gigca_hcmc_demo_osrm_route"
+    },
+    {
+      "dataset": "traffic",
+      "status": "missing",
+      "reason": "No road-segment traffic feed has been verified."
+    },
+    {
+      "dataset": "road_incidents",
+      "status": "missing",
+      "reason": "No incident/closure feed has been verified."
+    },
+    {
+      "dataset": "verified_waiting_places",
+      "status": "missing",
+      "reason": "POIs are not verified as legal or suitable places to wait or park."
+    },
+    {
+      "dataset": "events",
+      "status": "missing",
+      "reason": "No event source has been verified."
+    },
+    {
+      "dataset": "vehicle_density",
+      "status": "missing",
+      "reason": "No licensed vehicle-supply feed is available."
+    },
+    {
+      "dataset": "booking_and_destinations",
+      "status": "missing",
+      "reason": "No booking-rate or destination-distribution data is available."
+    },
+    {
+      "dataset": "trip_value",
+      "status": "missing",
+      "reason": "No licensed fare/trip-value data is available."
+    }
+  ],
+  "objective_readiness": [
+    {
+      "objective": "max_trip_value",
+      "status": "insufficient_data",
+      "blocking_datasets": [
+        "booking_and_destinations",
+        "trip_value"
+      ],
+      "reason": "No booking, destination, or fare data is available to rank expected trip value."
+    },
+    {
+      "objective": "maintain_position",
+      "status": "insufficient_data",
+      "blocking_datasets": [
+        "booking_and_destinations"
+      ],
+      "reason": "A single driving route does not estimate where a passenger may be dropped off or the next-trip opportunity."
+    },
+    {
+      "objective": "rest_spot",
+      "status": "partial",
+      "blocking_datasets": [
+        "verified_waiting_places"
+      ],
+      "reason": "POIs are available as candidates, but legal access and suitability for waiting are not verified."
+    },
+    {
+      "objective": "safety_comfort",
+      "status": "partial",
+      "blocking_datasets": [
+        "traffic",
+        "road_incidents"
+      ],
+      "reason": "Weather is available only for a sample point; traffic and incident feeds are missing."
+    }
   ],
   "areas": [
     {
