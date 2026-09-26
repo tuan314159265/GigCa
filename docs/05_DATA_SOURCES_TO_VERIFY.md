@@ -5,7 +5,7 @@ Ghi nhận các nguồn nhóm đề xuất để đánh giá sau. Link tài li�
 ## Danh sách
 
 | Nhà cung cấp | Dùng để đánh giá | Tài liệu/website | Trạng thái và việc cần kiểm chứng | JSON mẫu đã cào |
-|---|---|---|---|
+|---|---|---|---|---|
 | Goong | Bản đồ/tiles, địa điểm/POI, directions và ma trận khoảng cách/thời gian | [Goong REST docs](https://docs.goong.io/rest/), [Distance Matrix](https://docs.goong.io/rest/distance_matrix/) | **Ứng viên routing nội địa.** Xác minh coverage TP.HCM, lựa chọn `vehicle` phù hợp xe máy (`bike`/`hd` nếu có), API key/quota/giá, traffic-aware hay không, quyền cache và attribution. API docs có tham số vehicle nhưng cần thử request thật trên các khu vực/đường đã biết. | Chưa cào: cần API key/quota và chọn endpoint. |
 | OSRM | Routing/ma trận thời gian-khoảng cách trên dữ liệu OpenStreetMap | [OSRM API docs](https://project-osrm.org/docs/v5.24.0/api/), [Profiles](https://project-osrm.org/docs/v26.4.0/profiles) | **Đã cào mẫu route.** Public sample dùng profile `driving`, không xác nhận tuyến xe máy/live traffic. Kiểm tra server/profile, điều khoản public endpoint, giới hạn sử dụng, coverage, one-way/barrier và sai khác thực địa. | [Route mẫu (driving)](../data/samples/osrm_route_hcmc.json). |
 | OpenWeather | Thời tiết hiện tại/dự báo: nhiệt độ, cảm giác nhiệt, mưa, gió, mây | [Current Weather API](https://openweathermap.org/api/current), [API plans](https://openweathermap.org/api) | **Ứng viên thời tiết; chưa tích hợp.** Cần API key; xác minh endpoint/plan cần dùng, forecast horizon, quota/giá, coverage/độ trễ, attribution và quyền lưu/chia sẻ dữ liệu. | Chưa cào: cần API key và chốt plan. |
