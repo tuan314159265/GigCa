@@ -8,10 +8,11 @@ GigCa/
 ├── config/              # Versioned, non-secret model/product configuration
 ├── contracts/           # Shared API examples and JSON Schemas
 ├── data/
+│   ├── README.md          # Data dictionary and Data → Engine handoff
 │   ├── raw/              # Local-only source files; ignored by Git
 │   ├── processed/        # Generated/local processed data; ignored by Git
 │   ├── fixtures/         # Small, licensed or synthetic, clearly labeled fixtures
-│   └── samples/          # Small fetched snapshots with provenance and descriptions
+│   └── samples/          # Provider samples + normalized engine input example
 ├── docs/                # Architecture, API, schema, and user guide
 ├── engine/              # Role Decision model: candidate generation and scoring
 │   ├── src/

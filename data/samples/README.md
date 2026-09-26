@@ -7,6 +7,7 @@ Các JSON được tách theo nguồn để xem response từng phần; file t�
 | [`open_meteo_weather_hcmc.json`](open_meteo_weather_hcmc.json) | Forecast Open-Meteo theo giờ, kèm đơn vị, attribution và vị trí grid provider trả về. |
 | [`osm_overpass_pois_hcmc.json`](osm_overpass_pois_hcmc.json) | POI OpenStreetMap trong bán kính mẫu, kèm tags và provenance. |
 | [`osrm_route_hcmc.json`](osrm_route_hcmc.json) | Một route OSRM với profile `driving`, chỉ để xem schema/API. |
+| [`engine_input/hcmc_demo_snapshot.json`](engine_input/hcmc_demo_snapshot.json) | Dữ liệu ba nguồn đã chuẩn hóa thành bản input draft cho Decision Engine; một sample point, chưa phải các ô khu vực thật. |
 | [`hcmc_demo_snapshot.json`](hcmc_demo_snapshot.json) | Weather + POI đã chuẩn hóa trong một snapshot để thử trao đổi giữa Data/Engine/Backend. |
 
 Tạo/cập nhật bằng:
@@ -15,7 +16,7 @@ Tạo/cập nhật bằng:
 python3 scripts/fetch_sample_data.py
 ```
 
-Mặc định script lấy forecast theo giờ Open-Meteo, POI OSM trong bán kính 1 km, và một route OSRM `driving` giữa hai điểm demo ở TP.HCM. Có thể đổi tâm/bán kính qua `--lat`, `--lon`, `--radius-m`; xem `python3 scripts/fetch_sample_data.py --help`.
+Mặc định script lấy forecast theo giờ Open-Meteo, POI OSM trong bán kính 1 km, và một route OSRM `driving` giữa hai điểm demo ở TP.HCM. Script tạo từng file theo nguồn, engine-input sample và snapshot kết hợp. Có thể đổi tâm/bán kính qua `--lat`, `--lon`, `--radius-m`; xem `python3 scripts/fetch_sample_data.py --help`.
 
 Mỗi JSON lưu `generated_at`, vị trí/phạm vi, nguồn, attribution/license, thời gian dự báo và giới hạn. Đây chỉ là sample để kiểm tra luồng data/schema; không phải phủ toàn thành phố, không xác nhận POI được dừng/đỗ, route `driving` không xác nhận tuyến xe máy, không phải traffic realtime và không thể hiện xác suất/giá trị cuốc. Dữ liệu thay đổi theo thời gian.
 

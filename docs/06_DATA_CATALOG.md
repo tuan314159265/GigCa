@@ -1,5 +1,7 @@
 # Data catalog — trường dữ liệu dự kiến
 
+> Bảng bàn giao đầy đủ, có link trực tiếp tới sample JSON cho từng biến, nằm tại [`data/README.md`](../data/README.md). Tài liệu này giữ phần giải thích schema và giới hạn dữ liệu ở mức tổng quan.
+
 Tên dưới đây là tên chuẩn hóa nội bộ để các role thống nhất. Trường provider-specific cần giữ trong adapter/raw metadata nếu cần truy vết. `null`/không có nghĩa là chưa lấy được, không có coverage hoặc nguồn không cung cấp; không tự điền thành 0.
 
 ## Snapshot chung

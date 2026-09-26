@@ -9,6 +9,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from collections import Counter
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
@@ -287,6 +288,46 @@ def main() -> int:
             "Way/relation coordinates may be bounding-box centers, not entrances.",
         ],
     }
+    route = (route_response.get("routes") or [{}])[0]
+    route_dataset_id = "gigca_hcmc_demo_osrm_route"
+    engine_input_dataset = {
+        "schema_version": "0.1",
+        "snapshot_id": "hcmc_demo_point_01",
+        "generated_at": collected_at,
+        "source_dataset_ids": [
+            "gigca_hcmc_demo_open_meteo_weather",
+            "gigca_hcmc_demo_osm_pois",
+            route_dataset_id,
+        ],
+        "areas": [
+            {
+                "area_id": "hcmc_demo_point_01",
+                "spatial_scope": "point_sample",
+                "representative_point": {"latitude": args.lat, "longitude": args.lon},
+                "weather": {
+                    "provider_grid_location": weather_source["provider_location"],
+                    "hourly": weather,
+                },
+                "poi_counts_by_category": dict(
+                    Counter(poi["category"] for poi in pois)
+                ),
+                "routing_samples": [
+                    {
+                        "destination_id": "hcmc_demo_destination_01",
+                        "profile": "driving",
+                        "route_distance_m": route.get("distance"),
+                        "route_duration_s": route.get("duration"),
+                    }
+                ],
+            }
+        ],
+        "limitations": [
+            "This is a point sample, not weather or POI aggregated to a real map cell/polygon.",
+            "The OSRM route uses a driving profile and is only a schema example, not a verified motorcycle route.",
+            "POI counts describe mapped features and do not estimate booking demand or legal stopping availability.",
+            "No decision scores are included; the Decision Engine owns score formulas and weights.",
+        ],
+    }
 
     samples_dir = args.samples_dir.expanduser().resolve()
     samples_dir.mkdir(parents=True, exist_ok=True)
@@ -294,8 +335,10 @@ def main() -> int:
         samples_dir / "open_meteo_weather_hcmc.json": weather_dataset,
         samples_dir / "osm_overpass_pois_hcmc.json": poi_dataset,
         samples_dir / "osrm_route_hcmc.json": route_dataset,
+        samples_dir / "engine_input" / "hcmc_demo_snapshot.json": engine_input_dataset,
     }
     for path, content in datasets.items():
+        path.parent.mkdir(parents=True, exist_ok=True)
         temporary = path.with_suffix(path.suffix + ".tmp")
         temporary.write_text(
             json.dumps(content, ensure_ascii=False, indent=2) + "\n",
