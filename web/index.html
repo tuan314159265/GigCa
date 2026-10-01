@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#101b2a" />
+    <title>GigCa · Data Explorer</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="#overview" aria-label="GigCa Data Explorer">
+          <span class="brand-mark">G</span>
+          <span><strong>GigCa</strong><small>DATA EXPLORER</small></span>
+        </a>
+        <div class="sidebar-label">BẢNG ĐIỀU KHIỂN</div>
+        <nav class="nav-list" aria-label="Điều hướng">
+          <a class="nav-link active" href="#overview"><span class="nav-icon">◫</span>Tổng quan</a>
+          <a class="nav-link" href="#weather"><span class="nav-icon">◒</span>Dữ liệu mưa</a>
+          <a class="nav-link" href="#places"><span class="nav-icon">⌖</span>POI khu vực</a>
+          <a class="nav-link" href="#routing"><span class="nav-icon">↗</span>Routing</a>
+          <a class="nav-link" href="#sources"><span class="nav-icon">▤</span>Nguồn dữ liệu</a>
+        </nav>
+        <div class="sidebar-bottom">
+          <span class="status-dot"></span>
+          <div><strong>Sample mode</strong><small>Dữ liệu JSON cục bộ</small></div>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <div class="breadcrumbs">GigCa <span>/</span> Data Explorer</div>
+          <div class="topbar-actions">
+            <span class="env-badge"><span class="status-dot"></span>LOCAL SNAPSHOT</span>
+            <button id="reload-button" class="icon-button" type="button" title="Tải lại dữ liệu" aria-label="Tải lại dữ liệu">↻</button>
+          </div>
+        </header>
+
+        <section id="overview" class="page-heading">
+          <div>
+            <p class="eyebrow">DATA PIPELINE · MVP</p>
+            <h1>Data Explorer</h1>
+            <p class="subtitle">Theo dõi dữ liệu mẫu trước khi bàn giao cho Decision Engine.</p>
+          </div>
+          <div id="snapshot-meta" class="snapshot-meta">Đang đọc snapshot…</div>
+        </section>
+
+        <div id="load-error" class="load-error" hidden></div>
+        <section id="stale-banner" class="alert-banner" hidden aria-live="polite">
+          <span class="alert-icon">!</span>
+          <div><strong>Forecast đã cũ</strong><p id="stale-message">Không dùng forecast này để đưa ra gợi ý hiện tại. Hãy cập nhật dữ liệu rồi chạy ETL lại.</p></div>
+          <a class="text-link" href="#weather">Xem dữ liệu mưa <span>→</span></a>
+        </section>
+
+        <section class="metric-grid" aria-label="Tóm tắt snapshot">
+          <article class="metric-card">
+            <div class="metric-top"><span>ĐIỂM MẪU</span><span class="metric-icon mint">⌖</span></div>
+            <strong id="metric-location" class="metric-value">—</strong>
+            <small id="metric-area">—</small>
+          </article>
+          <article class="metric-card">
+            <div class="metric-top"><span>XÁC SUẤT MƯA</span><span class="metric-icon blue">◒</span></div>
+            <strong id="metric-rain" class="metric-value">—</strong>
+            <small id="metric-rain-time">—</small>
+          </article>
+          <article class="metric-card">
+            <div class="metric-top"><span>POI ĐÃ GHI NHẬN</span><span class="metric-icon amber">⌘</span></div>
+            <strong id="metric-pois" class="metric-value">—</strong>
+            <small id="metric-poi-categories">—</small>
+          </article>
+          <article class="metric-card">
+            <div class="metric-top"><span>ROUTE MẪU</span><span class="metric-icon violet">↗</span></div>
+            <strong id="metric-route" class="metric-value">—</strong>
+            <small id="metric-route-time">—</small>
+          </article>
+        </section>
+
+        <section class="content-grid">
+          <article id="weather" class="panel weather-panel">
+            <div class="panel-heading">
+              <div><p class="eyebrow">OPEN-METEO</p><h2>Dự báo mưa theo giờ</h2></div>
+              <span id="weather-status" class="status-pill">—</span>
+            </div>
+            <div class="chart-legend"><span class="legend-dot"></span>Xác suất mưa <strong>%</strong><span class="chart-note">Mỗi cột là một giờ</span></div>
+            <div id="weather-chart" class="weather-chart" role="img" aria-label="Biểu đồ xác suất mưa theo giờ"></div>
+            <div id="weather-axis" class="chart-axis"></div>
+            <div class="weather-footnote">
+              <span class="info-icon">i</span>
+              <span id="weather-location-note">Forecast là dự báo tại grid của provider, không phải đo mưa tại từng tuyến đường.</span>
+            </div>
+          </article>
+
+          <article class="panel readiness-panel">
+            <div class="panel-heading"><div><p class="eyebrow">ENGINE INPUT</p><h2>Độ sẵn sàng dữ liệu</h2></div><span id="readiness-count" class="tiny-count">—</span></div>
+            <div id="readiness-list" class="readiness-list"></div>
+            <div class="panel-footer-note">Trạng thái thiếu không được hiểu là giá trị bằng 0.</div>
+          </article>
+        </section>
+
+        <section class="content-grid lower-grid">
+          <article id="places" class="panel poi-panel">
+            <div class="panel-heading">
+              <div><p class="eyebrow">OPENSTREETMAP · OVERPASS</p><h2>POI trong vùng mẫu</h2></div>
+              <span id="poi-radius" class="subtle-badge">—</span>
+            </div>
+            <div id="poi-breakdown" class="poi-breakdown"></div>
+            <div class="poi-toolbar">
+              <div class="search-wrap"><span>⌕</span><input id="poi-search" type="search" placeholder="Tìm tên hoặc loại POI" aria-label="Tìm POI" /></div>
+              <span id="poi-result-count" class="result-count">—</span>
+            </div>
+            <div id="poi-list" class="poi-list"></div>
+            <p class="fine-print">POI chỉ là địa điểm được ghi nhận. Dữ liệu này không xác nhận được phép dừng/đỗ hoặc có nhu cầu đặt xe.</p>
+          </article>
+
+          <article id="routing" class="panel route-panel">
+            <div class="panel-heading"><div><p class="eyebrow">OSRM PUBLIC DEMO</p><h2>Route mẫu</h2></div><span id="route-profile" class="subtle-badge">—</span></div>
+            <div class="route-visual" aria-hidden="true"><span class="route-node start">A</span><span class="route-line"></span><span class="route-node end">B</span></div>
+            <div class="route-stats">
+              <div><small>QUÃNG ĐƯỜNG</small><strong id="route-distance">—</strong></div>
+              <div><small>THỜI GIAN API</small><strong id="route-duration">—</strong></div>
+            </div>
+            <div class="coordinate-box"><div><span>ĐIỂM A</span><strong id="route-origin">—</strong></div><div><span>ĐIỂM B</span><strong id="route-destination">—</strong></div></div>
+            <div class="warning-note"><span>!</span><p>Profile `driving` chưa được xác minh cho xe máy. Thời gian route không phải traffic thời gian thực.</p></div>
+          </article>
+        </section>
+
+        <section id="sources" class="panel sources-panel">
+          <div class="panel-heading"><div><p class="eyebrow">PROVIDER REGISTRY</p><h2>Nguồn và trạng thái kiểm chứng</h2></div><span class="subtle-badge">Ưu tiên theo từng dataset</span></div>
+          <div id="source-grid" class="source-grid"></div>
+          <div class="source-policy"><strong>Fallback policy</strong><span>Chỉ bật fallback sau khi xác nhận cùng ý nghĩa dữ liệu, độ phủ, độ mới, quota và điều khoản. Luôn ghi lại provider thực dùng.</span></div>
+        </section>
+
+        <footer class="page-footer"><span>GigCa · Data Explorer</span><span id="footer-snapshot">Snapshot sample · chưa phải khuyến nghị vận hành</span></footer>
+      </main>
+    </div>
+    <script src="./app.js" defer></script>
+  </body>
+</html>

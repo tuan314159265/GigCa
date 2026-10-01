@@ -1,0 +1,58 @@
+{
+  "schema_version": "0.1",
+  "selection_policy": "Choose and validate providers per dataset. Use one primary provider; enable a fallback only after verifying equivalent semantics, geographic coverage, freshness, terms, and quotas. Record the provider used in every output.",
+  "datasets": {
+    "rain_forecast": {
+      "primary": {
+        "provider": "Open-Meteo",
+        "status": "live_checked_for_demo",
+        "endpoint": "https://api.open-meteo.com/v1/forecast",
+        "notes": "Live request returned precipitation and precipitation_probability. Official openmeteo-requests Python client is available. Free API is non-commercial only; commercial plan/terms must be confirmed before product use."
+      },
+      "fallbacks": [
+        {
+          "provider": "OpenWeather",
+          "status": "not_live_checked",
+          "notes": "Requires a separate API key and verification of forecast fields, quota, attribution, and terms. Do not combine probabilities without calibration."
+        }
+      ]
+    },
+    "routing": {
+      "primary": null,
+      "candidates": [
+        {
+          "provider": "Goong",
+          "status": "not_live_checked",
+          "notes": "Verify Ho Chi Minh City coverage, motorcycle vehicle value, credentials, quota, and route behavior before selection."
+        },
+        {
+          "provider": "OSRM public demo server",
+          "status": "live_checked_prototype_only",
+          "notes": "A driving route request returned HTTP 200. This does not verify motorcycle routing or live traffic; public demo server is not selected as production primary."
+        }
+      ]
+    },
+    "poi": {
+      "primary": null,
+      "candidates": [
+        {
+          "provider": "OpenStreetMap via overpass-api.de",
+          "status": "temporarily_unavailable_at_check",
+          "notes": "Small request returned HTTP 504 due server overload. Keep cached sample; retry with backoff and identify an approved reliable provider before regular ETL."
+        },
+        {
+          "provider": "OpenStreetMap via overpass.private.coffee",
+          "status": "timed_out_at_check",
+          "notes": "Fallback request timed out; do not mark as verified."
+        }
+      ]
+    },
+    "traffic": {
+      "primary": null,
+      "candidates": [
+        {"provider": "TomTom Traffic API", "status": "not_live_checked"},
+        {"provider": "Ho Chi Minh City traffic portal", "status": "no_machine_readable_api_verified"}
+      ]
+    }
+  }
+}

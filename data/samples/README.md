@@ -16,6 +16,14 @@ Tạo/cập nhật bằng:
 python3 scripts/fetch_sample_data.py
 ```
 
+Chạy ETL offline trên ba JSON theo nguồn:
+
+```bash
+.venv/bin/python -m etl.pipeline
+```
+
+Để chỉ cập nhật forecast thời tiết qua Open-Meteo client (cache/retry), tạo `.venv`, cài `.venv/bin/python -m pip install -r etl/requirements.txt`, rồi chạy `.venv/bin/python -m etl.pipeline --refresh-weather`. Xem [ETL README](../../etl/README.md) để biết tình trạng kiểm chứng từng API; Overpass hiện có thể quá tải nên ETL mặc định dùng sample đã lưu.
+
 Mặc định script lấy forecast xác suất/lượng mưa theo giờ từ Open-Meteo, POI OSM trong bán kính 1 km, và một route OSRM `driving` giữa hai điểm demo ở TP.HCM. Script tạo từng file theo nguồn, engine-input sample và snapshot kết hợp. Có thể đổi tâm/bán kính qua `--lat`, `--lon`, `--radius-m`; xem `python3 scripts/fetch_sample_data.py --help`.
 
 Mỗi JSON lưu `generated_at`, vị trí/phạm vi, nguồn, attribution/license, thời gian dự báo và giới hạn. Đây chỉ là sample để kiểm tra luồng data/schema; không phải phủ toàn thành phố, không xác nhận POI được dừng/đỗ, route `driving` không xác nhận tuyến xe máy, không phải traffic realtime và không thể hiện xác suất/giá trị cuốc. Dữ liệu thay đổi theo thời gian.
