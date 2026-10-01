@@ -3,7 +3,7 @@ const DATA_PATHS = {
   weather: "../data/samples/open_meteo_weather_hcmc.json",
   pois: "../data/samples/osm_overpass_pois_hcmc.json",
   route: "../data/samples/osrm_route_hcmc.json",
-  registry: "../etl/config/source_registry.json",
+  registry: "../data/etl/config/source_registry.json",
 };
 
 const STATUS_LABELS = {
@@ -269,7 +269,7 @@ async function loadDashboard() {
       node("strong", "", "Chưa tải được dữ liệu."),
       node("div", "", `${error.message} Chạy web từ thư mục repo để trình duyệt đọc được JSON:`),
       node("code", "", ".venv/bin/python -m http.server 8000"),
-      node("div", "", "Sau đó mở http://localhost:8000/web/ . Nếu snapshot chưa có, chạy .venv/bin/python -m etl.pipeline trước."),
+      node("div", "", "Sau đó mở http://localhost:8000/web/ . Nếu snapshot chưa có, chạy .venv/bin/python -m data.etl.pipeline trước."),
     );
   }
 }

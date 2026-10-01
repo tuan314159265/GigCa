@@ -13,7 +13,7 @@ GigCa hỗ trợ tài xế chọn khu vực nên chờ hoặc nghỉ dựa trên
 
 Chi tiết cấu trúc, quy ước, API và schema nằm trong [`RULES.md`](RULES.md) và [`docs/`](docs/).
 
-Luồng ETL MVP đọc các JSON mẫu, kiểm tra, chuẩn hóa theo contract rồi ghi snapshot vào `data/processed/`. Tạo môi trường bằng `python3 -m venv .venv`, sau đó chạy `.venv/bin/python -m etl.pipeline`. Xem [`etl/README.md`](etl/README.md); trạng thái kiểm tra API và thứ tự nguồn/backup theo từng dataset nằm trong [`etl/config/source_registry.json`](etl/config/source_registry.json).
+Luồng ETL MVP nằm trong `data/etl/`, đọc các JSON mẫu, kiểm tra, chuẩn hóa theo contract rồi ghi snapshot vào `data/processed/`. Tạo môi trường bằng `python3 -m venv .venv`, sau đó chạy `.venv/bin/python -m data.etl.pipeline`. Xem [`data/etl/README.md`](data/etl/README.md); trạng thái kiểm tra API và thứ tự nguồn/backup theo từng dataset nằm trong [`data/etl/config/source_registry.json`](data/etl/config/source_registry.json).
 
 Web Data Explorer chưa có bản đồ, đọc snapshot và JSON mẫu để xem trạng thái mưa, POI, routing và provider. Chạy `.venv/bin/python -m http.server 8000` từ thư mục gốc rồi mở `http://localhost:8000/web/`; xem thêm [`web/README.md`](web/README.md).
 

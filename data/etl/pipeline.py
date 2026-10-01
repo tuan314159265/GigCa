@@ -13,7 +13,7 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_SAMPLES_DIR = ROOT / "data" / "samples"
 DEFAULT_OUTPUT = ROOT / "data" / "processed" / "engine_input_snapshot.json"
 SAMPLE_FILES = {
@@ -267,7 +267,7 @@ def main() -> int:
     args = parse_args()
     try:
         if args.refresh_weather:
-            from etl.extractors.open_meteo import fetch_weather_sample
+            from data.etl.extractors.open_meteo import fetch_weather_sample
 
             weather_path = fetch_weather_sample(args.samples_dir)
             print(f"Weather sample refreshed: {weather_path}")

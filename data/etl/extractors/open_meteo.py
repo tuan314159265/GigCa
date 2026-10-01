@@ -10,7 +10,7 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 API_URL = "https://api.open-meteo.com/v1/forecast"
 TIMEZONE = "Asia/Ho_Chi_Minh"
 
@@ -24,7 +24,7 @@ def fetch_weather_sample(samples_dir: Path) -> Path:
     except ImportError as exc:
         raise RuntimeError(
             "Live weather extraction dependencies are missing. Install with "
-            ".venv/bin/python -m pip install -r etl/requirements.txt"
+            ".venv/bin/python -m pip install -r data/etl/requirements.txt"
         ) from exc
 
     output_path = samples_dir / "open_meteo_weather_hcmc.json"

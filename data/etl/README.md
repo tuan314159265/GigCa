@@ -14,15 +14,15 @@ Run from the repository root:
 
 ```bash
 python3 -m venv .venv
-.venv/bin/python -m etl.pipeline
+.venv/bin/python -m data.etl.pipeline
 ```
 
 The default command is offline. To refresh just the weather source through Open-Meteo's official Python client, install its optional dependencies into a repository virtual environment and pass `--refresh-weather`:
 
 ```bash
 python3 -m venv .venv
-.venv/bin/python -m pip install -r etl/requirements.txt
-.venv/bin/python -m etl.pipeline --refresh-weather
+.venv/bin/python -m pip install -r data/etl/requirements.txt
+.venv/bin/python -m data.etl.pipeline --refresh-weather
 ```
 
 Weather requests use a one-hour cache and retry transient errors. Pandas is not required. The POI and routing adapters remain sample-only until their live endpoints and fallback choices are verified.
@@ -30,7 +30,7 @@ Weather requests use a one-hour cache and retry transient errors. Pandas is not 
 Optional paths:
 
 ```bash
-.venv/bin/python -m etl.pipeline --samples-dir data/samples --output data/processed/engine_input_snapshot.json
+.venv/bin/python -m data.etl.pipeline --samples-dir data/samples --output data/processed/engine_input_snapshot.json
 ```
 
 The default output is ignored by Git because `data/processed/` is generated data. The pipeline is offline and does not call provider APIs. It marks an expired weather forecast as `stale`; it does not let old sample data look current just because a new ETL run was generated.
