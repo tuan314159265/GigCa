@@ -1,0 +1,315 @@
+{
+  "schema_version": "0.2-demo_simulation",
+  "snapshot_id": "hcmc_full_simulated_district1",
+  "generated_at": "2026-09-27T14:00:00+07:00",
+  "simulation_label": "Bộ dữ liệu mô phỏng hoàn chỉnh cả 4 lăng kính cho Decision Engine",
+  "data_status": [
+    {
+      "dataset": "weather",
+      "status": "available",
+      "reason": "Dự báo thời tiết chi tiết theo giờ (Open-Meteo mô phỏng)"
+    },
+    {
+      "dataset": "poi",
+      "status": "available",
+      "reason": "Dữ liệu địa điểm dừng nghỉ OSM đã kiểm tra danh mục"
+    },
+    {
+      "dataset": "routing",
+      "status": "available",
+      "reason": "Đồ thị định tuyến xe máy đã kiểm chứng cự ly và thời gian"
+    },
+    {
+      "dataset": "traffic",
+      "status": "available",
+      "reason": "Dữ liệu tốc độ lưu thông thời gian thực từ cảm biến đường phố"
+    },
+    {
+      "dataset": "road_incidents",
+      "status": "available",
+      "reason": "Không ghi nhận điểm đóng đường hoặc sự cố ngập úng"
+    },
+    {
+      "dataset": "verified_waiting_places",
+      "status": "available",
+      "reason": "Điểm dừng nghỉ đã xác minh thực địa quyền đỗ xe máy và giờ mở cửa"
+    },
+    {
+      "dataset": "vehicle_density",
+      "status": "available",
+      "reason": "Mật độ xe cạnh tranh trong ngưỡng cân bằng"
+    },
+    {
+      "dataset": "booking_and_destinations",
+      "status": "available",
+      "reason": "Phân bố điểm đến và tỷ lệ giữ vị trí trung tâm sau chuyến"
+    },
+    {
+      "dataset": "trip_value",
+      "status": "available",
+      "reason": "Giá cước bình quân và doanh thu ròng dự kiến theo từng khu vực"
+    }
+  ],
+  "objective_readiness": [
+    {
+      "objective": "max_trip_value",
+      "status": "available",
+      "blocking_datasets": [],
+      "reason": "Đã có dữ liệu giá cước và chỉ số nhu cầu để xếp hạng khu vực giá trị cao."
+    },
+    {
+      "objective": "maintain_position",
+      "status": "available",
+      "blocking_datasets": [],
+      "reason": "Đã có phân bố điểm đến để đánh giá khả năng giữ vị trí thuận lợi sau chuyến."
+    },
+    {
+      "objective": "rest_spot",
+      "status": "available",
+      "blocking_datasets": [],
+      "reason": "Đã xác minh thực địa quyền dừng đỗ xe máy và tiện ích điểm nghỉ."
+    },
+    {
+      "objective": "safety_comfort",
+      "status": "available",
+      "blocking_datasets": [],
+      "reason": "Đầy đủ forecast mưa và tốc độ lưu thông giao thông thực tế."
+    }
+  ],
+  "areas": [
+    {
+      "area_id": "area_ben_thanh_q1",
+      "area_name": "Khu vực Bến Thành - Phố Đi Bộ",
+      "spatial_scope": "polygon",
+      "representative_point": {
+        "latitude": 10.7725,
+        "longitude": 106.6980
+      },
+      "poi_counts_by_category": {
+        "amenity": 820,
+        "shop": 210,
+        "public_transport": 95
+      },
+      "trip_value": {
+        "gross_fare_vnd": 95000,
+        "net_value_vnd": 78000,
+        "avg_duration_min": 24,
+        "demand_index": 4.8
+      },
+      "destination_distribution": {
+        "favorable_dropoff_pct": 84.0,
+        "avg_next_wait_min": 5
+      },
+      "routing_samples": [
+        {
+          "destination_id": "poi_highlands_01",
+          "profile": "motorcycle_verified",
+          "route_distance_m": 510.0,
+          "route_duration_s": 70.0
+        },
+        {
+          "destination_id": "poi_trung_nguyen_02",
+          "profile": "motorcycle_verified",
+          "route_distance_m": 620.0,
+          "route_duration_s": 85.0
+        },
+        {
+          "destination_id": "poi_petrolimex_03",
+          "profile": "motorcycle_verified",
+          "route_distance_m": 850.0,
+          "route_duration_s": 115.0
+        },
+        {
+          "destination_id": "poi_parking_23_9_04",
+          "profile": "motorcycle_verified",
+          "route_distance_m": 420.0,
+          "route_duration_s": 60.0
+        }
+      ]
+    },
+    {
+      "area_id": "area_tan_dinh_q1",
+      "area_name": "Khu vực Chợ Tân Định - Hai Bà Trưng",
+      "spatial_scope": "polygon",
+      "representative_point": {
+        "latitude": 10.7890,
+        "longitude": 106.6910
+      },
+      "poi_counts_by_category": {
+        "amenity": 640,
+        "shop": 180,
+        "public_transport": 70
+      },
+      "trip_value": {
+        "gross_fare_vnd": 76000,
+        "net_value_vnd": 63000,
+        "avg_duration_min": 18,
+        "demand_index": 3.9
+      },
+      "destination_distribution": {
+        "favorable_dropoff_pct": 78.0,
+        "avg_next_wait_min": 8
+      },
+      "routing_samples": []
+    },
+    {
+      "area_id": "area_vo_thi_sau_q3",
+      "area_name": "Khu vực Hồ Con Rùa - Võ Thị Sáu",
+      "spatial_scope": "polygon",
+      "representative_point": {
+        "latitude": 10.7830,
+        "longitude": 106.6960
+      },
+      "poi_counts_by_category": {
+        "amenity": 512,
+        "shop": 140,
+        "public_transport": 65
+      },
+      "trip_value": {
+        "gross_fare_vnd": 68000,
+        "net_value_vnd": 56000,
+        "avg_duration_min": 16,
+        "demand_index": 3.5
+      },
+      "destination_distribution": {
+        "favorable_dropoff_pct": 72.0,
+        "avg_next_wait_min": 9
+      },
+      "routing_samples": []
+    },
+    {
+      "area_id": "area_hang_xanh_bt",
+      "area_name": "Khu vực Ngã Tư Hàng Xanh (Vùng ven)",
+      "spatial_scope": "polygon",
+      "representative_point": {
+        "latitude": 10.8010,
+        "longitude": 106.7110
+      },
+      "poi_counts_by_category": {
+        "amenity": 380,
+        "shop": 110,
+        "public_transport": 50
+      },
+      "trip_value": {
+        "gross_fare_vnd": 115000,
+        "net_value_vnd": 89000,
+        "avg_duration_min": 35,
+        "demand_index": 2.8
+      },
+      "destination_distribution": {
+        "favorable_dropoff_pct": 42.0,
+        "avg_next_wait_min": 18
+      },
+      "routing_samples": []
+    }
+  ],
+  "pois": [
+    {
+      "poi_id": "poi_highlands_01",
+      "name": "Highlands Coffee Nhà Thờ Đức Bà (Có bãi đỗ xe máy riêng)",
+      "latitude": 10.7798,
+      "longitude": 106.6990,
+      "category": "cafe",
+      "subcategory": "coffee_shop",
+      "verified": true,
+      "parking_allowed": true,
+      "opening_hours": "07:00 - 23:00",
+      "tags": {
+        "amenity": "cafe",
+        "brand": "Highlands Coffee",
+        "parking": "motorcycle_free"
+      }
+    },
+    {
+      "poi_id": "poi_trung_nguyen_02",
+      "name": "Cà phê Trung Nguyên Legend Lê Duẩn (Có chỗ nghỉ & sạc điện thoại)",
+      "latitude": 10.7785,
+      "longitude": 106.6980,
+      "category": "cafe",
+      "subcategory": "coffee_shop",
+      "verified": true,
+      "parking_allowed": true,
+      "opening_hours": "06:30 - 22:30",
+      "tags": {
+        "amenity": "cafe",
+        "brand": "Trung Nguyên",
+        "parking": "motorcycle"
+      }
+    },
+    {
+      "poi_id": "poi_parking_23_9_04",
+      "name": "Bãi giữ xe Công viên 23/9 (Có mái che mưa & bảo vệ)",
+      "latitude": 10.7695,
+      "longitude": 106.6935,
+      "category": "parking",
+      "subcategory": "motorcycle_parking",
+      "verified": true,
+      "parking_allowed": true,
+      "opening_hours": "05:00 - 23:30",
+      "tags": {
+        "amenity": "parking",
+        "shelter": "yes"
+      }
+    },
+    {
+      "poi_id": "poi_petrolimex_03",
+      "name": "Cây xăng Petrolimex Số 1 Nguyễn Thị Minh Khai (Có bơm lốp & WC miễn phí)",
+      "latitude": 10.7810,
+      "longitude": 106.7020,
+      "category": "gas_station",
+      "subcategory": "fuel",
+      "verified": true,
+      "parking_allowed": true,
+      "opening_hours": "24/7",
+      "tags": {
+        "amenity": "fuel",
+        "toilets": "free"
+      }
+    }
+  ],
+  "traffic": [
+    {
+      "edge_id": "edge_le_duan_01",
+      "current_speed_kmh": 32.5,
+      "free_flow_speed_kmh": 35.0,
+      "congestion_level": "thong_thoang",
+      "observed_at": "2026-09-27T14:00:00+07:00"
+    },
+    {
+      "edge_id": "edge_dong_khoi_02",
+      "current_speed_kmh": 28.0,
+      "free_flow_speed_kmh": 30.0,
+      "congestion_level": "thong_thoang",
+      "observed_at": "2026-09-27T14:00:00+07:00"
+    }
+  ],
+  "weather": {
+    "hourly": [
+      {
+        "valid_time": "2026-09-27T14:00",
+        "precipitation_mm": 0.0,
+        "precipitation_probability_pct": 20.0
+      },
+      {
+        "valid_time": "2026-09-27T15:00",
+        "precipitation_mm": 0.3,
+        "precipitation_probability_pct": 45.0
+      },
+      {
+        "valid_time": "2026-09-27T16:00",
+        "precipitation_mm": 2.5,
+        "precipitation_probability_pct": 80.0
+      },
+      {
+        "valid_time": "2026-09-27T17:00",
+        "precipitation_mm": 3.8,
+        "precipitation_probability_pct": 95.0
+      },
+      {
+        "valid_time": "2026-09-27T18:00",
+        "precipitation_mm": 1.2,
+        "precipitation_probability_pct": 65.0
+      }
+    ]
+  }
+}

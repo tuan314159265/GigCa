@@ -1,0 +1,163 @@
+{
+  "rest_categories": [
+    "cafe",
+    "gas_station",
+    "parking",
+    "rest_area",
+    "toilet"
+  ],
+  "rain_tolerance_thresholds": {
+    "low": {
+      "prob_pct": 30.0,
+      "mm": 0.5,
+      "note": "Đề xuất tạm — chưa hiệu chỉnh"
+    },
+    "medium": {
+      "prob_pct": 55.0,
+      "mm": 2.0,
+      "note": "Đề xuất tạm — chưa hiệu chỉnh"
+    },
+    "high": {
+      "prob_pct": 75.0,
+      "mm": 5.0,
+      "note": "Đề xuất tạm — chưa hiệu chỉnh"
+    }
+  },
+  "objective_data_dependencies": {
+    "max_trip_value": [
+      "trip_value",
+      "booking_and_destinations"
+    ],
+    "maintain_position": [
+      "booking_and_destinations",
+      "routing"
+    ],
+    "rest_spot": [
+      "poi",
+      "verified_waiting_places"
+    ],
+    "safety_comfort": [
+      "weather",
+      "traffic"
+    ]
+  },
+  "time": {
+    "local_utc_offset_minutes": 420,
+    "note": "valid_time của Open-Meteo là giờ địa phương Asia/Ho_Chi_Minh (UTC+7); dùng khi chuỗi thời gian không kèm múi giờ"
+  },
+  "geo": {
+    "detour_factor": 1.3,
+    "reposition_speed_kmh": 20.0,
+    "reposition_cost_vnd_per_km": 2000,
+    "at_area_radius_m": 500,
+    "note": "Đề xuất tạm — chưa hiệu chỉnh. Chỉ dùng để ước tính chi phí/thời gian dịch chuyển từ đường chim bay; không phải cự ly routing thật"
+  },
+  "routing": {
+    "origin_tolerance_m": 800,
+    "note": "Route mẫu chỉ được dùng nếu điểm xuất phát của route (điểm đại diện khu vực) cách tài xế không quá ngưỡng này. Đề xuất tạm"
+  },
+  "weather": {
+    "area_scope_km": 5.0,
+    "pre_rain_buffer_min": 15,
+    "min_coverage_ratio": 0.5,
+    "heavy_mm_ratio": 1.5,
+    "note": "Đề xuất tạm. slot_convention: preceding_hour = giá trị tại valid_time T mô tả giờ (T-1h, T] theo docs/06_DATA_CATALOG (Open-Meteo hourly); following_hour = [T, T+1h). heavy_mm_ratio: lượng mưa gấp bao nhiêu lần ngưỡng mm của mức chịu mưa thì gọi là mưa lớn",
+    "slot_convention": "preceding_hour"
+  },
+  "traffic": {
+    "smooth_ratio": 0.8,
+    "congested_ratio": 0.5,
+    "max_age_min": 30,
+    "note": "Đề xuất tạm. ratio = current_speed / free_flow_speed; edge quá cũ (observed_at) bị loại"
+  },
+  "max_trip_value": {
+    "trip_accept_ratio": 0.8,
+    "max_wait_min": 20,
+    "note": "Đề xuất tạm. trip_accept_ratio: chỉ nên nhận cuốc có cước ròng >= tỷ lệ này x cước ròng bình quân của khu vực"
+  },
+  "maintain_position": {
+    "wait_penalty_per_min": 1.5,
+    "reposition_penalty_per_km": 2.0,
+    "note": "Đề xuất tạm. Điểm 0-100, cao hơn = tốt hơn: favorable_dropoff_pct - phạt chờ - phạt dịch chuyển"
+  },
+  "rest_spot": {
+    "max_candidates": 5,
+    "weights": {
+      "travel_time": 0.6,
+      "category_fit": 0.4
+    },
+    "travel_time_ref_s": 600,
+    "long_idle_min": 25,
+    "category_fit_long_idle": {
+      "cafe": 1.0,
+      "rest_area": 1.0,
+      "parking": 0.8,
+      "toilet": 0.5,
+      "gas_station": 0.5
+    },
+    "category_fit_short_idle": {
+      "gas_station": 1.0,
+      "toilet": 1.0,
+      "cafe": 0.8,
+      "rest_area": 0.8,
+      "parking": 0.6
+    },
+    "tier_cutoffs": {
+      "toi_uu": 0.75,
+      "kha": 0.5
+    },
+    "rest_duration_min_by_idle": [
+      {
+        "idle_ge": 0,
+        "rest_min": 15
+      },
+      {
+        "idle_ge": 25,
+        "rest_min": 25
+      },
+      {
+        "idle_ge": 45,
+        "rest_min": 30
+      }
+    ],
+    "note": "Đề xuất tạm — chưa hiệu chỉnh. fit_score 0-1, cao hơn = phù hợp hơn; POI đã xác minh luôn xếp trên POI chưa xác minh",
+    "category_aliases": {
+      "fuel": "gas_station",
+      "toilets": "toilet",
+      "motorcycle_parking": "parking",
+      "coffee_shop": "cafe",
+      "rest": "rest_area"
+    },
+    "amenity_tags": {
+      "cafe": [
+        "có_chỗ_ngồi",
+        "đồ_uống_nghỉ_ngơi"
+      ],
+      "parking": [
+        "bãi_đỗ_xe_máy"
+      ],
+      "toilet": [
+        "vệ_sinh_công_cộng"
+      ],
+      "gas_station": [
+        "nạp_nhiên_liệu",
+        "dừng_chân_nhanh"
+      ],
+      "rest_area": [
+        "điểm_nghỉ_chân"
+      ]
+    }
+  },
+  "robustness": {
+    "perturbation_pct": 20.0,
+    "top1_share_min": 0.8,
+    "tie_margin_pct": 5.0,
+    "note": "Kiểm tra độ vững: dao động từng tham số giả định ±perturbation_pct, xem hạng 1 có đổi không"
+  },
+  "priority": {
+    "rain_lead_min": 45,
+    "fatigue_idle_min": 45,
+    "note": "Đề xuất tạm. Dùng để SẮP THỨ TỰ 4 hướng, không gộp thành điểm tổng"
+  },
+  "final_note": "Đây là gợi ý dựa trên dữ liệu hiện có, không phải quyết định thay bạn — hãy tự kiểm tra trước khi hành động, đặc biệt với các mục còn đang thiếu dữ liệu."
+}
