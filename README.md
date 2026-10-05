@@ -13,7 +13,7 @@ GigCa hỗ trợ tài xế chọn khu vực nên chờ hoặc nghỉ dựa trên
 
 Chi tiết cấu trúc, quy ước, API và schema nằm trong [`RULES.md`](RULES.md) và [`docs/`](docs/).
 
-Data dictionary và hướng dẫn bàn giao cho Decision Engine nằm trong [`data/README.md`](data/README.md); contract draft ở [`contracts/engine_input.schema.json`](contracts/engine_input.schema.json). Danh sách nguồn chờ kiểm chứng nằm trong `docs/05_DATA_SOURCES_TO_VERIFY.md`. Có thể tạo/cập nhật JSON mẫu bằng `python3 scripts/fetch_sample_data.py`; mục lục file mẫu ở [`data/samples/README.md`](data/samples/README.md).
+Data dictionary và hướng dẫn bàn giao cho Decision Engine nằm trong [`data/README.md`](data/README.md); tài liệu giải thích chi tiết kiến trúc và code Decision Engine nằm trong [`engine/README.md`](engine/README.md); contract draft ở [`contracts/engine_input.schema.json`](contracts/engine_input.schema.json). Danh sách nguồn chờ kiểm chứng nằm trong `docs/05_DATA_SOURCES_TO_VERIFY.md`. Có thể tạo/cập nhật JSON mẫu bằng `python3 scripts/fetch_sample_data.py`; mục lục file mẫu ở [`data/samples/README.md`](data/samples/README.md).
 
 ## Bắt đầu
 
