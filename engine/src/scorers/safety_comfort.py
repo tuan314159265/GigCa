@@ -223,6 +223,11 @@ def score_safety_comfort(
             "forecast_coverage_pct": round(wa.coverage_ratio * 100),
             "traffic_speed_kmh": None if ta.mean_speed_kmh is None else round(ta.mean_speed_kmh, 1),
             "traffic_mean_ratio": None if ta.mean_ratio is None else round(ta.mean_ratio, 2),
+            "traffic_congestion_index_mean": (
+                None if ta.mean_congestion_index is None else round(ta.mean_congestion_index, 3)
+            ),
+            "traffic_congestion_index_aggregation": ta.congestion_index_aggregation,
+            "traffic_segments_by_congestion": ta.details,
             "traffic_edges_used": ta.used_edges,
         },
         trade_offs=(

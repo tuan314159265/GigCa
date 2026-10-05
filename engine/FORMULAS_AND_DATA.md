@@ -198,18 +198,26 @@ So sánh dự báo từng giờ với mức chịu đựng cá nhân của tài 
 Một đoạn đường (`traffic_edge`) chỉ được xem là hợp lệ nếu độ trễ dữ liệu:
 $$\text{age\_min} = \frac{\text{now\_local} - \text{edge.timestamp}}{60} \le \text{max\_age\_min} \quad (\text{mặc định } 30\text{ phút})$$
 
-#### B. Phân loại trạng thái lưu thông
-Dựa trên tỷ số tốc độ lưu thông thực tế so với tốc độ tự do:
+#### B. Chỉ số ùn tắc liên tục và nhãn hiển thị
+Dữ liệu gốc là tốc độ số, không phải nhãn one-hot. Engine tính tỷ số và chỉ số CI trên từng đoạn:
 $$\text{Speed Ratio} = \frac{v_{\text{current}}}{v_{\text{free\_flow}}}$$
 
-* **Hành lang thông thoáng (`smooth`):** $\text{Speed Ratio} \ge 0.8$ (hoặc vận tốc $v_{\text{current}} \ge 25.0\text{ km/h}$).
+$$\text{CI} = \max\left(0, \frac{v_{\text{free\_flow}} - v_{\text{current}}}{v_{\text{free\_flow}}}\right)$$
+
+CI nằm trong [0, 1] với tốc độ hợp lệ; CI là `None` nếu thiếu tốc độ hoặc tốc độ tự do không dương. CI trung bình được tính theo chiều dài nếu mọi đoạn có `length_m` hợp lệ; nếu không, Engine báo rõ `segment_mean` (trung bình đều theo đoạn). Engine xuất CI trung bình và danh sách `traffic_segments_by_congestion` được xếp theo CI giảm dần trong `key_metrics`.
+
+Nhãn chỉ là phần diễn giải cho người dùng, không thay dữ liệu liên tục. Các ngưỡng hiện tại vẫn là cấu hình ban đầu, chưa được hiệu chỉnh theo dữ liệu TP.HCM:
+
+* **Hành lang thông thoáng (`smooth`):** $\text{Speed Ratio} \ge 0.8$.
 * **Lưu thông chậm (`slow`):** $0.5 \le \text{Speed Ratio} < 0.8$.
 * **Điểm đen ùn tắc (`congested`):** $\text{Speed Ratio} < 0.5$.
 
+Các nhãn trên không khẳng định toàn khu vực hoặc tuyến đường bị ùn tắc. Khi dữ liệu chỉ có provider segment chưa map-match, chỉ diễn giải đúng các segment đã quan sát; CI không phải mật độ xe.
+
 ### 6.3. Ma Trận Kết Hợp An Toàn
-Engine tạo ra 2 danh sách hành động hiển thị trên bản đồ kế hoạch:
-* **Hành lang an toàn (`safe_corridors`):** Tập hợp các trục đường thuộc nhóm `smooth` $\rightarrow$ Điều hướng tài xế di chuyển trên các trục này để giữ đều ga, tiết kiệm xăng, giảm mỏi côn/thắng.
-* **Vùng/Đoạn cần né (`avoid_zones`):** Tập hợp các đoạn đường thuộc nhóm `congested` + `slow` VÀ khung thời gian mưa dông đạt đỉnh.
+Engine tạo các danh sách diễn giải để Backend/Frontend hiển thị, không tính lại tuyến đi:
+* **Các segment có tốc độ gần tự do (`safe_corridors`):** Segment được gắn nhãn `smooth` theo ngưỡng cấu hình. Đây là quan sát giao thông, không phải cam kết tuyến đường an toàn hay lệnh điều hướng.
+* **Các segment có tốc độ giảm (`avoid_zones`):** Segment được gắn nhãn `congested` hoặc `slow` theo ngưỡng cấu hình, cộng với khung mưa vượt ngưỡng nếu có. `traffic_segments_by_congestion` giữ CI số liên tục để hệ thống sắp xếp và giải thích mức độ thay vì chỉ còn nhãn.
 
 ---
 

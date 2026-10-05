@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 import re
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -25,6 +26,8 @@ class TrafficAnalysis:
     congested: list[str] = field(default_factory=list)
     mean_speed_kmh: float | None = None
     mean_ratio: float | None = None
+    mean_congestion_index: float | None = None
+    congestion_index_aggregation: str | None = None
     newest_age_min: int | None = None
     details: list[dict[str, Any]] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
@@ -36,6 +39,24 @@ def edge_label(edge_id: str) -> str:
     core = re.sub(r"[_\-]?\d+$", "", core)
     core = core.replace("_", " ").replace("-", " ").strip()
     return core.title() if core else edge_id
+
+
+def calculate_congestion_index(
+    current_speed_kmh: float | None,
+    free_flow_speed_kmh: float | None,
+) -> float | None:
+    """Return a continuous speed-based congestion index in [0, 1].
+
+    The index is unavailable when either speed is missing/invalid. Speeds above
+    the free-flow reference are treated as no measured congestion (CI = 0).
+    """
+    if current_speed_kmh is None or free_flow_speed_kmh is None:
+        return None
+    current = float(current_speed_kmh)
+    free_flow = float(free_flow_speed_kmh)
+    if not math.isfinite(current) or not math.isfinite(free_flow) or current < 0 or free_flow <= 0:
+        return None
+    return max(0.0, min(1.0, (free_flow - current) / free_flow))
 
 
 def analyze_traffic(
@@ -52,6 +73,7 @@ def analyze_traffic(
     details: list[dict[str, Any]] = []
     speeds: list[tuple[float, float | None]] = []
     ratios: list[float] = []
+    congestion_indices: list[tuple[float, float | None]] = []
     stale = unusable = undated = 0
     ages: list[int] = []
     for e in edges:
@@ -66,10 +88,12 @@ def analyze_traffic(
             ages.append(max(0, int(age)))
 
         ratio = None
+        congestion_index = None
         cls = None
         cs, ff = e.current_speed_kmh, e.free_flow_speed_kmh
         if cs is not None and ff is not None and ff > 0 and cs >= 0:
             ratio = cs / ff
+            congestion_index = calculate_congestion_index(cs, ff)
             cls = "smooth" if ratio >= cfg["smooth_ratio"] else ("congested" if ratio < cfg["congested_ratio"] else "slow")
         elif e.congestion_level in _LABEL_CLASS:
             cls = _LABEL_CLASS[e.congestion_level]
@@ -82,8 +106,16 @@ def analyze_traffic(
             speeds.append((float(cs), e.length_m))
         if ratio is not None:
             ratios.append(ratio)
+        if congestion_index is not None:
+            congestion_indices.append((congestion_index, e.length_m))
         details.append(
-            {"edge_id": e.edge_id, "class": cls, "ratio": None if ratio is None else round(ratio, 2), "speed_kmh": cs}
+            {
+                "edge_id": e.edge_id,
+                "class": cls,
+                "ratio": None if ratio is None else round(ratio, 2),
+                "congestion_index": None if congestion_index is None else round(congestion_index, 3),
+                "speed_kmh": cs,
+            }
         )
 
     used = len(details)
@@ -94,6 +126,27 @@ def analyze_traffic(
             mean_speed = sum(v * l for v, l in speeds) / total  # type: ignore[operator]
         else:
             mean_speed = sum(v for v, _ in speeds) / len(speeds)
+    mean_ci = None
+    ci_aggregation = None
+    if congestion_indices:
+        if all(length is not None and length > 0 for _, length in congestion_indices):
+            total_length = sum(length for _, length in congestion_indices if length is not None)
+            mean_ci = (
+                sum(index * length for index, length in congestion_indices if length is not None)
+                / total_length
+            )
+            ci_aggregation = "length_weighted"
+        else:
+            mean_ci = sum(index for index, _ in congestion_indices) / len(congestion_indices)
+            ci_aggregation = "segment_mean"
+    ranked_details = sorted(
+        details,
+        key=lambda item: (
+            item["congestion_index"] is None,
+            -(item["congestion_index"] or 0.0),
+            item["edge_id"],
+        ),
+    )
     warnings: list[str] = []
     if stale:
         warnings.append(f"Giao thông: loại {stale} đoạn quá cũ (> {cfg['max_age_min']} phút)")
@@ -112,7 +165,9 @@ def analyze_traffic(
         congested=sorted(cong),
         mean_speed_kmh=mean_speed,
         mean_ratio=(sum(ratios) / len(ratios)) if ratios else None,
+        mean_congestion_index=mean_ci,
+        congestion_index_aggregation=ci_aggregation,
         newest_age_min=min(ages) if ages else None,
-        details=details,
+        details=ranked_details,
         warnings=warnings,
     )
