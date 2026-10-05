@@ -1,0 +1,5482 @@
+{
+  "schema_version": "1.0",
+  "dataset_id": "gigca_hcmc_demo_osm_poi_spatial_context",
+  "generated_at": "2026-10-02T12:02:01+00:00",
+  "coverage": {
+    "center": {
+      "latitude": 10.7769,
+      "longitude": 106.7009
+    },
+    "bbox": {
+      "south": 10.767856282670428,
+      "west": 106.69175560599072,
+      "north": 10.785943717329571,
+      "east": 106.71004439400929
+    },
+    "half_width_m": 1000,
+    "shape": "circle",
+    "cell_size_m": 250,
+    "cell_count": 32,
+    "poi_element_count": 284,
+    "cafe_count": 230,
+    "waiting_candidate_count": 54,
+    "minimum_open_area_candidate_m2": 2500
+  },
+  "source_generated_at": "2026-09-26T10:20:30+00:00",
+  "source": {
+    "provider": "OpenStreetMap via Overpass API",
+    "endpoint": "https://overpass-api.de/api/interpreter",
+    "documentation": "https://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide",
+    "license": "Open Database License (ODbL) 1.0",
+    "attribution": "© OpenStreetMap contributors",
+    "query": "[out:json][timeout:45];\n(\n  node(around:1000,10.7769,106.7009)[\"amenity\"~\"^(cafe|restaurant|fast_food|food_court|toilets|bench|shelter|parking|fuel|bus_station)$\"];\n  node(around:1000,10.7769,106.7009)[\"shop\"~\"^(convenience|supermarket|mall)$\"];\n  node(around:1000,10.7769,106.7009)[\"public_transport\"~\"^(platform|station)$\"];\n  way(around:1000,10.7769,106.7009)[\"amenity\"~\"^(cafe|restaurant|fast_food|food_court|toilets|bench|shelter|parking|fuel|bus_station)$\"];\n  way(around:1000,10.7769,106.7009)[\"shop\"~\"^(convenience|supermarket|mall)$\"];\n  way(around:1000,10.7769,106.7009)[\"public_transport\"~\"^(platform|station)$\"];\n  relation(around:1000,10.7769,106.7009)[\"amenity\"~\"^(cafe|restaurant|fast_food|food_court|toilets|bench|shelter|parking|fuel|bus_station)$\"];\n  relation(around:1000,10.7769,106.7009)[\"shop\"~\"^(convenience|supermarket|mall)$\"];\n  relation(around:1000,10.7769,106.7009)[\"public_transport\"~\"^(platform|station)$\"];\n);\nout center tags;",
+    "result_count": 920,
+    "point_note": "Way/relation coordinates use the bounding-box center and are approximate, not entrances or legal stopping locations.",
+    "derivation": "Normalized from osm_overpass_pois_hcmc.json; source sample generated at 2026-09-26T10:20:30+00:00.",
+    "scope": "Existing circular POI sample; cells are retained only when fully inside its source radius."
+  },
+  "pois": [
+    {
+      "candidate_id": "osm_node_4151397889",
+      "osm_type": "node",
+      "osm_id": 4151397889,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7762035,
+      "longitude": 106.6921817,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4292856296",
+      "osm_type": "node",
+      "osm_id": 4292856296,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.773525,
+      "longitude": 106.70642,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4358645292",
+      "osm_type": "node",
+      "osm_id": 4358645292,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7743456,
+      "longitude": 106.7039054,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "96",
+        "addr:postcode": "70000",
+        "addr:street": "Mạc Thị Bưởi",
+        "amenity": "cafe",
+        "email": "mtb96@caferunam.com",
+        "name:en": "Café Runam",
+        "name:zh": "網友推薦超美咖啡廳",
+        "opening_hours": "Mo-Su 07:00-23:00",
+        "phone": "+84838258883",
+        "website": "https://www.caferunam.com/"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4423818692",
+      "osm_type": "node",
+      "osm_id": 4423818692,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7750614,
+      "longitude": 106.6974194,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4607172689",
+      "osm_type": "node",
+      "osm_id": 4607172689,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7745646,
+      "longitude": 106.7053421,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:street": "Hồ Huấn Nghiệp",
+        "amenity": "cafe",
+        "internet_access": "wlan",
+        "name:de": "Shin Coffe",
+        "name:en": "Shin Coffee"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4676760690",
+      "osm_type": "node",
+      "osm_id": 4676760690,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7702399,
+      "longitude": 106.70391,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "77B",
+        "amenity": "cafe",
+        "name:en": "La Rotonde",
+        "name:fr": "La Rotonde"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4716460189",
+      "osm_type": "node",
+      "osm_id": 4716460189,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7690558,
+      "longitude": 106.6968165,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "internet_access": "wlan",
+        "name:en": "Sainte Coffee"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4796572365",
+      "osm_type": "node",
+      "osm_id": 4796572365,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7776417,
+      "longitude": 106.6989508,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name:en": "Loft Café"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4796610621",
+      "osm_type": "node",
+      "osm_id": 4796610621,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7795226,
+      "longitude": 106.7046835,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name:en": "Vietnam Coffee Republic"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4801502023",
+      "osm_type": "node",
+      "osm_id": 4801502023,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7727598,
+      "longitude": 106.7017634,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "94E",
+        "addr:street": "Đường Pasteur",
+        "amenity": "cafe",
+        "name:en": "E-Paso Coffee"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4853550621",
+      "osm_type": "node",
+      "osm_id": 4853550621,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7720623,
+      "longitude": 106.7020827,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name:en": "Homefood Market und Bistro"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4881292621",
+      "osm_type": "node",
+      "osm_id": 4881292621,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7724172,
+      "longitude": 106.7037256,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "99",
+        "addr:street": "Hồ Tùng Mậu",
+        "amenity": "cafe",
+        "name:en": "Rio Coffee"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5134726839",
+      "osm_type": "node",
+      "osm_id": 5134726839,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7725293,
+      "longitude": 106.7045671,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "source": "Mapillary"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5246991828",
+      "osm_type": "node",
+      "osm_id": 5246991828,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7716734,
+      "longitude": 106.6976178,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "cuisine": "coffee_shop",
+        "name:en": "Shin Coffee"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5247153224",
+      "osm_type": "node",
+      "osm_id": 5247153224,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7746511,
+      "longitude": 106.7054606,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name:en": "Bason Café"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5247155226",
+      "osm_type": "node",
+      "osm_id": 5247155226,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7694493,
+      "longitude": 106.6998703,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name:en": "The Art Café"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5295237121",
+      "osm_type": "node",
+      "osm_id": 5295237121,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7740732,
+      "longitude": 106.70411,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "42/25",
+        "addr:street": "Nguyễn Huệ",
+        "amenity": "cafe",
+        "name:en": "Poke Saigon"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5307861921",
+      "osm_type": "node",
+      "osm_id": 5307861921,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7749924,
+      "longitude": 106.7005975,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "63/11 Floor 3",
+        "addr:street": "Đường Pasteur",
+        "amenity": "cafe",
+        "name:en": "The Old Compass Cafe and Bar"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5314379122",
+      "osm_type": "node",
+      "osm_id": 5314379122,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7740746,
+      "longitude": 106.7041377,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name:en": "Cafés & Boutiques"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5469236221",
+      "osm_type": "node",
+      "osm_id": 5469236221,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7789519,
+      "longitude": 106.6983631,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "7",
+        "addr:postcode": "700000",
+        "addr:street": "Hàn Thuyên",
+        "amenity": "cafe",
+        "cuisine": "vietnamese",
+        "internet_access": "wlan",
+        "name:en": "Ms. Coffee",
+        "opening_hours": "Mo-Su 07:00-23:30"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5474894122",
+      "osm_type": "node",
+      "osm_id": 5474894122,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7823266,
+      "longitude": 106.7040483,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:city": "Thành Phố Hồ Chí Minh",
+        "addr:district": "Quận 1",
+        "addr:housenumber": "13",
+        "addr:street": "Chu Mạnh Trinh",
+        "addr:subdistrict": "Bến Nghé",
+        "amenity": "cafe",
+        "cuisine": "coffee_shop;coffee;tea_shop;teahouse",
+        "internet_access": "yes",
+        "name:en": "Early Morning Coffee & Tea",
+        "opening_hours": "Mo-Su 07:00-23:00",
+        "website": "https://earlymorning.vn/"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5749070126",
+      "osm_type": "node",
+      "osm_id": 5749070126,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7690599,
+      "longitude": 106.6995532,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name:en": "Chè Lâm Vinh Mậu"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5796368453",
+      "osm_type": "node",
+      "osm_id": 5796368453,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7782363,
+      "longitude": 106.7008592,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name:en": "Loft Café"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5808530355",
+      "osm_type": "node",
+      "osm_id": 5808530355,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7689938,
+      "longitude": 106.7019551,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name:en": "Café Hao"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6154722185",
+      "osm_type": "node",
+      "osm_id": 6154722185,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7748219,
+      "longitude": 106.7010571,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name:en": "Thinker&Dreamer Coffee"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6154761085",
+      "osm_type": "node",
+      "osm_id": 6154761085,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7696693,
+      "longitude": 106.6975354,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name:en": "Saigon Coffee Roastery 2"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6157680485",
+      "osm_type": "node",
+      "osm_id": 6157680485,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7722807,
+      "longitude": 106.7042344,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name:en": "Drago Specialty Coffee"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6163473286",
+      "osm_type": "node",
+      "osm_id": 6163473286,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7850981,
+      "longitude": 106.7000494,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name:en": "Phin & Bean Roastery"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6264068186",
+      "osm_type": "node",
+      "osm_id": 6264068186,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7724829,
+      "longitude": 106.6996017,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name:en": "Saigon Steak 123"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6315288820",
+      "osm_type": "node",
+      "osm_id": 6315288820,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.769934,
+      "longitude": 106.7005826,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name:en": "Antique Coffee"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6315351591",
+      "osm_type": "node",
+      "osm_id": 6315351591,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7739893,
+      "longitude": 106.6990368,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name:en": "Lounge"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6315352816",
+      "osm_type": "node",
+      "osm_id": 6315352816,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7772485,
+      "longitude": 106.6984262,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6315672482",
+      "osm_type": "node",
+      "osm_id": 6315672482,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7854925,
+      "longitude": 106.6987911,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name:en": "Time Coffee"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6315672838",
+      "osm_type": "node",
+      "osm_id": 6315672838,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7851909,
+      "longitude": 106.6989513,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name:en": "Coffee Factory"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6315672846",
+      "osm_type": "node",
+      "osm_id": 6315672846,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7770456,
+      "longitude": 106.7001164,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6315673285",
+      "osm_type": "node",
+      "osm_id": 6315673285,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7684206,
+      "longitude": 106.6989519,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name:en": "Kai"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6315680999",
+      "osm_type": "node",
+      "osm_id": 6315680999,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7711352,
+      "longitude": 106.7027073,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "104",
+        "addr:street": "Đường Hàm Nghi",
+        "amenity": "cafe"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6315688886",
+      "osm_type": "node",
+      "osm_id": 6315688886,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7706208,
+      "longitude": 106.7036069,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6318125505",
+      "osm_type": "node",
+      "osm_id": 6318125505,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7694513,
+      "longitude": 106.7024126,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name:en": "Tabak"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6318161308",
+      "osm_type": "node",
+      "osm_id": 6318161308,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7730326,
+      "longitude": 106.7034137,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name:en": "Saigon Garden"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6346784186",
+      "osm_type": "node",
+      "osm_id": 6346784186,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7744347,
+      "longitude": 106.6984912,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "27",
+        "addr:street": "Nguyễn Trung Trực",
+        "amenity": "cafe",
+        "name:en": "Scarab Saigon"
+      }
+    },
+    {
+      "candidate_id": "osm_node_7244299685",
+      "osm_type": "node",
+      "osm_id": 7244299685,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7764282,
+      "longitude": 106.7066432,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name:en": "Egg Coffe"
+      }
+    },
+    {
+      "candidate_id": "osm_node_7293635485",
+      "osm_type": "node",
+      "osm_id": 7293635485,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7724991,
+      "longitude": 106.6973312,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "internet_access": "wlan",
+        "name:en": "Trung Nguyen Legend"
+      }
+    },
+    {
+      "candidate_id": "osm_node_10232377317",
+      "osm_type": "node",
+      "osm_id": 10232377317,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7695039,
+      "longitude": 106.6961547,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "check_date": "2025-05-02",
+        "internet_access": "wlan",
+        "internet_access:fee": "customers",
+        "name:en": "little hanoi egg coffee"
+      }
+    },
+    {
+      "candidate_id": "osm_node_13651492302",
+      "osm_type": "node",
+      "osm_id": 13651492302,
+      "name": null,
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7746868,
+      "longitude": 106.6961306,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe"
+      }
+    },
+    {
+      "candidate_id": "osm_node_12218545669",
+      "osm_type": "node",
+      "osm_id": 12218545669,
+      "name": "139 Coffee & Tea",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7707988,
+      "longitude": 106.7001322,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:city": "Thành phố Hồ Chí Minh",
+        "addr:district": "Quận 1",
+        "addr:housenumber": "139",
+        "addr:street": "Hàm Nghi",
+        "addr:subdistrict": "Phường Nguyễn Thái Bình",
+        "amenity": "cafe",
+        "cuisine": "coffee_shop",
+        "name": "139 Coffee & Tea"
+      }
+    },
+    {
+      "candidate_id": "osm_node_10736277207",
+      "osm_type": "node",
+      "osm_id": 10736277207,
+      "name": "365 Chay",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7693971,
+      "longitude": 106.6972643,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "26",
+        "addr:street": "Đặng Thị Nhu, District 1, Ho Chi Minh City, Vietnam",
+        "amenity": "cafe",
+        "diet:vegan": "yes",
+        "name": "365 Chay",
+        "opening_hours": "Mo-Su 07:00-22:00",
+        "phone": "+84923183183"
+      }
+    },
+    {
+      "candidate_id": "osm_node_12414857401",
+      "osm_type": "node",
+      "osm_id": 12414857401,
+      "name": "Bagel Brothers",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7698526,
+      "longitude": 106.6963743,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Bagel Brothers"
+      }
+    },
+    {
+      "candidate_id": "osm_node_11491076669",
+      "osm_type": "node",
+      "osm_id": 11491076669,
+      "name": "Bún riêu ganh",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7739063,
+      "longitude": 106.698934,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Bún riêu ganh"
+      }
+    },
+    {
+      "candidate_id": "osm_node_13664113301",
+      "osm_type": "node",
+      "osm_id": 13664113301,
+      "name": "Cafe Haru",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7696056,
+      "longitude": 106.7041826,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "14",
+        "addr:street": "Tôn Thất Ðạm",
+        "amenity": "cafe",
+        "name": "Cafe Haru"
+      }
+    },
+    {
+      "candidate_id": "osm_node_11056054205",
+      "osm_type": "node",
+      "osm_id": 11056054205,
+      "name": "Café 30/4",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7765828,
+      "longitude": 106.696011,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "internet_access": "wlan",
+        "name": "Café 30/4"
+      }
+    },
+    {
+      "candidate_id": "osm_node_11078288705",
+      "osm_type": "node",
+      "osm_id": 11078288705,
+      "name": "Cafés Le",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.774285,
+      "longitude": 106.6986867,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cafés Le"
+      }
+    },
+    {
+      "candidate_id": "osm_node_2176976131",
+      "osm_type": "node",
+      "osm_id": 2176976131,
+      "name": "Central Parc Bánh Mì",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7787487,
+      "longitude": 106.6985432,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:city": "Thành phố Hồ Chí Minh",
+        "addr:district": "Quận 1",
+        "addr:street": "Pasteur",
+        "amenity": "cafe",
+        "name": "Central Parc Bánh Mì",
+        "phone": "3822 8549"
+      }
+    },
+    {
+      "candidate_id": "osm_way_193268178",
+      "osm_type": "way",
+      "osm_id": 193268178,
+      "name": "Cheese Coffee - Đinh Tiên Hoàng",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.785829,
+      "longitude": 106.7021587,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "building": "yes",
+        "name": "Cheese Coffee - Đinh Tiên Hoàng"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1770597603",
+      "osm_type": "node",
+      "osm_id": 1770597603,
+      "name": "Cà Phê 30-4",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7761438,
+      "longitude": 106.6946963,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:street": "Huyền Trân Công Chúa",
+        "amenity": "cafe",
+        "name": "Cà Phê 30-4",
+        "phone": "08085413"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1770193890",
+      "osm_type": "node",
+      "osm_id": 1770193890,
+      "name": "Cà Phê 4A",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.781379,
+      "longitude": 106.697592,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê 4A"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6154749389",
+      "osm_type": "node",
+      "osm_id": 6154749389,
+      "name": "Cà Phê Amazing",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7732655,
+      "longitude": 106.6990709,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê Amazing",
+        "name:en": "Amazing Coffee"
+      }
+    },
+    {
+      "candidate_id": "osm_node_2674331004",
+      "osm_type": "node",
+      "osm_id": 2674331004,
+      "name": "Cà Phê Anh Phán",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7690065,
+      "longitude": 106.6992927,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "60",
+        "addr:street": "Đường Nguyễn Thái Bình",
+        "amenity": "cafe",
+        "cuisine": "juice",
+        "name": "Cà Phê Anh Phán",
+        "name:de": "Anh Phán",
+        "outdoor_seating": "yes",
+        "smoking": "yes",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1407135685",
+      "osm_type": "node",
+      "osm_id": 1407135685,
+      "name": "Cà Phê Au Parc",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7787503,
+      "longitude": 106.6981182,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:city": "Thành phố Hồ Chí Minh",
+        "addr:district": "Quận 1",
+        "addr:housenumber": "32",
+        "addr:street": "Hàn Thuyên",
+        "amenity": "cafe",
+        "cuisine": "mediterranean",
+        "internet_access": "wlan",
+        "name": "Cà Phê Au Parc",
+        "opening_hours": "Mo-Sa 07:30-22:30; Su 08:00-17:00",
+        "phone": "3829 2772",
+        "wheelchair": "limited"
+      }
+    },
+    {
+      "candidate_id": "osm_node_2616958804",
+      "osm_type": "node",
+      "osm_id": 2616958804,
+      "name": "Cà Phê BB Corner",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7728073,
+      "longitude": 106.6952588,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê BB Corner"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5134725712",
+      "osm_type": "node",
+      "osm_id": 5134725712,
+      "name": "Cà Phê Ben House",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7736017,
+      "longitude": 106.7024387,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:street": "Tôn Thất Thiệp",
+        "amenity": "cafe",
+        "name": "Cà Phê Ben House",
+        "source": "Mapillary"
+      }
+    },
+    {
+      "candidate_id": "osm_node_7213947986",
+      "osm_type": "node",
+      "osm_id": 7213947986,
+      "name": "Cà Phê Boo",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7740557,
+      "longitude": 106.7041347,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "42",
+        "addr:postcode": "80000",
+        "addr:street": "Nguyễn Huệ",
+        "amenity": "cafe",
+        "internet_access": "wlan",
+        "name": "Cà Phê Boo"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5467207449",
+      "osm_type": "node",
+      "osm_id": 5467207449,
+      "name": "Cà Phê Bệt",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7798794,
+      "longitude": 106.6983062,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "cuisine": "coffee_shop",
+        "name": "Cà Phê Bệt",
+        "wifi": "no"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1969392540",
+      "osm_type": "node",
+      "osm_id": 1969392540,
+      "name": "Cà Phê Calibre",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7743763,
+      "longitude": 106.7037363,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "cuisine": "coffee_shop",
+        "name": "Cà Phê Calibre"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1985346125",
+      "osm_type": "node",
+      "osm_id": 1985346125,
+      "name": "Cà Phê Central Nguyễn Huệ",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7738692,
+      "longitude": 106.7034139,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "cuisine": "coffee_shop",
+        "name": "Cà Phê Central Nguyễn Huệ",
+        "name:de": "Central Nguyễn Huệ"
+      }
+    },
+    {
+      "candidate_id": "osm_node_9645073798",
+      "osm_type": "node",
+      "osm_id": 9645073798,
+      "name": "Cà Phê Chateraise Lê Thánh Tôn",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.77908,
+      "longitude": 106.7035922,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:city": "Thành phố Hồ Chí Minh",
+        "addr:district": "Quận 1",
+        "addr:housenumber": "29A",
+        "addr:street": "Lê Thánh Tôn",
+        "addr:subdistrict": "Phường Bến Nghé",
+        "amenity": "cafe",
+        "cuisine": "cafe;bakery;japanese",
+        "name": "Cà Phê Chateraise Lê Thánh Tôn",
+        "name:en": "Chateraise Le Thanh Ton"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1770305118",
+      "osm_type": "node",
+      "osm_id": 1770305118,
+      "name": "Cà Phê Ciao",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7751001,
+      "longitude": 106.7029693,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "74-76",
+        "addr:street": "Nguyễn Huệ",
+        "amenity": "cafe",
+        "cuisine": "vietnamese;international;coffee_shop",
+        "internet_access": "wlan",
+        "name": "Cà Phê Ciao",
+        "note": "add address",
+        "opening_hours": "Mo-Su 07:00-23:00",
+        "phone": "+8438231130",
+        "source": "survey",
+        "website": "https://ciaocafe.vn/"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1969580038",
+      "osm_type": "node",
+      "osm_id": 1969580038,
+      "name": "Cà Phê Cuộc Sống Dễ Dàng",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7826261,
+      "longitude": 106.6965122,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "10A",
+        "addr:street": "Phạm Ngọc Thạch",
+        "amenity": "cafe",
+        "cuisine": "coffee_shop",
+        "name": "Cà Phê Cuộc Sống Dễ Dàng"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5138271120",
+      "osm_type": "node",
+      "osm_id": 5138271120,
+      "name": "Cà Phê Donna",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7752521,
+      "longitude": 106.7025547,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:city": "Thành phố Hồ Chí Minh",
+        "addr:housenumber": "18A",
+        "addr:postcode": "70000",
+        "addr:province": "Vietnam",
+        "addr:street": "Nguyễn Huệ",
+        "amenity": "cafe",
+        "cuisine": "mexican",
+        "name": "Cà Phê Donna",
+        "outdoor_seating": "yes",
+        "smoking": "no"
+      }
+    },
+    {
+      "candidate_id": "osm_node_2935020335",
+      "osm_type": "node",
+      "osm_id": 2935020335,
+      "name": "Cà Phê Eleven",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7716401,
+      "longitude": 106.6951331,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "29",
+        "addr:street": "Đường Lê Anh Xuân",
+        "amenity": "cafe",
+        "name": "Cà Phê Eleven",
+        "name:de": "Cafe Eleven"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5290098121",
+      "osm_type": "node",
+      "osm_id": 5290098121,
+      "name": "Cà Phê F.r.i.e.n.d.s",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7736665,
+      "longitude": 106.6977599,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "24/8",
+        "addr:street": "Hẻm Thủ Khoa Huân",
+        "amenity": "cafe",
+        "cuisine": "cake;breakfast;grill;coffee_shop",
+        "email": "nhithaonguyen95@gmail.com",
+        "internet_access": "wlan",
+        "name": "Cà Phê F.r.i.e.n.d.s",
+        "opening_hours": "Mo-Su 09:00-00:00",
+        "phone": "+84909502530",
+        "website": "http://facebook.com/saigonfriendscafe"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4693374193",
+      "osm_type": "node",
+      "osm_id": 4693374193,
+      "name": "Cà Phê Fanny",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.769282,
+      "longitude": 106.6962621,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "cuisine": "crepe;ice_cream;coffee_shop",
+        "description": "16 Dec 2018: closed (under construction)",
+        "internet_access": "wlan",
+        "name": "Cà Phê Fanny",
+        "opening_hours": "Mo-Su 03:00-03:00",
+        "payment:cash": "yes",
+        "payment:gift_card": "yes",
+        "payment:jcb": "yes",
+        "payment:mastercard": "yes",
+        "payment:visa": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_7106415085",
+      "osm_type": "node",
+      "osm_id": 7106415085,
+      "name": "Cà Phê Flat White",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7716243,
+      "longitude": 106.6935693,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê Flat White"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4878421221",
+      "osm_type": "node",
+      "osm_id": 4878421221,
+      "name": "Cà Phê Fugashin",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7788136,
+      "longitude": 106.6925847,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê Fugashin"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1969579682",
+      "osm_type": "node",
+      "osm_id": 1969579682,
+      "name": "Cà Phê Gió Bấc",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.783145,
+      "longitude": 106.6955418,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "10",
+        "addr:street": "Công trường Quốc tế",
+        "amenity": "cafe",
+        "cuisine": "coffee_shop",
+        "internet_access": "wlan",
+        "internet_access:fee": "no",
+        "name": "Cà Phê Gió Bấc"
+      }
+    },
+    {
+      "candidate_id": "osm_node_2676923010",
+      "osm_type": "node",
+      "osm_id": 2676923010,
+      "name": "Cà Phê Hello Boba",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.769426,
+      "longitude": 106.697944,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "cuisine": "coffee_shop",
+        "name": "Cà Phê Hello Boba",
+        "name:de": "Hello Boba"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1256312346",
+      "osm_type": "node",
+      "osm_id": 1256312346,
+      "name": "Cà Phê Hog's Breath",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7718499,
+      "longitude": 106.7048379,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "cuisine": "australian",
+        "name": "Cà Phê Hog's Breath",
+        "name:de": "Hog's Breath Cafe",
+        "wheelchair": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5556535121",
+      "osm_type": "node",
+      "osm_id": 5556535121,
+      "name": "Cà Phê Journeys Sandwich Bistro",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7730051,
+      "longitude": 106.6984535,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "30-36",
+        "addr:street": "Phan Bội Châu",
+        "amenity": "cafe",
+        "cuisine": "vietnamese;american;french",
+        "internet_access": "wlan",
+        "name": "Cà Phê Journeys Sandwich Bistro",
+        "opening_hours": "Mo-Su 07:30-22:00"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6315672915",
+      "osm_type": "node",
+      "osm_id": 6315672915,
+      "name": "Cà Phê Koi Thé",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7732455,
+      "longitude": 106.7016973,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê Koi Thé"
+      }
+    },
+    {
+      "candidate_id": "osm_node_2286005147",
+      "osm_type": "node",
+      "osm_id": 2286005147,
+      "name": "Cà Phê La Dolce Vita",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7770275,
+      "longitude": 106.7022407,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê La Dolce Vita",
+        "source": "survey"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4256038789",
+      "osm_type": "node",
+      "osm_id": 4256038789,
+      "name": "Cà Phê La Fenetre Soleil",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7773999,
+      "longitude": 106.7003456,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "44, 1st floor",
+        "addr:street": "Lý Tự Trọng",
+        "amenity": "cafe",
+        "name": "Cà Phê La Fenetre Soleil"
+      }
+    },
+    {
+      "candidate_id": "osm_node_7498869395",
+      "osm_type": "node",
+      "osm_id": 7498869395,
+      "name": "Cà Phê Live Jazz",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7743567,
+      "longitude": 106.7006343,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê Live Jazz"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5369150222",
+      "osm_type": "node",
+      "osm_id": 5369150222,
+      "name": "Cà Phê L’amant",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7820278,
+      "longitude": 106.7046166,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê L’amant"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5372639421",
+      "osm_type": "node",
+      "osm_id": 5372639421,
+      "name": "Cà Phê L’amant",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7730991,
+      "longitude": 106.7052231,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê L’amant"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4633807289",
+      "osm_type": "node",
+      "osm_id": 4633807289,
+      "name": "Cà Phê Maison Marou French",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7695926,
+      "longitude": 106.6978674,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "167-169",
+        "addr:street": "Đường Calmette",
+        "amenity": "cafe",
+        "cuisine": "cake;french;coffee_shop",
+        "name": "Cà Phê Maison Marou French",
+        "name:de": "Maison Marou French cafe",
+        "name:vi": "Maison Marou French cafe"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5134725720",
+      "osm_type": "node",
+      "osm_id": 5134725720,
+      "name": "Cà Phê Masstige",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7734285,
+      "longitude": 106.702821,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê Masstige",
+        "source": "Mapillary"
+      }
+    },
+    {
+      "candidate_id": "osm_node_2392496458",
+      "osm_type": "node",
+      "osm_id": 2392496458,
+      "name": "Cà Phê Mocking Bird",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7694751,
+      "longitude": 106.7044829,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "14",
+        "addr:street": "Tôn Thất Ðạm",
+        "amenity": "cafe",
+        "internet_access": "wlan",
+        "internet_access:fee": "no",
+        "name": "Cà Phê Mocking Bird"
+      }
+    },
+    {
+      "candidate_id": "osm_node_3227820391",
+      "osm_type": "node",
+      "osm_id": 3227820391,
+      "name": "Cà Phê Mylife",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7769687,
+      "longitude": 106.6980029,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê Mylife"
+      }
+    },
+    {
+      "candidate_id": "osm_node_946794499",
+      "osm_type": "node",
+      "osm_id": 946794499,
+      "name": "Cà Phê Màu Hoa Anh Đào",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7814169,
+      "longitude": 106.7061129,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê Màu Hoa Anh Đào",
+        "name:en": "Sakura Color Coffe"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6909743962",
+      "osm_type": "node",
+      "osm_id": 6909743962,
+      "name": "Cà Phê Mùa Hè",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7789735,
+      "longitude": 106.7023243,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:city": "Ho Chi Minh City",
+        "addr:district": "Quan 1",
+        "addr:housenumber": "115",
+        "addr:street": "Hai Bà Trưng",
+        "addr:subdistrict": "Phường Bến Nghé",
+        "amenity": "cafe",
+        "cuisine": "coffee_shop",
+        "internet_access": "wlan",
+        "internet_access:fee": "yes",
+        "name": "Cà Phê Mùa Hè",
+        "opening_hours": "Mo-Su 07:00-22:00",
+        "outdoor_seating": "yes",
+        "website": "https://facebook.com/tiemcafemuahe/"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1275863719",
+      "osm_type": "node",
+      "osm_id": 1275863719,
+      "name": "Cà Phê Napoli",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7732622,
+      "longitude": 106.6938064,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:street": "Nguyễn Du",
+        "amenity": "cafe",
+        "internet_access": "yes",
+        "internet_access:fee": "no",
+        "name": "Cà Phê Napoli",
+        "smoking": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4582585089",
+      "osm_type": "node",
+      "osm_id": 4582585089,
+      "name": "Cà Phê Nest By AIA",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7715546,
+      "longitude": 106.7042965,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "2",
+        "amenity": "cafe",
+        "internet_access": "wlan",
+        "name": "Cà Phê Nest By AIA",
+        "name:en": "Nest By AIA",
+        "name:vi": "Nest By AIA"
+      }
+    },
+    {
+      "candidate_id": "osm_node_2267949130",
+      "osm_type": "node",
+      "osm_id": 2267949130,
+      "name": "Cà Phê New Day",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7739206,
+      "longitude": 106.6970944,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê New Day"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4133670092",
+      "osm_type": "node",
+      "osm_id": 4133670092,
+      "name": "Cà Phê Nguyễn Hoàng",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7716515,
+      "longitude": 106.695367,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "70/38A",
+        "amenity": "cafe",
+        "internet_access": "wlan",
+        "name": "Cà Phê Nguyễn Hoàng"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4857827423",
+      "osm_type": "node",
+      "osm_id": 4857827423,
+      "name": "Cà Phê Người Sài Gòn",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7785399,
+      "longitude": 106.7052813,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê Người Sài Gòn",
+        "name:vi": "Người Sài Gòn coffee"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5822036653",
+      "osm_type": "node",
+      "osm_id": 5822036653,
+      "name": "Cà Phê Người Sài Gòn",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7787019,
+      "longitude": 106.7052509,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "9",
+        "addr:street": "Thái Văn Lung",
+        "amenity": "cafe",
+        "internet_access": "wlan",
+        "name": "Cà Phê Người Sài Gòn",
+        "name:fr": "Le Saigonais café",
+        "opening_hours": "Mo-Su 08:00-23:00"
+      }
+    },
+    {
+      "candidate_id": "osm_node_2927183601",
+      "osm_type": "node",
+      "osm_id": 2927183601,
+      "name": "Cà Phê Passio",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.779941,
+      "longitude": 106.701006,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:street": "Nguyễn Du",
+        "amenity": "cafe",
+        "cuisine": "coffee_shop",
+        "name": "Cà Phê Passio",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4104884305",
+      "osm_type": "node",
+      "osm_id": 4104884305,
+      "name": "Cà Phê Passio",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7856401,
+      "longitude": 106.7009163,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê Passio"
+      }
+    },
+    {
+      "candidate_id": "osm_node_9584833437",
+      "osm_type": "node",
+      "osm_id": 9584833437,
+      "name": "Cà Phê Phindeli",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7822276,
+      "longitude": 106.6961969,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê Phindeli"
+      }
+    },
+    {
+      "candidate_id": "osm_node_2927327001",
+      "osm_type": "node",
+      "osm_id": 2927327001,
+      "name": "Cà Phê Phúc Long",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7724413,
+      "longitude": 106.6988757,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê Phúc Long",
+        "name:de": "Phuc Long"
+      }
+    },
+    {
+      "candidate_id": "osm_node_2930719501",
+      "osm_type": "node",
+      "osm_id": 2930719501,
+      "name": "Cà Phê Press",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.779376,
+      "longitude": 106.6960124,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "14",
+        "addr:street": "Alexandre de Rhodes",
+        "amenity": "cafe",
+        "cuisine": "coffee_shop",
+        "name": "Cà Phê Press"
+      }
+    },
+    {
+      "candidate_id": "osm_node_2392496454",
+      "osm_type": "node",
+      "osm_id": 2392496454,
+      "name": "Cà Phê Princess And The Pea",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7749587,
+      "longitude": 106.7005062,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê Princess And The Pea"
+      }
+    },
+    {
+      "candidate_id": "osm_node_2965478333",
+      "osm_type": "node",
+      "osm_id": 2965478333,
+      "name": "Cà Phê Regina",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.778345,
+      "longitude": 106.699128,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê Regina"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4586416838",
+      "osm_type": "node",
+      "osm_id": 4586416838,
+      "name": "Cà Phê Royal Tea House",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7813628,
+      "longitude": 106.6970135,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:city": "Ho Chi Minh City",
+        "addr:district": "1",
+        "addr:housenumber": "1Bis",
+        "addr:street": "Phạm Ngọc Thạch",
+        "amenity": "cafe",
+        "description": "Local tea and coffee shop that serves various types of organic loose leaf teas grown from the Da Lat region.\n\nBoba tea/Bubble tea/Milk tea are also served using the house-brand of tea and coffee.",
+        "name": "Cà Phê Royal Tea House",
+        "note": "https://www.facebook.com/royalteahousetiendat/"
+      }
+    },
+    {
+      "candidate_id": "osm_node_7523274865",
+      "osm_type": "node",
+      "osm_id": 7523274865,
+      "name": "Cà Phê Royaltea",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7752924,
+      "longitude": 106.7028656,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê Royaltea"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4554032400",
+      "osm_type": "node",
+      "osm_id": 4554032400,
+      "name": "Cà Phê Saigon",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7732497,
+      "longitude": 106.7063052,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê Saigon",
+        "name:vi": "Saigon Cafe"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6319111422",
+      "osm_type": "node",
+      "osm_id": 6319111422,
+      "name": "Cà Phê Saigon Fusion",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7691497,
+      "longitude": 106.6997524,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê Saigon Fusion",
+        "name:en": "Saigon Fusion"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6319111492",
+      "osm_type": "node",
+      "osm_id": 6319111492,
+      "name": "Cà Phê Share Tea",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7736759,
+      "longitude": 106.7036585,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê Share Tea",
+        "start_date": "1992"
+      }
+    },
+    {
+      "candidate_id": "osm_node_7093107185",
+      "osm_type": "node",
+      "osm_id": 7093107185,
+      "name": "Cà Phê Share Tea",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7732755,
+      "longitude": 106.7016718,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê Share Tea"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1985346221",
+      "osm_type": "node",
+      "osm_id": 1985346221,
+      "name": "Cà Phê Soho",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7725032,
+      "longitude": 106.7019571,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "cuisine": "coffee_shop",
+        "name": "Cà Phê Soho"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4104884509",
+      "osm_type": "node",
+      "osm_id": 4104884509,
+      "name": "Cà Phê Stop",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7857002,
+      "longitude": 106.7005878,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê Stop"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4815270222",
+      "osm_type": "node",
+      "osm_id": 4815270222,
+      "name": "Cà Phê Teaspoon",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7793691,
+      "longitude": 106.702413,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "cuisine": "tea;coffee_shop;cake",
+        "internet_access": "wlan",
+        "name": "Cà Phê Teaspoon"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1407133660",
+      "osm_type": "node",
+      "osm_id": 1407133660,
+      "name": "Cà Phê Terrace",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7737673,
+      "longitude": 106.7011077,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê Terrace"
+      }
+    },
+    {
+      "candidate_id": "osm_node_8654087341",
+      "osm_type": "node",
+      "osm_id": 8654087341,
+      "name": "Cà Phê Thanh",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7729237,
+      "longitude": 106.7052196,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:city": "Ho Chi Minh City",
+        "addr:district": "Quận 1",
+        "addr:housenumber": "13",
+        "addr:street": "Nguyễn Huệ",
+        "addr:subdistrict": "Phường Bến Nghé",
+        "amenity": "cafe",
+        "name": "Cà Phê Thanh"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6534620919",
+      "osm_type": "node",
+      "osm_id": 6534620919,
+      "name": "Cà Phê The Central",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7745417,
+      "longitude": 106.7027372,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê The Central"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1499626823",
+      "osm_type": "node",
+      "osm_id": 1499626823,
+      "name": "Cà Phê The Refinery",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7782301,
+      "longitude": 106.7037621,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "internet_access": "wlan",
+        "name": "Cà Phê The Refinery",
+        "name:ja": "ザ リファイナリー",
+        "wheelchair": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_7502727743",
+      "osm_type": "node",
+      "osm_id": 7502727743,
+      "name": "Cà Phê The V",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7729647,
+      "longitude": 106.6971172,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "internet_access": "wlan",
+        "internet_access:fee": "no",
+        "level": "1",
+        "name": "Cà Phê The V"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4349831001",
+      "osm_type": "node",
+      "osm_id": 4349831001,
+      "name": "Cà Phê Thức",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7798626,
+      "longitude": 106.6924403,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê Thức"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5483859821",
+      "osm_type": "node",
+      "osm_id": 5483859821,
+      "name": "Cà Phê Thức",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7784297,
+      "longitude": 106.6982091,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "Q1",
+        "addr:street": "Đường Pasteur",
+        "amenity": "cafe",
+        "internet_access": "wlan",
+        "name": "Cà Phê Thức",
+        "name:en": "Thuc Coffee"
+      }
+    },
+    {
+      "candidate_id": "osm_node_7502330333",
+      "osm_type": "node",
+      "osm_id": 7502330333,
+      "name": "Cà Phê Thức",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7770535,
+      "longitude": 106.6997485,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê Thức"
+      }
+    },
+    {
+      "candidate_id": "osm_node_947763567",
+      "osm_type": "node",
+      "osm_id": 947763567,
+      "name": "Cà Phê Trùng 3T",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7805044,
+      "longitude": 106.7072351,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "cuisine": "coffee_shop",
+        "name": "Cà Phê Trùng 3T"
+      }
+    },
+    {
+      "candidate_id": "osm_node_2539425567",
+      "osm_type": "node",
+      "osm_id": 2539425567,
+      "name": "Cà Phê Tutti Frutti Frozen Yogurt",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7719303,
+      "longitude": 106.6976976,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "internet_access": "wlan",
+        "internet_access:fee": "no",
+        "name": "Cà Phê Tutti Frutti Frozen Yogurt",
+        "name:de": "Tutti frutti Frozen Yogurt",
+        "opening_hours": "Mo-Su 08:00-22:30",
+        "smoking": "no"
+      }
+    },
+    {
+      "candidate_id": "osm_node_943230073",
+      "osm_type": "node",
+      "osm_id": 943230073,
+      "name": "Cà Phê Vườn Kiểng",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7757808,
+      "longitude": 106.7071741,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Cà Phê Vườn Kiểng"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1770193865",
+      "osm_type": "node",
+      "osm_id": 1770193865,
+      "name": "Cà Phê Đá",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7805631,
+      "longitude": 106.6975344,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "4",
+        "addr:street": "Alexandre de Rhodes",
+        "amenity": "cafe",
+        "cuisine": "coffee_shop",
+        "internet_access": "wlan",
+        "internet_access:fee": "no",
+        "name": "Cà Phê Đá"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5333005525",
+      "osm_type": "node",
+      "osm_id": 5333005525,
+      "name": "Cộng Cà Phê",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7761333,
+      "longitude": 106.7054272,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:street": "Mạc Thị Bưởi",
+        "amenity": "cafe",
+        "brand": "Cộng Cà Phê",
+        "brand:wikidata": "Q63864181",
+        "cuisine": "coffee_shop;vietnamese",
+        "name": "Cộng Cà Phê",
+        "name:vi": "Cộng Cà Phê",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5832350885",
+      "osm_type": "node",
+      "osm_id": 5832350885,
+      "name": "Cộng Cà Phê",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7781683,
+      "longitude": 106.7010262,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "26",
+        "addr:street": "Lý Tự Trọng",
+        "amenity": "cafe",
+        "brand": "Cộng Cà Phê",
+        "brand:wikidata": "Q63864181",
+        "cuisine": "coffee_shop;vietnamese",
+        "email": "cmo@congcaphe.com",
+        "indoor_seating": "yes",
+        "internet_access": "wlan",
+        "name": "Cộng Cà Phê",
+        "name:en": "Cong cafe",
+        "name:vi": "Cộng Cà Phê",
+        "opening_hours": "Mo-Su 07:00-23:00",
+        "outdoor_seating": "balcony",
+        "takeaway": "yes",
+        "website": "http://www.congcaphe.com",
+        "wheelchair": "no"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6520653696",
+      "osm_type": "node",
+      "osm_id": 6520653696,
+      "name": "Cộng Cà Phê",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7831523,
+      "longitude": 106.695846,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:street": "Công Trường Quốc Tế",
+        "air_conditioning": "yes",
+        "amenity": "cafe",
+        "branch": "coconut coffee",
+        "brand": "Cộng Cà Phê",
+        "brand:wikidata": "Q63864181",
+        "cuisine": "coffee_shop;vietnamese",
+        "diet:gluten_free": "no",
+        "diet:vegan": "no",
+        "diet:vegetarian": "yes",
+        "indoor_seating": "yes",
+        "name": "Cộng Cà Phê",
+        "name:vi": "Cộng Cà Phê",
+        "outdoor_seating": "no",
+        "smoking": "no",
+        "takeaway": "yes",
+        "wheelchair": "no"
+      }
+    },
+    {
+      "candidate_id": "osm_node_9584932186",
+      "osm_type": "node",
+      "osm_id": 9584932186,
+      "name": "Cửa Hàng Conservo Japanese Bakery Cafe",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7818414,
+      "longitude": 106.7048071,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "cuisine": "coffee_shop",
+        "name": "Cửa Hàng Conservo Japanese Bakery Cafe",
+        "name:en": "Conservo Japanese bakery Cafe"
+      }
+    },
+    {
+      "candidate_id": "osm_node_11056307307",
+      "osm_type": "node",
+      "osm_id": 11056307307,
+      "name": "Dinh Độc Lập Cafe",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7766797,
+      "longitude": 106.6971987,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "internet_access": "wlan",
+        "name": "Dinh Độc Lập Cafe"
+      }
+    },
+    {
+      "candidate_id": "osm_node_12483471701",
+      "osm_type": "node",
+      "osm_id": 12483471701,
+      "name": "Eggyolk Coffee",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7725992,
+      "longitude": 106.6966088,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "220",
+        "addr:street": "Lê Thánh Tôn",
+        "amenity": "cafe",
+        "internet_access": "wlan",
+        "name": "Eggyolk Coffee",
+        "website": "https://eggyolk.vn/"
+      }
+    },
+    {
+      "candidate_id": "osm_node_14197423637",
+      "osm_type": "node",
+      "osm_id": 14197423637,
+      "name": "Every Half Coffee Roasters - Ngô Văn Năm",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7813651,
+      "longitude": 106.7058646,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:city": "Hồ Chí Minh",
+        "addr:country": "Vietnam",
+        "addr:housenumber": "19A",
+        "addr:postcode": "71000",
+        "addr:street": "Ngô Văn Năm",
+        "addr:subdistrict": "Sài Gòn",
+        "air_conditioning": "yes",
+        "amenity": "cafe",
+        "indoor_seating": "yes",
+        "internet_access": "wlan",
+        "internet_access:fee": "no",
+        "name": "Every Half Coffee Roasters - Ngô Văn Năm",
+        "opening_hours": "Mo-Su 07:00-21:30",
+        "outdoor_seating": "yes",
+        "pets_allowed": "yes",
+        "phone": "+84 838 999 102",
+        "website": "https://www.everyhalf.vn"
+      }
+    },
+    {
+      "candidate_id": "osm_node_11055959705",
+      "osm_type": "node",
+      "osm_id": 11055959705,
+      "name": "Gióng",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7793468,
+      "longitude": 106.7004214,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "57",
+        "addr:street": "Đường Nguyễn Du",
+        "amenity": "cafe",
+        "internet_access": "wlan",
+        "name": "Gióng"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1770597627",
+      "osm_type": "node",
+      "osm_id": 1770597627,
+      "name": "Highlands Coffee",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7769684,
+      "longitude": 106.70344,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housename": "Nha hat Lon",
+        "addr:street": "Cong truong Lam Son",
+        "amenity": "cafe",
+        "brand": "Highlands Coffee",
+        "brand:wikidata": "Q5759361",
+        "cuisine": "coffee_shop;vietnamese",
+        "name": "Highlands Coffee",
+        "name:en": "Highlands Coffee",
+        "name:vi": "Cafe Highlands",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1970245474",
+      "osm_type": "node",
+      "osm_id": 1970245474,
+      "name": "Highlands Coffee",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7841289,
+      "longitude": 106.7033179,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "brand": "Highlands Coffee",
+        "brand:wikidata": "Q5759361",
+        "cuisine": "coffee_shop;vietnamese",
+        "internet_access": "wlan",
+        "name": "Highlands Coffee",
+        "name:en": "Highlands Coffee",
+        "opening_hours": "Mo-Su 06:30-23:00",
+        "phone": "84839105689",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1985346178",
+      "osm_type": "node",
+      "osm_id": 1985346178,
+      "name": "Highlands Coffee",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7736729,
+      "longitude": 106.7007717,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "brand": "Highlands Coffee",
+        "brand:wikidata": "Q5759361",
+        "cuisine": "coffee_shop;vietnamese",
+        "name": "Highlands Coffee",
+        "name:de": "Highlands Coffee",
+        "name:en": "Highlands Coffee",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_2036596623",
+      "osm_type": "node",
+      "osm_id": 2036596623,
+      "name": "Highlands Coffee",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7809781,
+      "longitude": 106.6980644,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "brand": "Highlands Coffee",
+        "brand:wikidata": "Q5759361",
+        "cuisine": "coffee_shop;vietnamese",
+        "name": "Highlands Coffee",
+        "name:en": "Highlands Coffee",
+        "name:vi": "Cafe Hight Land 2",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_2948811933",
+      "osm_type": "node",
+      "osm_id": 2948811933,
+      "name": "Highlands Coffee",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.784071,
+      "longitude": 106.699901,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "brand": "Highlands Coffee",
+        "brand:wikidata": "Q5759361",
+        "cuisine": "coffee_shop;vietnamese",
+        "name": "Highlands Coffee",
+        "name:en": "Highlands Coffee",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4381798790",
+      "osm_type": "node",
+      "osm_id": 4381798790,
+      "name": "Highlands Coffee",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7796762,
+      "longitude": 106.6924435,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "brand": "Highlands Coffee",
+        "brand:wikidata": "Q5759361",
+        "cuisine": "coffee_shop;vietnamese",
+        "internet_access": "wlan",
+        "name": "Highlands Coffee",
+        "name:en": "Highlands Coffee",
+        "name:vi": "Highlands Coffee",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4401850390",
+      "osm_type": "node",
+      "osm_id": 4401850390,
+      "name": "Highlands Coffee",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7854421,
+      "longitude": 106.6986902,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:street": "Mạc Đĩnh Chi",
+        "amenity": "cafe",
+        "brand": "Highlands Coffee",
+        "brand:wikidata": "Q5759361",
+        "cuisine": "coffee_shop;vietnamese",
+        "name": "Highlands Coffee",
+        "name:en": "Highlands Coffee",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4550329993",
+      "osm_type": "node",
+      "osm_id": 4550329993,
+      "name": "Highlands Coffee",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7706252,
+      "longitude": 106.7031762,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "brand": "Highlands Coffee",
+        "brand:wikidata": "Q5759361",
+        "cuisine": "coffee_shop;vietnamese",
+        "internet_access": "wlan",
+        "name": "Highlands Coffee",
+        "name:en": "Highlands Coffee",
+        "name:vi": "Highlands Coffee",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6049078985",
+      "osm_type": "node",
+      "osm_id": 6049078985,
+      "name": "Highlands Coffee",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7692864,
+      "longitude": 106.6980978,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "brand": "Highlands Coffee",
+        "brand:wikidata": "Q5759361",
+        "cuisine": "coffee_shop;vietnamese",
+        "name": "Highlands Coffee",
+        "name:en": "Highlands Coffee",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6315390429",
+      "osm_type": "node",
+      "osm_id": 6315390429,
+      "name": "Highlands Coffee",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7754667,
+      "longitude": 106.6994608,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "brand": "Highlands Coffee",
+        "brand:wikidata": "Q5759361",
+        "cuisine": "coffee_shop;vietnamese",
+        "name": "Highlands Coffee",
+        "name:en": "Highlands Coffee",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6315672842",
+      "osm_type": "node",
+      "osm_id": 6315672842,
+      "name": "Highlands Coffee",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.783607,
+      "longitude": 106.7012693,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "brand": "Highlands Coffee",
+        "brand:wikidata": "Q5759361",
+        "cuisine": "coffee_shop;vietnamese",
+        "name": "Highlands Coffee",
+        "name:en": "Highlands Coffee",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6442018088",
+      "osm_type": "node",
+      "osm_id": 6442018088,
+      "name": "Highlands Coffee",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7829101,
+      "longitude": 106.6964275,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "branch": "Hồ Con Rùa",
+        "brand": "Highlands Coffee",
+        "brand:wikidata": "Q5759361",
+        "cuisine": "coffee_shop;vietnamese",
+        "name": "Highlands Coffee",
+        "name:en": "Highlands Coffee",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_9920341617",
+      "osm_type": "node",
+      "osm_id": 9920341617,
+      "name": "Highlands Coffee",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7747454,
+      "longitude": 106.6982421,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:floor": "0;1",
+        "air_conditioning": "yes",
+        "amenity": "cafe",
+        "brand": "Highlands Coffee",
+        "brand:wikidata": "Q5759361",
+        "check_date": "2024-12-14",
+        "cuisine": "coffee_shop;vietnamese",
+        "internet_access": "wlan",
+        "internet_access:fee": "no",
+        "name": "Highlands Coffee",
+        "name:en": "Highlands Coffee",
+        "opening_hours": "07:00-23:00",
+        "smoking": "no",
+        "takeaway": "yes",
+        "toilets": "yes",
+        "toilets:wheelchair": "yes",
+        "wheelchair": "limited"
+      }
+    },
+    {
+      "candidate_id": "osm_node_12230294804",
+      "osm_type": "node",
+      "osm_id": 12230294804,
+      "name": "Highlands Coffee",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7707859,
+      "longitude": 106.7004642,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "brand": "Highlands Coffee",
+        "brand:wikidata": "Q5759361",
+        "cuisine": "coffee_shop;vietnamese",
+        "name": "Highlands Coffee",
+        "name:en": "Highlands Coffee",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_12452421090",
+      "osm_type": "node",
+      "osm_id": 12452421090,
+      "name": "Highlands Coffee",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.782496,
+      "longitude": 106.7009967,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "brand": "Highlands Coffee",
+        "brand:wikidata": "Q5759361",
+        "cuisine": "coffee_shop;vietnamese",
+        "name": "Highlands Coffee",
+        "name:en": "Highlands Coffee",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_way_262966615",
+      "osm_type": "way",
+      "osm_id": 262966615,
+      "name": "Highlands Coffee",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.777746,
+      "longitude": 106.6991246,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "addr:street": "Nguyễn Du",
+        "amenity": "cafe",
+        "brand": "Highlands Coffee",
+        "brand:wikidata": "Q5759361",
+        "brand:wikipedia": "vi:Highlands Coffee",
+        "building": "yes",
+        "cuisine": "coffee_shop;vietnamese",
+        "name": "Highlands Coffee",
+        "name:en": "Highlands Coffee",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_12344428048",
+      "osm_type": "node",
+      "osm_id": 12344428048,
+      "name": "Hom Nay Cafe",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7692839,
+      "longitude": 106.7010267,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Hom Nay Cafe"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6319103239",
+      "osm_type": "node",
+      "osm_id": 6319103239,
+      "name": "Hoàng Tuấn",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7688981,
+      "longitude": 106.6976802,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "air_conditioning": "yes",
+        "amenity": "cafe",
+        "check_date": "2025-11-14",
+        "cuisine": "coffee_shop",
+        "name": "Hoàng Tuấn",
+        "pets_allowed": "yes",
+        "smoking": "separated",
+        "wheelchair": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1770193907",
+      "osm_type": "node",
+      "osm_id": 1770193907,
+      "name": "Hội Quán Thanh Niên",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7819478,
+      "longitude": 106.6979915,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "cuisine": "coffee_shop",
+        "internet_access": "wlan",
+        "internet_access:fee": "no",
+        "name": "Hội Quán Thanh Niên"
+      }
+    },
+    {
+      "candidate_id": "osm_node_10738913812",
+      "osm_type": "node",
+      "osm_id": 10738913812,
+      "name": "JUICETIN",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.780694,
+      "longitude": 106.707006,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "cuisine": "coffee_shop",
+        "name": "JUICETIN"
+      }
+    },
+    {
+      "candidate_id": "osm_node_12450968926",
+      "osm_type": "node",
+      "osm_id": 12450968926,
+      "name": "Kaffee Klatsch",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7820009,
+      "longitude": 106.7005579,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Kaffee Klatsch"
+      }
+    },
+    {
+      "candidate_id": "osm_node_10208698771",
+      "osm_type": "node",
+      "osm_id": 10208698771,
+      "name": "Kalf Coffee & Tea",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7784708,
+      "longitude": 106.6985896,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:city": "Thành phố Hồ Chí Minh",
+        "addr:district": "Quận 1",
+        "addr:housenumber": "178/15B",
+        "addr:street": "Pasteur",
+        "addr:subdistrict": "Bến Nghé",
+        "amenity": "cafe",
+        "cuisine": "coffee_shop",
+        "internet_access": "yes",
+        "internet_access:fee": "no",
+        "name": "Kalf Coffee & Tea",
+        "opening_hours": "Mo-Sa 07:00-16:00",
+        "outdoor_seating": "no",
+        "phone": "0916361990"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6318125508",
+      "osm_type": "node",
+      "osm_id": 6318125508,
+      "name": "Katinat",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7711456,
+      "longitude": 106.7025259,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:street": "Đường Hàm Nghi",
+        "amenity": "cafe",
+        "name": "Katinat"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6318163393",
+      "osm_type": "node",
+      "osm_id": 6318163393,
+      "name": "Katinat",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7679505,
+      "longitude": 106.7007311,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "41",
+        "addr:street": "Phó Đức Chính",
+        "amenity": "cafe",
+        "cuisine": "coffee_shop",
+        "internet_access": "wlan",
+        "name": "Katinat",
+        "name:en": "Katinat"
+      }
+    },
+    {
+      "candidate_id": "osm_node_9584833422",
+      "osm_type": "node",
+      "osm_id": 9584833422,
+      "name": "Katinat",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7735654,
+      "longitude": 106.6983486,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Katinat"
+      }
+    },
+    {
+      "candidate_id": "osm_node_9587113812",
+      "osm_type": "node",
+      "osm_id": 9587113812,
+      "name": "Katinat - Đồng Khởi",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7746804,
+      "longitude": 106.7043718,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Katinat - Đồng Khởi"
+      }
+    },
+    {
+      "candidate_id": "osm_node_12452421840",
+      "osm_type": "node",
+      "osm_id": 12452421840,
+      "name": "Kohi Coffee",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7835099,
+      "longitude": 106.7012037,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Kohi Coffee"
+      }
+    },
+    {
+      "candidate_id": "osm_way_1275902196",
+      "osm_type": "way",
+      "osm_id": 1275902196,
+      "name": "Le Café De Dinh",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.77845,
+      "longitude": 106.6959617,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "135",
+        "addr:street": "Nam Kỳ Khởi Nghĩa",
+        "amenity": "cafe",
+        "building": "yes",
+        "name": "Le Café De Dinh",
+        "opening_hours": "Mo-Su 07:00-21:00"
+      }
+    },
+    {
+      "candidate_id": "osm_node_12347163501",
+      "osm_type": "node",
+      "osm_id": 12347163501,
+      "name": "Libra Coffee",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7855319,
+      "longitude": 106.6996473,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Libra Coffee",
+        "opening_hours": "Mo-Su,PH 08:00-22:00"
+      }
+    },
+    {
+      "candidate_id": "osm_node_10296577020",
+      "osm_type": "node",
+      "osm_id": 10296577020,
+      "name": "Linh",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7710994,
+      "longitude": 106.6963805,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Linh"
+      }
+    },
+    {
+      "candidate_id": "osm_node_10296583010",
+      "osm_type": "node",
+      "osm_id": 10296583010,
+      "name": "Linh",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7712929,
+      "longitude": 106.6964334,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Linh"
+      }
+    },
+    {
+      "candidate_id": "osm_node_12344433262",
+      "osm_type": "node",
+      "osm_id": 12344433262,
+      "name": "Loop Coffee",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7691711,
+      "longitude": 106.7030796,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Loop Coffee"
+      }
+    },
+    {
+      "candidate_id": "osm_node_12728501576",
+      "osm_type": "node",
+      "osm_id": 12728501576,
+      "name": "Madison",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7783293,
+      "longitude": 106.7042766,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Madison"
+      }
+    },
+    {
+      "candidate_id": "osm_node_12345930101",
+      "osm_type": "node",
+      "osm_id": 12345930101,
+      "name": "Miến Phở Gà",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7846923,
+      "longitude": 106.6979902,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Miến Phở Gà"
+      }
+    },
+    {
+      "candidate_id": "osm_node_947763603",
+      "osm_type": "node",
+      "osm_id": 947763603,
+      "name": "Nhà Hàng Buffet Vasta",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7820596,
+      "longitude": 106.7057171,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "cuisine": "burger",
+        "name": "Nhà Hàng Buffet Vasta"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5293252521",
+      "osm_type": "node",
+      "osm_id": 5293252521,
+      "name": "Nước Ép Trái Cây Hurom",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7711411,
+      "longitude": 106.7032086,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "80",
+        "addr:street": "Đường Hàm Nghi",
+        "amenity": "cafe",
+        "cuisine": "korean;ice_cream",
+        "internet_access": "wlan",
+        "name": "Nước Ép Trái Cây Hurom",
+        "name:en": "Hurom Juice Cafe",
+        "opening_hours": "Mo-Su 07:00-23:00",
+        "phone": "02838218820",
+        "website": "http://www.huromjuice.vn"
+      }
+    },
+    {
+      "candidate_id": "osm_node_12475137501",
+      "osm_type": "node",
+      "osm_id": 12475137501,
+      "name": "OKKIO Cafe",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7725238,
+      "longitude": 106.698948,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:city": "Ho Chi Minh City",
+        "addr:district": "Quận 1",
+        "addr:housenumber": "120-122",
+        "addr:street": "Lê Lợi",
+        "addr:subdistrict": "Phường Bến Thành",
+        "air_conditioning": "yes",
+        "amenity": "cafe",
+        "branch": "Lê Lợi",
+        "brand": "OKKIO Cafe",
+        "internet_access": "wlan",
+        "internet_access:fee": "customers",
+        "name": "OKKIO Cafe",
+        "opening_hours": "Mo-Su 07:30-20:00",
+        "outdoor_seating": "no",
+        "toilets": "yes",
+        "toilets:access": "customers",
+        "toilets:unisex": "yes",
+        "wheelchair": "no"
+      }
+    },
+    {
+      "candidate_id": "osm_node_10690009990",
+      "osm_type": "node",
+      "osm_id": 10690009990,
+      "name": "Okkio",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7757723,
+      "longitude": 106.7032334,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Okkio",
+        "website": "https://m.facebook.com/okkiocaffe/"
+      }
+    },
+    {
+      "candidate_id": "osm_node_12466418009",
+      "osm_type": "node",
+      "osm_id": 12466418009,
+      "name": "Okkio",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7760322,
+      "longitude": 106.7033275,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "air_conditioning": "yes",
+        "amenity": "cafe",
+        "cuisine": "coffee_shop",
+        "diet:vegan": "no",
+        "diet:vegetarian": "yes",
+        "indoor_seating": "yes",
+        "name": "Okkio",
+        "opening_hours": "Mo-Su 07:30-21:00",
+        "outdoor_seating": "balcony",
+        "smoking": "no",
+        "wheelchair": "no"
+      }
+    },
+    {
+      "candidate_id": "osm_node_11243016703",
+      "osm_type": "node",
+      "osm_id": 11243016703,
+      "name": "Phuc Long",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7733575,
+      "longitude": 106.705484,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "cuisine": "coffee_shop",
+        "name": "Phuc Long",
+        "name:ja": "フックロン"
+      }
+    },
+    {
+      "candidate_id": "osm_node_12452684151",
+      "osm_type": "node",
+      "osm_id": 12452684151,
+      "name": "Phuc Long",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7842486,
+      "longitude": 106.6997882,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Phuc Long"
+      }
+    },
+    {
+      "candidate_id": "osm_node_12873041699",
+      "osm_type": "node",
+      "osm_id": 12873041699,
+      "name": "Phuc Long",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7726904,
+      "longitude": 106.70465,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "cuisine": "coffee_shop",
+        "internet_access": "yes",
+        "internet_access:fee": "customers",
+        "name": "Phuc Long",
+        "outdoor_seating": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_13485154792",
+      "osm_type": "node",
+      "osm_id": 13485154792,
+      "name": "Phuc Long",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7845771,
+      "longitude": 106.6995595,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Phuc Long"
+      }
+    },
+    {
+      "candidate_id": "osm_way_801950691",
+      "osm_type": "way",
+      "osm_id": 801950691,
+      "name": "Phòng trà Đồng Dao",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7776522,
+      "longitude": 106.6995966,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "building": "yes",
+        "name": "Phòng trà Đồng Dao"
+      }
+    },
+    {
+      "candidate_id": "osm_node_7513022970",
+      "osm_type": "node",
+      "osm_id": 7513022970,
+      "name": "Phúc Long - Huỳnh Thúc Kháng",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7730412,
+      "longitude": 106.7025775,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "cuisine": "coffee_shop",
+        "name": "Phúc Long - Huỳnh Thúc Kháng"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6361818786",
+      "osm_type": "node",
+      "osm_id": 6361818786,
+      "name": "Phúc Long Coffee",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.771387,
+      "longitude": 106.6955645,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:street": "Phạm Hồng Thái",
+        "air_conditioning": "yes",
+        "amenity": "cafe",
+        "cuisine": "coffee_shop",
+        "delivery": "yes",
+        "internet_access": "wlan",
+        "internet_access:fee": "no",
+        "level": "1;2;3",
+        "name": "Phúc Long Coffee",
+        "opening_hours": "Mo-Su 07:00-22:30",
+        "panoramax": "e862f0dd-10a4-40a2-88a9-ee1b8050097a",
+        "panoramax:0": "fd7b0dae-fe2e-4ff7-9060-0c281276451a",
+        "toilets": "yes",
+        "toilets:access": "permissive",
+        "toilets:fee": "no",
+        "wheelchair": "no"
+      }
+    },
+    {
+      "candidate_id": "osm_node_13013079801",
+      "osm_type": "node",
+      "osm_id": 13013079801,
+      "name": "Po Café",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7741964,
+      "longitude": 106.7042408,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "41",
+        "addr:street": "Nguyễn Huệ",
+        "amenity": "cafe",
+        "cuisine": "coffee_shop;tea",
+        "name": "Po Café",
+        "phone": "0375978325"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5413915924",
+      "osm_type": "node",
+      "osm_id": 5413915924,
+      "name": "Quán Cà Phê Mellower",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7786352,
+      "longitude": 106.699858,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:street": "Nguyễn Du",
+        "amenity": "cafe",
+        "cuisine": "coffee_shop",
+        "name": "Quán Cà Phê Mellower",
+        "name:en": "Mellower Coffee",
+        "opening_hours": "Mo-Su 08:00-18:00"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1969579631",
+      "osm_type": "node",
+      "osm_id": 1969579631,
+      "name": "Quán Cà Phê Papa",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7833122,
+      "longitude": 106.6956127,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housename": "Cafe Papa",
+        "addr:housenumber": "6B",
+        "addr:street": "Công trường Quốc Tế",
+        "amenity": "cafe",
+        "cuisine": "coffee_shop",
+        "name": "Quán Cà Phê Papa"
+      }
+    },
+    {
+      "candidate_id": "osm_node_12595582301",
+      "osm_type": "node",
+      "osm_id": 12595582301,
+      "name": "Ren Coffee and Tea",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7723516,
+      "longitude": 106.694261,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Ren Coffee and Tea"
+      }
+    },
+    {
+      "candidate_id": "osm_node_13319722322",
+      "osm_type": "node",
+      "osm_id": 13319722322,
+      "name": "SOBO Coffee & Matcha",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7727902,
+      "longitude": 106.6934539,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:city": "Ho Chi Minh City",
+        "addr:district": "1",
+        "addr:housenumber": "135",
+        "addr:postcode": "70000",
+        "addr:province": "Hồ Chí Minh",
+        "addr:street": "Nguyễn Du",
+        "addr:subdistrict": "Bến Thành",
+        "air_conditioning": "yes",
+        "amenity": "cafe",
+        "capacity": "50",
+        "contact:facebook": "facebook.com/sobosaigon",
+        "cuisine": "coffee_shop",
+        "internet_access": "wlan",
+        "internet_access:fee": "customers",
+        "name": "SOBO Coffee & Matcha",
+        "opening_hours": "Mo-Su 09:00-19:00",
+        "outdoor_seating": "yes",
+        "payment:apple_pay": "yes",
+        "payment:credit_cards": "yes",
+        "payment:google_pay": "yes",
+        "payment:mastercard": "yes",
+        "payment:visa": "yes",
+        "phone": "+84964267028",
+        "smoking": "outside",
+        "website": "https://sobosaigon.my.canva.site/"
+      }
+    },
+    {
+      "candidate_id": "osm_node_7062369385",
+      "osm_type": "node",
+      "osm_id": 7062369385,
+      "name": "Sen Nhà hàng chay",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7690855,
+      "longitude": 106.7000419,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "93-95",
+        "addr:street": "Phó Ðức Chính",
+        "addr:subdistrict": "Phường Nguyễn Thái Bình",
+        "air_conditioning": "yes",
+        "amenity": "cafe",
+        "contact:facebook": "senvegan",
+        "diet:gluten_free": "yes",
+        "diet:halal": "yes",
+        "diet:vegan": "yes",
+        "diet:vegetarian": "only",
+        "indoor_seating": "yes",
+        "internet_access": "wlan",
+        "name": "Sen Nhà hàng chay",
+        "name:en": "Sen Vegan House",
+        "outdoor_seating": "no",
+        "phone": "+842862703836",
+        "smoking": "no",
+        "wheelchair": "no"
+      }
+    },
+    {
+      "candidate_id": "osm_node_12485938001",
+      "osm_type": "node",
+      "osm_id": 12485938001,
+      "name": "Soo Kafe Bến Thành",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7725434,
+      "longitude": 106.6971552,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "35",
+        "addr:street": "Phan Chu Trinh",
+        "amenity": "cafe",
+        "internet_access": "wlan",
+        "level": "2",
+        "name": "Soo Kafe Bến Thành"
+      }
+    },
+    {
+      "candidate_id": "osm_node_13124776413",
+      "osm_type": "node",
+      "osm_id": 13124776413,
+      "name": "Sova Café Ho Chi Minh",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7722561,
+      "longitude": 106.7027258,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:city": "Ho Chi Minh City",
+        "addr:district": "Quận 1",
+        "addr:housenumber": "119",
+        "addr:postcode": "710000",
+        "addr:province": "Thành phố Hồ Chí Minh",
+        "addr:street": "Tôn Thất Ðạm",
+        "addr:subdistrict": "Bến Nghé",
+        "amenity": "cafe",
+        "cuisine": "coffee_shop",
+        "name": "Sova Café Ho Chi Minh",
+        "opening_hours": "Mo-Su 11:00-23:00",
+        "phone": "+84377949493",
+        "website": "https://sova.social/"
+      }
+    },
+    {
+      "candidate_id": "osm_node_2141010788",
+      "osm_type": "node",
+      "osm_id": 2141010788,
+      "name": "Starbucks",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7765217,
+      "longitude": 106.7049252,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "branch": "Đông Du",
+        "brand": "Starbucks",
+        "brand:wikidata": "Q37158",
+        "cuisine": "coffee_shop",
+        "name": "Starbucks",
+        "official_name": "Starbucks Coffee",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_2176976132",
+      "osm_type": "node",
+      "osm_id": 2176976132,
+      "name": "Starbucks",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7788646,
+      "longitude": 106.6982455,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "11-13",
+        "addr:street": "Hàn Thuyên",
+        "amenity": "cafe",
+        "branch": "Reserve",
+        "brand": "Starbucks",
+        "brand:wikidata": "Q37158",
+        "brand:wikipedia": "en:Starbucks",
+        "cuisine": "coffee_shop",
+        "name": "Starbucks",
+        "name:en": "Starbucks Han Thuyen",
+        "name:vi": "Starbucks Hàn Thuyên",
+        "official_name": "Starbucks Coffee",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_2616958820",
+      "osm_type": "node",
+      "osm_id": 2616958820,
+      "name": "Starbucks",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7756464,
+      "longitude": 106.7005642,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housename": "Rex Hotel Saigon",
+        "amenity": "cafe",
+        "brand": "Starbucks",
+        "brand:wikidata": "Q37158",
+        "cuisine": "coffee_shop",
+        "name": "Starbucks",
+        "name:de": "Starbucks Rex Lê Thánh Tôn",
+        "official_name": "Starbucks Coffee",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_2616975924",
+      "osm_type": "node",
+      "osm_id": 2616975924,
+      "name": "Starbucks",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7767726,
+      "longitude": 106.6983083,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housename": "President Place",
+        "addr:housenumber": "93",
+        "addr:street": "Nguyễn Du",
+        "amenity": "cafe",
+        "branch": "Nguyễn Du",
+        "brand": "Starbucks",
+        "brand:wikidata": "Q37158",
+        "cuisine": "coffee_shop",
+        "name": "Starbucks",
+        "official_name": "Starbucks Coffee",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6165485986",
+      "osm_type": "node",
+      "osm_id": 6165485986,
+      "name": "Starbucks",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7719408,
+      "longitude": 106.7047134,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "brand": "Starbucks",
+        "brand:wikidata": "Q37158",
+        "cuisine": "coffee_shop",
+        "internet_access": "wlan",
+        "name": "Starbucks",
+        "name:en": "Starbucks",
+        "name:ru": "Старбакс",
+        "official_name": "Starbucks Coffee",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_9587269858",
+      "osm_type": "node",
+      "osm_id": 9587269858,
+      "name": "Starbucks",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.773341,
+      "longitude": 106.703915,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "brand": "Starbucks",
+        "brand:wikidata": "Q37158",
+        "brand:wikipedia": "en:Starbucks",
+        "cuisine": "coffee_shop",
+        "name": "Starbucks",
+        "official_name": "Starbucks Coffee",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_11104600819",
+      "osm_type": "node",
+      "osm_id": 11104600819,
+      "name": "Starbucks",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7746116,
+      "longitude": 106.706044,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:city": "Thành phố Hồ Chí Minh",
+        "addr:district": "Quận 1",
+        "addr:housenumber": "2",
+        "addr:province": "Vietnam",
+        "addr:street": "Đường Ngô Ðức Kế",
+        "addr:subdistrict": "Phường Bến Nghé",
+        "amenity": "cafe",
+        "brand": "Starbucks",
+        "brand:wikidata": "Q37158",
+        "cuisine": "coffee_shop",
+        "internet_access": "wlan",
+        "internet_access:fee": "customers",
+        "name": "Starbucks",
+        "official_name": "Starbucks Coffee",
+        "opening_hours": "Mo-Su 07:00-21:00",
+        "outdoor_seating": "yes",
+        "phone": "02835352692",
+        "takeaway": "yes",
+        "website": "https://www.starbucks.vn/"
+      }
+    },
+    {
+      "candidate_id": "osm_node_12344382595",
+      "osm_type": "node",
+      "osm_id": 12344382595,
+      "name": "Sugar free black Sesame",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.768247,
+      "longitude": 106.6987072,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Sugar free black Sesame"
+      }
+    },
+    {
+      "candidate_id": "osm_node_7109110689",
+      "osm_type": "node",
+      "osm_id": 7109110689,
+      "name": "T-Plus Coffee",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7743341,
+      "longitude": 106.6990072,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "T-Plus Coffee"
+      }
+    },
+    {
+      "candidate_id": "osm_node_12876526001",
+      "osm_type": "node",
+      "osm_id": 12876526001,
+      "name": "Tam Caphe",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7785281,
+      "longitude": 106.7029446,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Tam Caphe"
+      }
+    },
+    {
+      "candidate_id": "osm_node_12328286801",
+      "osm_type": "node",
+      "osm_id": 12328286801,
+      "name": "Tan Lap",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7718641,
+      "longitude": 106.6955095,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "272",
+        "addr:street": "Lê Thánh Tôn",
+        "amenity": "cafe",
+        "name": "Tan Lap"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6328917587",
+      "osm_type": "node",
+      "osm_id": 6328917587,
+      "name": "Tanpopo",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7723083,
+      "longitude": 106.6947648,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "253",
+        "addr:street": "Lý Tự Trọng",
+        "amenity": "cafe",
+        "cuisine": "pancake",
+        "internet_access": "wlan",
+        "name": "Tanpopo",
+        "phone": "02838273589"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1969358661",
+      "osm_type": "node",
+      "osm_id": 1969358661,
+      "name": "The Coffee Bean & Tea Leaf",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7805315,
+      "longitude": 106.6956539,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "94",
+        "addr:street": "Nguyễn Thị Minh Khai",
+        "amenity": "cafe",
+        "brand": "The Coffee Bean & Tea Leaf",
+        "brand:wikidata": "Q1141384",
+        "cuisine": "coffee_shop",
+        "name": "The Coffee Bean & Tea Leaf",
+        "opening_hours": "Mo-Su 07:30-23:00+",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_2176976137",
+      "osm_type": "node",
+      "osm_id": 2176976137,
+      "name": "The Coffee Bean & Tea Leaf",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7799219,
+      "longitude": 106.7039841,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:city": "TP HCM",
+        "addr:district": "Quận 1",
+        "addr:housenumber": "12-14",
+        "addr:street": "Thai Van Lung",
+        "amenity": "cafe",
+        "brand": "The Coffee Bean & Tea Leaf",
+        "brand:wikidata": "Q1141384",
+        "cuisine": "coffee_shop",
+        "name": "The Coffee Bean & Tea Leaf",
+        "takeaway": "yes",
+        "website": "https://coffeebean.com.vn"
+      }
+    },
+    {
+      "candidate_id": "osm_node_2286005165",
+      "osm_type": "node",
+      "osm_id": 2286005165,
+      "name": "The Coffee Bean & Tea Leaf",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7717336,
+      "longitude": 106.6975733,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:city": "TP HCM",
+        "addr:district": "Quận 1",
+        "addr:housenumber": "1-3",
+        "addr:street": "Phan Chu Trunh",
+        "amenity": "cafe",
+        "brand": "The Coffee Bean & Tea Leaf",
+        "brand:wikidata": "Q1141384",
+        "cuisine": "coffee_shop",
+        "name": "The Coffee Bean & Tea Leaf",
+        "name:de": "The Coffee Bean & Tea Leaf",
+        "source": "survey",
+        "takeaway": "yes",
+        "website": "https://coffeebean.com.vn"
+      }
+    },
+    {
+      "candidate_id": "osm_node_2686083951",
+      "osm_type": "node",
+      "osm_id": 2686083951,
+      "name": "The Coffee Bean & Tea Leaf",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.778667,
+      "longitude": 106.6980739,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:city": "TP HCM",
+        "addr:district": "Quận 1",
+        "addr:housenumber": "27",
+        "addr:street": "Han Thuyen",
+        "amenity": "cafe",
+        "brand": "The Coffee Bean & Tea Leaf",
+        "brand:wikidata": "Q1141384",
+        "cuisine": "coffee_shop",
+        "name": "The Coffee Bean & Tea Leaf",
+        "takeaway": "yes",
+        "website": "https://coffeebean.com.vn"
+      }
+    },
+    {
+      "candidate_id": "osm_node_3365758422",
+      "osm_type": "node",
+      "osm_id": 3365758422,
+      "name": "The Coffee Bean & Tea Leaf",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7842255,
+      "longitude": 106.7036949,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:city": "Ho Chi Minh City",
+        "addr:district": "Quận 1",
+        "addr:housenumber": "37",
+        "addr:street": "Tôn Đức Thắng",
+        "amenity": "cafe",
+        "brand": "The Coffee Bean & Tea Leaf",
+        "brand:wikidata": "Q1141384",
+        "cuisine": "coffee_shop",
+        "diet:vegetarian": "yes",
+        "email": "tonducthang@coffeebean.com.vn",
+        "internet_access": "wlan",
+        "name": "The Coffee Bean & Tea Leaf",
+        "name:en": "The Coffee Bean & Tea Leaf",
+        "name:vi": "The Coffee Bean & Tea Leaf",
+        "operator": "IFB Holdings",
+        "phone": "+84 839 110 585",
+        "takeaway": "yes",
+        "website": "https://www.coffeebean.com.vn/"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5617113058",
+      "osm_type": "node",
+      "osm_id": 5617113058,
+      "name": "The Coffee Bean & Tea Leaf",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.771816,
+      "longitude": 106.704635,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:city": "Ho Chi Minh City",
+        "addr:district": "Quận 1",
+        "addr:street": "Hai Trieu",
+        "amenity": "cafe",
+        "brand": "The Coffee Bean & Tea Leaf",
+        "brand:wikidata": "Q1141384",
+        "cuisine": "coffee_shop",
+        "name": "The Coffee Bean & Tea Leaf",
+        "takeaway": "yes",
+        "website": "https://coffeebean.com.vn"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5617113059",
+      "osm_type": "node",
+      "osm_id": 5617113059,
+      "name": "The Coffee Bean & Tea Leaf",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.773504,
+      "longitude": 106.703873,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:city": "Ho Chi Minh City",
+        "addr:district": "Quận 1",
+        "addr:housenumber": "99",
+        "addr:street": "Nguyen Hue",
+        "amenity": "cafe",
+        "brand": "The Coffee Bean & Tea Leaf",
+        "brand:wikidata": "Q1141384",
+        "cuisine": "coffee_shop",
+        "name": "The Coffee Bean & Tea Leaf",
+        "takeaway": "yes",
+        "website": "https://coffeebean.com.vn"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5617113060",
+      "osm_type": "node",
+      "osm_id": 5617113060,
+      "name": "The Coffee Bean & Tea Leaf",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.777277,
+      "longitude": 106.704149,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:city": "Ho Chi Minh City",
+        "addr:district": "Quận 1",
+        "addr:housenumber": "97",
+        "addr:street": "Hai Ba Trung",
+        "amenity": "cafe",
+        "brand": "The Coffee Bean & Tea Leaf",
+        "brand:wikidata": "Q1141384",
+        "cuisine": "coffee_shop",
+        "name": "The Coffee Bean & Tea Leaf",
+        "takeaway": "yes",
+        "website": "https://coffeebean.com.vn"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1969579993",
+      "osm_type": "node",
+      "osm_id": 1969579993,
+      "name": "The Coffee Bean & Tea Leaf;235 Đồng Khởi",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7786273,
+      "longitude": 106.6999908,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:city": "TP HCM",
+        "addr:district": "Quận 1",
+        "addr:housename": "Metropolitan",
+        "addr:housenumber": "235",
+        "addr:province": "Thành phố Hồ Chí Minh",
+        "addr:street": "Đường Ðồng Khởi",
+        "addr:subdistrict": "Phường Bến Nghé",
+        "amenity": "cafe",
+        "brand": "The Coffee Bean & Tea Leaf",
+        "brand:wikidata": "Q1141384",
+        "brand:wikipedia": "en:The Coffee Bean & Tea Leaf",
+        "cuisine": "coffee_shop",
+        "name": "The Coffee Bean & Tea Leaf;235 Đồng Khởi",
+        "takeaway": "yes",
+        "website": "https://coffeebean.com.vn"
+      }
+    },
+    {
+      "candidate_id": "osm_node_946794525",
+      "osm_type": "node",
+      "osm_id": 946794525,
+      "name": "The Coffee House",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7809412,
+      "longitude": 106.7064002,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "brand": "The Coffee House",
+        "brand:wikidata": "Q60775742",
+        "cuisine": "coffee_shop;vietnamese",
+        "name": "The Coffee House",
+        "name:en": "The Coffee House",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1769692429",
+      "osm_type": "node",
+      "osm_id": 1769692429,
+      "name": "The Coffee House",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7850269,
+      "longitude": 106.7026662,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "2",
+        "addr:street": "Lê Duẩn",
+        "amenity": "cafe",
+        "brand": "The Coffee House",
+        "brand:wikidata": "Q60775742",
+        "cuisine": "coffee_shop;vietnamese",
+        "name": "The Coffee House",
+        "name:en": "The Coffee House",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4281614689",
+      "osm_type": "node",
+      "osm_id": 4281614689,
+      "name": "The Coffee House",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7683299,
+      "longitude": 106.6988431,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "141",
+        "addr:street": "Đường Nguyễn Thái Bình",
+        "amenity": "cafe",
+        "brand": "The Coffee House",
+        "brand:wikidata": "Q60775742",
+        "cuisine": "coffee_shop;vietnamese",
+        "name": "The Coffee House",
+        "name:de": "The Coffee House",
+        "name:en": "The Coffee House",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_9586890719",
+      "osm_type": "node",
+      "osm_id": 9586890719,
+      "name": "The Running Bean Hồ Tùng Mậu",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7728101,
+      "longitude": 106.7032534,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "The Running Bean Hồ Tùng Mậu"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4214872992",
+      "osm_type": "node",
+      "osm_id": 4214872992,
+      "name": "The Workshop Coffee",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7734061,
+      "longitude": 106.7055391,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "27",
+        "addr:street": "Ngô Ðức Kế",
+        "amenity": "cafe",
+        "cuisine": "coffee_shop",
+        "name": "The Workshop Coffee",
+        "opening_hours": "Mo-Su 08:00-21:00",
+        "phone": "+84838246801"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5307861821",
+      "osm_type": "node",
+      "osm_id": 5307861821,
+      "name": "Things Cafe",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7695208,
+      "longitude": 106.7042939,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "14",
+        "addr:street": "Tôn Thất Ðạm",
+        "amenity": "cafe",
+        "name": "Things Cafe"
+      }
+    },
+    {
+      "candidate_id": "osm_node_13081226501",
+      "osm_type": "node",
+      "osm_id": 13081226501,
+      "name": "Tonkin Speciality Coffee",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7744878,
+      "longitude": 106.6978081,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:street": "91 Lý Tự Trọng, Phường Bến Thành, Quận 1, Hồ Chí Minh 700000, Vietnam",
+        "amenity": "cafe",
+        "internet_access": "wlan",
+        "level": "2",
+        "name": "Tonkin Speciality Coffee",
+        "opening_hours": "Mo-Su 08:00-21:00",
+        "outdoor_seating": "yes",
+        "website": "https://tonkin.coffee/",
+        "website:menu": "https://maps.app.goo.gl/UrEAGudMRECYLDSr6?g_st=ipc"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4172485389",
+      "osm_type": "node",
+      "osm_id": 4172485389,
+      "name": "Tous les Jours",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7740844,
+      "longitude": 106.7005221,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "44",
+        "addr:street": "Lê Lợi",
+        "amenity": "cafe",
+        "brand": "Tous les Jours",
+        "brand:wikidata": "Q3535609",
+        "name": "Tous les Jours",
+        "shop": "bakery"
+      }
+    },
+    {
+      "candidate_id": "osm_node_7529106457",
+      "osm_type": "node",
+      "osm_id": 7529106457,
+      "name": "Tous les Jours",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7819458,
+      "longitude": 106.7056668,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "brand": "Tous les Jours",
+        "brand:wikidata": "Q3535609",
+        "name": "Tous les Jours",
+        "shop": "bakery"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1969392566",
+      "osm_type": "node",
+      "osm_id": 1969392566,
+      "name": "Trung Nguyên Coffee",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7817145,
+      "longitude": 106.6982688,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housename": "Cafe Trung Nguyên",
+        "addr:housenumber": "7",
+        "addr:street": "Nguyễn Văn Chiêm",
+        "alt_name": "Cafe Trung Nguyên",
+        "amenity": "cafe",
+        "branch": "Legend Café   Nguyễn Văn Chiêm",
+        "brand": "Trung Nguyên",
+        "brand:wikidata": "Q3541154",
+        "brand:wikipedia": "vi:Trung Nguyên (công ty)",
+        "cuisine": "coffee_shop;vietnamese",
+        "int_name": "Cafe Trung Nguyen",
+        "internet_access": "wlan",
+        "internet_access:fee": "no",
+        "name": "Trung Nguyên Coffee",
+        "name:en": "Trung Nguyên Coffee",
+        "name:vi": "Cà phê Trung Nguyên",
+        "takeaway": "yes",
+        "website": "http://www.trungnguyen.com.vn/quan/thanhniensangtao.aspx"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1969599014",
+      "osm_type": "node",
+      "osm_id": 1969599014,
+      "name": "Trung Nguyên Coffee",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.772661,
+      "longitude": 106.6954006,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "brand": "Trung Nguyên",
+        "brand:wikidata": "Q3541154",
+        "cuisine": "coffee_shop;vietnamese",
+        "name": "Trung Nguyên Coffee",
+        "name:de": "Cafe Trung Nguyên",
+        "name:en": "Trung Nguyên Coffee",
+        "name:vi": "Cà phê Trung Nguyên",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_2286005158",
+      "osm_type": "node",
+      "osm_id": 2286005158,
+      "name": "Trung Nguyên Coffee",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7797937,
+      "longitude": 106.7041252,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "brand": "Trung Nguyên",
+        "brand:wikidata": "Q3541154",
+        "cuisine": "coffee_shop;vietnamese",
+        "name": "Trung Nguyên Coffee",
+        "name:en": "Trung Nguyên Coffee",
+        "name:vi": "Cà phê Trung Nguyên",
+        "source": "survey",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_2616958842",
+      "osm_type": "node",
+      "osm_id": 2616958842,
+      "name": "Trung Nguyên Coffee",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7753501,
+      "longitude": 106.7040924,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "brand": "Trung Nguyên",
+        "brand:wikidata": "Q3541154",
+        "camera:type": "dome",
+        "cuisine": "coffee_shop;vietnamese",
+        "indoor_seating": "yes",
+        "man_made": "surveillance",
+        "name": "Trung Nguyên Coffee",
+        "name:en": "Trung Nguyên Coffee",
+        "name:vi": "Cà phê Trung Nguyên",
+        "outdoor_seating": "no",
+        "source": "survey",
+        "surveillance": "public",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6315390295",
+      "osm_type": "node",
+      "osm_id": 6315390295,
+      "name": "Trung Nguyên Coffee",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7736119,
+      "longitude": 106.7000454,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "branch": "Legend",
+        "brand": "Trung Nguyên",
+        "brand:wikidata": "Q3541154",
+        "cuisine": "coffee_shop;vietnamese",
+        "name": "Trung Nguyên Coffee",
+        "name:en": "Trung Nguyên Coffee",
+        "name:vi": "Cà phê Trung Nguyên",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_9584833448",
+      "osm_type": "node",
+      "osm_id": 9584833448,
+      "name": "Trung Nguyên Coffee",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7793653,
+      "longitude": 106.6962527,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "branch": "Legend   12 Alexander De Rhodes",
+        "brand": "Trung Nguyên",
+        "brand:wikidata": "Q3541154",
+        "cuisine": "coffee_shop;vietnamese",
+        "name": "Trung Nguyên Coffee",
+        "name:en": "Trung Nguyên Coffee",
+        "name:vi": "Cà phê Trung Nguyên",
+        "opening_hours": "Mo-Su 07:00-22:00",
+        "takeaway": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5008004723",
+      "osm_type": "node",
+      "osm_id": 5008004723,
+      "name": "Trà Sữa Bobapop",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.772827,
+      "longitude": 106.7027679,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "24",
+        "addr:street": "Huỳnh Thúc Kháng",
+        "amenity": "cafe",
+        "cuisine": "tea",
+        "internet_access": "wlan",
+        "name": "Trà Sữa Bobapop",
+        "name:en": "BoBaPop",
+        "phone": "02836207174"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5544274221",
+      "osm_type": "node",
+      "osm_id": 5544274221,
+      "name": "Trà Sữa Phúc Long",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7830975,
+      "longitude": 106.6961727,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Trà Sữa Phúc Long",
+        "name:en": "Phuc Long Tea & Coffee"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4550634344",
+      "osm_type": "node",
+      "osm_id": 4550634344,
+      "name": "Trà Sữa R&B",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7721465,
+      "longitude": 106.7040893,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "level": "0",
+        "name": "Trà Sữa R&B",
+        "name:de": "R&B tea"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4274875289",
+      "osm_type": "node",
+      "osm_id": 4274875289,
+      "name": "Trà sữa TenRen",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7831114,
+      "longitude": 106.6962575,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "42",
+        "addr:street": "Trần Cao Vân",
+        "amenity": "cafe",
+        "name": "Trà sữa TenRen",
+        "name:en": "TenRen Tea"
+      }
+    },
+    {
+      "candidate_id": "osm_node_11381918869",
+      "osm_type": "node",
+      "osm_id": 11381918869,
+      "name": "Văn minh cà phê",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7751982,
+      "longitude": 106.7040925,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Văn minh cà phê",
+        "name:en": "Ottoman Coffee Culture",
+        "name:ru": "Турецко-романская атмосферная кофейня"
+      }
+    },
+    {
+      "candidate_id": "osm_node_5582484321",
+      "osm_type": "node",
+      "osm_id": 5582484321,
+      "name": "hey sugar",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7837369,
+      "longitude": 106.6967649,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:city": "Ho Chi Minh City",
+        "addr:district": "Quận 3",
+        "addr:housenumber": "40",
+        "addr:postcode": "700000",
+        "addr:province": "Hồ Chí Minh",
+        "addr:street": "Trần Cao Vân",
+        "addr:subdistrict": "Phường 6",
+        "amenity": "cafe",
+        "cuisine": "coffee_shop",
+        "diet:milk_tea": "yes",
+        "name": "hey sugar",
+        "phone": "840362761853"
+      }
+    },
+    {
+      "candidate_id": "osm_node_9584833449",
+      "osm_type": "node",
+      "osm_id": 9584833449,
+      "name": "Đen Đá Coffee - Pasteur",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7783879,
+      "longitude": 106.6982947,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "Đen Đá Coffee - Pasteur"
+      }
+    },
+    {
+      "candidate_id": "osm_node_6318163394",
+      "osm_type": "node",
+      "osm_id": 6318163394,
+      "name": "茶sis Teahouse",
+      "poi_type": "cafe",
+      "role": "activity_anchor",
+      "latitude": 10.7682397,
+      "longitude": 106.7007618,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "cafe",
+        "name": "茶sis Teahouse"
+      }
+    },
+    {
+      "candidate_id": "osm_node_729604786",
+      "osm_type": "node",
+      "osm_id": 729604786,
+      "name": null,
+      "poi_type": "fuel_station",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7753118,
+      "longitude": 106.7048514,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "fuel",
+        "operator": "Cong Ty CP TM Dai Ly Dau Tinh Ba Ria Vung Tau - CN"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1969358658",
+      "osm_type": "node",
+      "osm_id": 1969358658,
+      "name": "Cửa Hàng Xăng Dầu Petrolimex",
+      "poi_type": "fuel_station",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7807762,
+      "longitude": 106.6958072,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "fuel",
+        "brand": "Petrolimex",
+        "brand:wikidata": "Q10831598",
+        "compressed_air": "no",
+        "name": "Cửa Hàng Xăng Dầu Petrolimex"
+      }
+    },
+    {
+      "candidate_id": "osm_node_729604816",
+      "osm_type": "node",
+      "osm_id": 729604816,
+      "name": "Cửa Hàng Xăng Dầu Satra",
+      "poi_type": "fuel_station",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7689585,
+      "longitude": 106.6966613,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "fuel",
+        "name": "Cửa Hàng Xăng Dầu Satra",
+        "operator": "Tran Thien Trading Services Pte."
+      }
+    },
+    {
+      "candidate_id": "osm_way_718492440",
+      "osm_type": "way",
+      "osm_id": 718492440,
+      "name": "Cửa hàng Xăng dầu Petrolimex Số 01",
+      "poi_type": "fuel_station",
+      "role": "waiting_location_candidate",
+      "latitude": 10.784144,
+      "longitude": 106.6970604,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "addr:street": "Hai Bà Trưng",
+        "amenity": "fuel",
+        "brand": "Petrolimex",
+        "building": "roof",
+        "fuel:biodiesel": "yes",
+        "fuel:diesel": "yes",
+        "name": "Cửa hàng Xăng dầu Petrolimex Số 01",
+        "not:brand:wikidata": "Q10831598",
+        "operator": "Petrolimex"
+      }
+    },
+    {
+      "candidate_id": "osm_way_1483716978",
+      "osm_type": "way",
+      "osm_id": 1483716978,
+      "name": "Cửa hàng Xăng dầu Petrolimex Số 03",
+      "poi_type": "fuel_station",
+      "role": "waiting_location_candidate",
+      "latitude": 10.771437,
+      "longitude": 106.6951692,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "fuel",
+        "brand": "Petrolimex",
+        "brand:wikidata": "Q10831598",
+        "building": "yes",
+        "name": "Cửa hàng Xăng dầu Petrolimex Số 03"
+      }
+    },
+    {
+      "candidate_id": "osm_way_1153472355",
+      "osm_type": "way",
+      "osm_id": 1153472355,
+      "name": "Cửa hàng Xăng dầu Petrolimex Số 38",
+      "poi_type": "fuel_station",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7808133,
+      "longitude": 106.6958029,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "188",
+        "addr:province": "Thành phố Hồ Chí Minh",
+        "addr:street": "Pasteur",
+        "addr:subdistrict": "Phường Xuân Hòa",
+        "amenity": "fuel",
+        "brand": "Petrolimex",
+        "brand:wikidata": "Q10831598",
+        "building": "roof",
+        "compressed_air": "no",
+        "name": "Cửa hàng Xăng dầu Petrolimex Số 38"
+      }
+    },
+    {
+      "candidate_id": "osm_node_860700661",
+      "osm_type": "node",
+      "osm_id": 860700661,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7812499,
+      "longitude": 106.6983279,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "layer": "-1",
+        "parking": "underground"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1769456892",
+      "osm_type": "node",
+      "osm_id": 1769456892,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7734144,
+      "longitude": 106.6937048,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1770193810",
+      "osm_type": "node",
+      "osm_id": 1770193810,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7814261,
+      "longitude": 106.6969159,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "parking": "surface"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1770193902",
+      "osm_type": "node",
+      "osm_id": 1770193902,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7810892,
+      "longitude": 106.6965647,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "parking": "surface"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1770193965",
+      "osm_type": "node",
+      "osm_id": 1770193965,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7825263,
+      "longitude": 106.6974271,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "layer": "-1",
+        "parking": "underground"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1770305088",
+      "osm_type": "node",
+      "osm_id": 1770305088,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7754919,
+      "longitude": 106.6984902,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1770305235",
+      "osm_type": "node",
+      "osm_id": 1770305235,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7761981,
+      "longitude": 106.6977285,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1969392557",
+      "osm_type": "node",
+      "osm_id": 1969392557,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7760071,
+      "longitude": 106.702098,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "layer": "-4",
+        "parking": "underground"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1969598926",
+      "osm_type": "node",
+      "osm_id": 1969598926,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7771916,
+      "longitude": 106.6962032,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking"
+      }
+    },
+    {
+      "candidate_id": "osm_node_1969599005",
+      "osm_type": "node",
+      "osm_id": 1969599005,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7720545,
+      "longitude": 106.697625,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "parking": "surface"
+      }
+    },
+    {
+      "candidate_id": "osm_node_7513022941",
+      "osm_type": "node",
+      "osm_id": 7513022941,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7727335,
+      "longitude": 106.7029363,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking"
+      }
+    },
+    {
+      "candidate_id": "osm_node_13039147367",
+      "osm_type": "node",
+      "osm_id": 13039147367,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.769641,
+      "longitude": 106.7054782,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "access": "yes",
+        "amenity": "parking",
+        "parking": "surface"
+      }
+    },
+    {
+      "candidate_id": "osm_node_13039147369",
+      "osm_type": "node",
+      "osm_id": 13039147369,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7705198,
+      "longitude": 106.7056119,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "access": "yes",
+        "amenity": "parking",
+        "parking": "surface"
+      }
+    },
+    {
+      "candidate_id": "osm_way_165567727",
+      "osm_type": "way",
+      "osm_id": 165567727,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7830824,
+      "longitude": 106.7001036,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking"
+      }
+    },
+    {
+      "candidate_id": "osm_way_165582262",
+      "osm_type": "way",
+      "osm_id": 165582262,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7809425,
+      "longitude": 106.6995393,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking"
+      }
+    },
+    {
+      "candidate_id": "osm_way_165887836",
+      "osm_type": "way",
+      "osm_id": 165887836,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.777978,
+      "longitude": 106.7064217,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "building": "yes",
+        "parking": "multi-storey"
+      }
+    },
+    {
+      "candidate_id": "osm_way_801958384",
+      "osm_type": "way",
+      "osm_id": 801958384,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7818001,
+      "longitude": 106.7036077,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "building": "roof"
+      }
+    },
+    {
+      "candidate_id": "osm_way_802105042",
+      "osm_type": "way",
+      "osm_id": 802105042,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.776407,
+      "longitude": 106.6997597,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking"
+      }
+    },
+    {
+      "candidate_id": "osm_way_802105045",
+      "osm_type": "way",
+      "osm_id": 802105045,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7753217,
+      "longitude": 106.6996533,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking"
+      }
+    },
+    {
+      "candidate_id": "osm_way_802105051",
+      "osm_type": "way",
+      "osm_id": 802105051,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7757097,
+      "longitude": 106.6998551,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking"
+      }
+    },
+    {
+      "candidate_id": "osm_way_802105052",
+      "osm_type": "way",
+      "osm_id": 802105052,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7759462,
+      "longitude": 106.7000023,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking"
+      }
+    },
+    {
+      "candidate_id": "osm_way_802328109",
+      "osm_type": "way",
+      "osm_id": 802328109,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7765955,
+      "longitude": 106.7027721,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "parking": "surface"
+      }
+    },
+    {
+      "candidate_id": "osm_way_802328110",
+      "osm_type": "way",
+      "osm_id": 802328110,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7762524,
+      "longitude": 106.7031428,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "parking": "surface"
+      }
+    },
+    {
+      "candidate_id": "osm_way_1150209719",
+      "osm_type": "way",
+      "osm_id": 1150209719,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7758036,
+      "longitude": 106.7070089,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "access": "yes",
+        "amenity": "parking",
+        "parking": "surface"
+      }
+    },
+    {
+      "candidate_id": "osm_way_1150240110",
+      "osm_type": "way",
+      "osm_id": 1150240110,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.774612,
+      "longitude": 106.7063431,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "parking": "street_side"
+      }
+    },
+    {
+      "candidate_id": "osm_way_1153459798",
+      "osm_type": "way",
+      "osm_id": 1153459798,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7809459,
+      "longitude": 106.6951796,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking"
+      }
+    },
+    {
+      "candidate_id": "osm_way_1153505736",
+      "osm_type": "way",
+      "osm_id": 1153505736,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7801034,
+      "longitude": 106.6956798,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "access": "private",
+        "amenity": "parking",
+        "parking": "surface"
+      }
+    },
+    {
+      "candidate_id": "osm_way_1153511099",
+      "osm_type": "way",
+      "osm_id": 1153511099,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7780818,
+      "longitude": 106.6933495,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking"
+      }
+    },
+    {
+      "candidate_id": "osm_way_1154573551",
+      "osm_type": "way",
+      "osm_id": 1154573551,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7805752,
+      "longitude": 106.6961322,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "access": "private",
+        "amenity": "parking",
+        "parking": "surface"
+      }
+    },
+    {
+      "candidate_id": "osm_way_1221511604",
+      "osm_type": "way",
+      "osm_id": 1221511604,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7799268,
+      "longitude": 106.7003494,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking"
+      }
+    },
+    {
+      "candidate_id": "osm_way_1247781792",
+      "osm_type": "way",
+      "osm_id": 1247781792,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7727493,
+      "longitude": 106.7013702,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "covered": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_way_1275090322",
+      "osm_type": "way",
+      "osm_id": 1275090322,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7706126,
+      "longitude": 106.6954568,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "operator": "VETC",
+        "orientation": "perpendicular",
+        "parking": "street_side",
+        "wheelchair": "yes"
+      }
+    },
+    {
+      "candidate_id": "osm_way_1477771419",
+      "osm_type": "way",
+      "osm_id": 1477771419,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7741976,
+      "longitude": 106.7016436,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "access": "yes",
+        "amenity": "parking"
+      }
+    },
+    {
+      "candidate_id": "osm_way_804926055",
+      "osm_type": "way",
+      "osm_id": 804926055,
+      "name": "Bãi giữ xe 42 Chu Mạnh Trinh",
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7834556,
+      "longitude": 106.7032945,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "name": "Bãi giữ xe 42 Chu Mạnh Trinh"
+      }
+    },
+    {
+      "candidate_id": "osm_node_4445200893",
+      "osm_type": "node",
+      "osm_id": 4445200893,
+      "name": "Bãi Đậu Xe Nguyễn Văn Chiêm",
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7817942,
+      "longitude": 106.6988031,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "name": "Bãi Đậu Xe Nguyễn Văn Chiêm"
+      }
+    },
+    {
+      "candidate_id": "osm_way_165626211",
+      "osm_type": "way",
+      "osm_id": 165626211,
+      "name": "Lavenue Crown Hotel",
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.781474,
+      "longitude": 106.6989854,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "barrier": "fence",
+        "name": "Lavenue Crown Hotel"
+      }
+    },
+    {
+      "candidate_id": "osm_node_13437482021",
+      "osm_type": "node",
+      "osm_id": 13437482021,
+      "name": "Nhà Xe Phúc Bình Dương",
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7779142,
+      "longitude": 106.7060295,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "3",
+        "addr:street": "Thái Văn Lung",
+        "amenity": "parking",
+        "name": "Nhà Xe Phúc Bình Dương",
+        "operator": "Nhà Xe Phúc Bình Dương"
+      }
+    },
+    {
+      "candidate_id": "osm_way_802125675",
+      "osm_type": "way",
+      "osm_id": 802125675,
+      "name": null,
+      "poi_type": "shopping_center",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7735909,
+      "longitude": 106.7009736,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "building:part": "yes",
+        "shop": "mall"
+      }
+    },
+    {
+      "candidate_id": "osm_way_802125676",
+      "osm_type": "way",
+      "osm_id": 802125676,
+      "name": null,
+      "poi_type": "shopping_center",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7735471,
+      "longitude": 106.7009763,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "building": "yes",
+        "building:part": "yes",
+        "height": "170",
+        "shop": "mall"
+      }
+    },
+    {
+      "candidate_id": "osm_way_827000695",
+      "osm_type": "way",
+      "osm_id": 827000695,
+      "name": null,
+      "poi_type": "shopping_center",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7731512,
+      "longitude": 106.7005724,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "building:part": "yes",
+        "shop": "mall"
+      }
+    },
+    {
+      "candidate_id": "osm_way_187895187",
+      "osm_type": "way",
+      "osm_id": 187895187,
+      "name": "Lucky Plaza",
+      "poi_type": "shopping_center",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7741404,
+      "longitude": 106.7045043,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "building": "yes",
+        "building:levels": "3",
+        "name": "Lucky Plaza",
+        "name:ja": "ラッキープラザ",
+        "shop": "mall"
+      }
+    },
+    {
+      "candidate_id": "osm_way_802125674",
+      "osm_type": "way",
+      "osm_id": 802125674,
+      "name": "Saigon Centre",
+      "poi_type": "shopping_center",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7729521,
+      "longitude": 106.7006604,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "building": "yes",
+        "building:levels": "39",
+        "building:part": "yes",
+        "height": "193",
+        "name": "Saigon Centre",
+        "shop": "mall"
+      }
+    },
+    {
+      "candidate_id": "osm_node_13711065242",
+      "osm_type": "node",
+      "osm_id": 13711065242,
+      "name": "Saigon Centre - Cổng Nam Kỳ Khởi Nghĩa - Điểm Đón Trả",
+      "poi_type": "shopping_center",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7725665,
+      "longitude": 106.7006849,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:city": "Hồ Chí Minh",
+        "addr:housenumber": "65-67",
+        "addr:street": "Lê Lợi",
+        "addr:subdistrict": "P. Sài Gòn",
+        "name": "Saigon Centre - Cổng Nam Kỳ Khởi Nghĩa - Điểm Đón Trả",
+        "name:en": "Saigon Centre - Nam Ky Khoi Nghia Gate - Pick-up and Drop-off Point",
+        "opening_hours": "08:00-21:00",
+        "shop": "mall"
+      }
+    },
+    {
+      "candidate_id": "osm_way_1527137541",
+      "osm_type": "way",
+      "osm_id": 1527137541,
+      "name": "Saigon Garden",
+      "poi_type": "shopping_center",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7733315,
+      "longitude": 106.7037938,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "building": "yes",
+        "name": "Saigon Garden",
+        "shop": "mall"
+      }
+    },
+    {
+      "candidate_id": "osm_way_802125677",
+      "osm_type": "way",
+      "osm_id": 802125677,
+      "name": "Toà Nhà Saigon Centre",
+      "poi_type": "shopping_center",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7732401,
+      "longitude": 106.7008784,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "65",
+        "addr:postcode": "71006",
+        "addr:street": "Lê Lợi",
+        "building": "commercial",
+        "name": "Toà Nhà Saigon Centre",
+        "name:ru": "Сайгон Сентер",
+        "name:zh": "西贡中心",
+        "name:zh-Hant": "西貢中心",
+        "shop": "mall"
+      }
+    },
+    {
+      "candidate_id": "osm_node_9586890718",
+      "osm_type": "node",
+      "osm_id": 9586890718,
+      "name": "Trung tâm mua sắm Sài Gòn Garden",
+      "poi_type": "shopping_center",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7733608,
+      "longitude": 106.7038659,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "name": "Trung tâm mua sắm Sài Gòn Garden",
+        "shop": "mall"
+      }
+    },
+    {
+      "candidate_id": "osm_node_9585162923",
+      "osm_type": "node",
+      "osm_id": 9585162923,
+      "name": "Nhà Xe Hoa Mai",
+      "poi_type": "transit_or_rest_area",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7692272,
+      "longitude": 106.6998101,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "bus_station",
+        "bus": "yes",
+        "name": "Nhà Xe Hoa Mai",
+        "public_transport": "station"
+      }
+    },
+    {
+      "candidate_id": "osm_node_9585162924",
+      "osm_type": "node",
+      "osm_id": 9585162924,
+      "name": "Nhà Xe Toàn Thắng",
+      "poi_type": "transit_or_rest_area",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7701978,
+      "longitude": 106.7009692,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "bus_station",
+        "bus": "yes",
+        "name": "Nhà Xe Toàn Thắng",
+        "public_transport": "station"
+      }
+    }
+  ],
+  "limitations": [
+    "This dataset is a local sample and does not estimate ride-hailing demand.",
+    "Area and way coordinates may be approximations; use verified entrances for operational guidance."
+  ]
+}

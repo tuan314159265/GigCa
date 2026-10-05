@@ -1,0 +1,19 @@
+services:
+  postgis:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-gigca}
+      POSTGRES_USER: ${POSTGRES_USER:-gigca}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in your local environment}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - gigca_postgis_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-gigca} -d ${POSTGRES_DB:-gigca}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  gigca_postgis_data:

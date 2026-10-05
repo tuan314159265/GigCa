@@ -1,0 +1,355 @@
+{
+  "schema_version": "1.0",
+  "dataset_id": "gigca_hcmc_demo_osrm_waiting_candidate_routes",
+  "generated_at": "2026-10-05T13:03:14+00:00",
+  "request": {
+    "origin": {
+      "latitude": 10.7769,
+      "longitude": 106.7009
+    },
+    "profile": "driving",
+    "service": "table",
+    "candidate_count": 54
+  },
+  "source": {
+    "provider": "OSRM public demo server",
+    "endpoint": "https://router.project-osrm.org/table/v1/driving",
+    "documentation": "https://project-osrm.org/docs/v26.4.0/http#table-service",
+    "license": "Route data based on OpenStreetMap; attribute © OpenStreetMap contributors and OSRM. Check public demo usage policy before production use.",
+    "attribution": "Routing by OSRM; map data © OpenStreetMap contributors",
+    "profile": "driving"
+  },
+  "routes": [
+    {
+      "destination_id": "osm_node_729604786",
+      "profile": "driving",
+      "route_distance_m": 627.2,
+      "route_duration_s": 72.9
+    },
+    {
+      "destination_id": "osm_node_1969358658",
+      "profile": "driving",
+      "route_distance_m": 904.5,
+      "route_duration_s": 85.1
+    },
+    {
+      "destination_id": "osm_node_729604816",
+      "profile": "driving",
+      "route_distance_m": 1082.8,
+      "route_duration_s": 98.1
+    },
+    {
+      "destination_id": "osm_way_718492440",
+      "profile": "driving",
+      "route_distance_m": 1465.7,
+      "route_duration_s": 139.4
+    },
+    {
+      "destination_id": "osm_way_1483716978",
+      "profile": "driving",
+      "route_distance_m": 884.7,
+      "route_duration_s": 85.6
+    },
+    {
+      "destination_id": "osm_way_1153472355",
+      "profile": "driving",
+      "route_distance_m": 907.6,
+      "route_duration_s": 85.4
+    },
+    {
+      "destination_id": "osm_node_860700661",
+      "profile": "driving",
+      "route_distance_m": 1045,
+      "route_duration_s": 128.9
+    },
+    {
+      "destination_id": "osm_node_1769456892",
+      "profile": "driving",
+      "route_distance_m": 1250.4,
+      "route_duration_s": 145.1
+    },
+    {
+      "destination_id": "osm_node_1770193810",
+      "profile": "driving",
+      "route_distance_m": 1032,
+      "route_duration_s": 96.8
+    },
+    {
+      "destination_id": "osm_node_1770193902",
+      "profile": "driving",
+      "route_distance_m": 978.6,
+      "route_duration_s": 92.8
+    },
+    {
+      "destination_id": "osm_node_1770193965",
+      "profile": "driving",
+      "route_distance_m": 1158.1,
+      "route_duration_s": 114.6
+    },
+    {
+      "destination_id": "osm_node_1770305088",
+      "profile": "driving",
+      "route_distance_m": 590.2,
+      "route_duration_s": 69.9
+    },
+    {
+      "destination_id": "osm_node_1770305235",
+      "profile": "driving",
+      "route_distance_m": 771,
+      "route_duration_s": 108.1
+    },
+    {
+      "destination_id": "osm_node_1969392557",
+      "profile": "driving",
+      "route_distance_m": 804.7,
+      "route_duration_s": 90
+    },
+    {
+      "destination_id": "osm_node_1969598926",
+      "profile": "driving",
+      "route_distance_m": 823,
+      "route_duration_s": 87.4
+    },
+    {
+      "destination_id": "osm_node_1969599005",
+      "profile": "driving",
+      "route_distance_m": 832.3,
+      "route_duration_s": 83.2
+    },
+    {
+      "destination_id": "osm_node_7513022941",
+      "profile": "driving",
+      "route_distance_m": 633.5,
+      "route_duration_s": 86
+    },
+    {
+      "destination_id": "osm_node_13039147367",
+      "profile": "driving",
+      "route_distance_m": 1070.9,
+      "route_duration_s": 106.3
+    },
+    {
+      "destination_id": "osm_node_13039147369",
+      "profile": "driving",
+      "route_distance_m": 1226.6,
+      "route_duration_s": 105.4
+    },
+    {
+      "destination_id": "osm_way_165567727",
+      "profile": "driving",
+      "route_distance_m": 1235.8,
+      "route_duration_s": 132.5
+    },
+    {
+      "destination_id": "osm_way_165582262",
+      "profile": "driving",
+      "route_distance_m": 979.8,
+      "route_duration_s": 97.3
+    },
+    {
+      "destination_id": "osm_way_165887836",
+      "profile": "driving",
+      "route_distance_m": 1361.4,
+      "route_duration_s": 158.1
+    },
+    {
+      "destination_id": "osm_way_801958384",
+      "profile": "driving",
+      "route_distance_m": 1107.9,
+      "route_duration_s": 117
+    },
+    {
+      "destination_id": "osm_way_802105042",
+      "profile": "driving",
+      "route_distance_m": 764.4,
+      "route_duration_s": 106.3
+    },
+    {
+      "destination_id": "osm_way_802105045",
+      "profile": "driving",
+      "route_distance_m": 262.6,
+      "route_duration_s": 37.5
+    },
+    {
+      "destination_id": "osm_way_802105051",
+      "profile": "driving",
+      "route_distance_m": 237.9,
+      "route_duration_s": 31.6
+    },
+    {
+      "destination_id": "osm_way_802105052",
+      "profile": "driving",
+      "route_distance_m": 800.1,
+      "route_duration_s": 116.6
+    },
+    {
+      "destination_id": "osm_way_802328109",
+      "profile": "driving",
+      "route_distance_m": 1061.7,
+      "route_duration_s": 113.8
+    },
+    {
+      "destination_id": "osm_way_802328110",
+      "profile": "driving",
+      "route_distance_m": 394.1,
+      "route_duration_s": 56.2
+    },
+    {
+      "destination_id": "osm_way_1150209719",
+      "profile": "driving",
+      "route_distance_m": 995.2,
+      "route_duration_s": 109.4
+    },
+    {
+      "destination_id": "osm_way_1150240110",
+      "profile": "driving",
+      "route_distance_m": 838.7,
+      "route_duration_s": 91.1
+    },
+    {
+      "destination_id": "osm_way_1153459798",
+      "profile": "driving",
+      "route_distance_m": 967.4,
+      "route_duration_s": 89.9
+    },
+    {
+      "destination_id": "osm_way_1153505736",
+      "profile": "driving",
+      "route_distance_m": 906.9,
+      "route_duration_s": 100.3
+    },
+    {
+      "destination_id": "osm_way_1153511099",
+      "profile": "driving",
+      "route_distance_m": 1724.1,
+      "route_duration_s": 164.6
+    },
+    {
+      "destination_id": "osm_way_1154573551",
+      "profile": "driving",
+      "route_distance_m": 904.7,
+      "route_duration_s": 87.2
+    },
+    {
+      "destination_id": "osm_way_1221511604",
+      "profile": "driving",
+      "route_distance_m": 1017,
+      "route_duration_s": 126
+    },
+    {
+      "destination_id": "osm_way_1247781792",
+      "profile": "driving",
+      "route_distance_m": 826,
+      "route_duration_s": 89.2
+    },
+    {
+      "destination_id": "osm_way_1275090322",
+      "profile": "driving",
+      "route_distance_m": 1074.1,
+      "route_duration_s": 93.4
+    },
+    {
+      "destination_id": "osm_way_1477771419",
+      "profile": "driving",
+      "route_distance_m": 633.7,
+      "route_duration_s": 89.3
+    },
+    {
+      "destination_id": "osm_way_804926055",
+      "profile": "driving",
+      "route_distance_m": 1263,
+      "route_duration_s": 137.6
+    },
+    {
+      "destination_id": "osm_node_4445200893",
+      "profile": "driving",
+      "route_distance_m": 1156.3,
+      "route_duration_s": 118.1
+    },
+    {
+      "destination_id": "osm_way_165626211",
+      "profile": "driving",
+      "route_distance_m": 1068.5,
+      "route_duration_s": 121.7
+    },
+    {
+      "destination_id": "osm_node_13437482021",
+      "profile": "driving",
+      "route_distance_m": 870.9,
+      "route_duration_s": 128.8
+    },
+    {
+      "destination_id": "osm_way_802125675",
+      "profile": "driving",
+      "route_distance_m": 911.7,
+      "route_duration_s": 102.1
+    },
+    {
+      "destination_id": "osm_way_802125676",
+      "profile": "driving",
+      "route_distance_m": 909.4,
+      "route_duration_s": 101.6
+    },
+    {
+      "destination_id": "osm_way_827000695",
+      "profile": "driving",
+      "route_distance_m": 502.4,
+      "route_duration_s": 53.4
+    },
+    {
+      "destination_id": "osm_way_187895187",
+      "profile": "driving",
+      "route_distance_m": 617.5,
+      "route_duration_s": 80.5
+    },
+    {
+      "destination_id": "osm_way_802125674",
+      "profile": "driving",
+      "route_distance_m": 513.3,
+      "route_duration_s": 56
+    },
+    {
+      "destination_id": "osm_node_13711065242",
+      "profile": "driving",
+      "route_distance_m": 583.2,
+      "route_duration_s": 66.2
+    },
+    {
+      "destination_id": "osm_way_1527137541",
+      "profile": "driving",
+      "route_distance_m": 494.7,
+      "route_duration_s": 53.8
+    },
+    {
+      "destination_id": "osm_way_802125677",
+      "profile": "driving",
+      "route_distance_m": 899.2,
+      "route_duration_s": 99.1
+    },
+    {
+      "destination_id": "osm_node_9586890718",
+      "profile": "driving",
+      "route_distance_m": 498.3,
+      "route_duration_s": 54.2
+    },
+    {
+      "destination_id": "osm_node_9585162923",
+      "profile": "driving",
+      "route_distance_m": 988.5,
+      "route_duration_s": 103.9
+    },
+    {
+      "destination_id": "osm_node_9585162924",
+      "profile": "driving",
+      "route_distance_m": 822.5,
+      "route_duration_s": 76.1
+    }
+  ],
+  "limitations": [
+    "One table request from the fixed demo point; route durations/distances describe fastest driving-profile routes, not motorcycle-verified routes.",
+    "The public demo server is best-effort, may be rate-limited or withdrawn, and is not a production dependency.",
+    "Mapped candidate coordinates may be POI centers, not entrances or permitted waiting locations.",
+    "0 candidate routes were unreachable; their null measures must stay missing.",
+    "This route table is not traffic-aware and does not estimate demand or booking probability."
+  ]
+}

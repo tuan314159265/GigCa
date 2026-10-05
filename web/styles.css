@@ -156,6 +156,46 @@ a { color: inherit; text-decoration: none; }
 .page-footer { color: #a4afb9; display: flex; font-size: 9px; justify-content: space-between; padding: 3px 2px 0; }
 .empty-state { color: #9aa7b3; font-size: 10px; grid-column: 1 / -1; padding: 15px 0; }
 
+.map-panel { margin-bottom: 17px; padding: 19px; }
+.map-heading { margin-bottom: 15px; }
+.map-toolbar { align-items: center; border: 1px solid #edf1f3; border-radius: 9px 9px 0 0; display: flex; flex-wrap: wrap; gap: 10px 18px; padding: 10px 12px; }
+.layer-toggle { align-items: center; color: #596b7d; cursor: pointer; display: inline-flex; font-size: 10px; gap: 6px; }
+.layer-toggle input { accent-color: #16877b; height: 14px; margin: 0; width: 14px; }
+.map-updated { color: #98a5b1; font-size: 9px; margin-left: auto; }
+.map-workspace { display: grid; grid-template-columns: minmax(0, 1fr) 275px; min-height: 410px; }
+.gigca-map { background: #e8eff0; border: 1px solid #edf1f3; border-top: 0; min-height: 410px; z-index: 1; }
+.map-inspector { border: 1px solid #edf1f3; border-left: 0; display: flex; flex-direction: column; gap: 14px; padding: 14px; }
+.map-coordinates { display: grid; gap: 13px; }
+.map-coordinates > div { border-bottom: 1px solid #f0f3f5; padding-bottom: 10px; }
+.map-coordinates span, .map-route-summary > span { color: #9aa6b2; display: block; font-size: 8px; font-weight: 700; letter-spacing: .65px; }
+.map-coordinates strong { color: #46596d; display: block; font-size: 10px; font-weight: 600; margin: 5px 0; }
+.map-coordinates button { background: transparent; border: 0; color: #16877b; cursor: pointer; font-size: 9px; padding: 0; }
+.map-coordinates button.active { color: #b76a24; font-weight: 700; }
+.primary-button { background: #167f77; border: 0; border-radius: 8px; color: white; cursor: pointer; font-size: 10px; font-weight: 700; padding: 10px 12px; }
+.primary-button:hover { background: #116c65; }
+.primary-button:disabled { cursor: wait; opacity: .65; }
+.map-route-summary { background: #f7faf9; border-radius: 8px; padding: 10px; }
+.map-route-summary strong { color: #30465a; display: block; font: 700 16px Manrope, sans-serif; margin-top: 6px; }
+.map-route-summary small { color: #8a98a5; display: block; font-size: 9px; line-height: 1.5; margin-top: 4px; }
+.live-observations { display: grid; gap: 7px; }
+.live-observation { align-items: start; border-bottom: 1px solid #f0f3f5; display: flex; gap: 8px; padding: 0 0 8px; }
+.live-observation:last-child { border-bottom: 0; }
+.live-observation-icon { align-items: center; background: #edf5f4; border-radius: 7px; color: #27867a; display: inline-flex; flex: 0 0 auto; font-size: 10px; height: 25px; justify-content: center; width: 25px; }
+.live-observation strong { color: #4a5d70; display: block; font-size: 9px; }
+.live-observation small { color: #8d9aa7; display: block; font-size: 8px; line-height: 1.4; margin-top: 3px; }
+.map-caveat { color: #9aa6b1; font-size: 8px; line-height: 1.5; margin: auto 0 0; }
+.map-attribution { color: #a1adb7; font-size: 8px; padding-top: 8px; text-align: right; }
+.leaflet-container { font: 11px 'DM Sans', sans-serif; }
+.leaflet-popup-content { color: #3b4f63; font-size: 11px; line-height: 1.5; }
+.map-pin { align-items: center; background: #fff; border: 2px solid #16877b; border-radius: 50% 50% 50% 4px; box-shadow: 0 2px 6px #19394d44; color: #167f77; display: flex; font-size: 9px; font-weight: 700; height: 25px; justify-content: center; transform: rotate(-45deg); width: 25px; }
+.map-pin span { transform: rotate(45deg); }
+.traffic-incident-icon { align-items: center; background: #fff0ed; border: 2px solid #c4584f; border-radius: 50%; box-shadow: 0 2px 6px #19394d33; color: #a9423a; display: flex; font-size: 10px; font-weight: 800; height: 23px; justify-content: center; width: 23px; }
+.rain-map-icon { align-items: center; background: #e7f3ff; border: 2px solid #5495d0; border-radius: 50%; box-shadow: 0 0 0 8px #4a9ce322; color: #286eaa; display: flex; font-size: 9px; font-weight: 700; height: 38px; justify-content: center; width: 38px; }
+.candidate-map-icon { align-items: center; background: #fff8e8; border: 2px solid #c78b31; border-radius: 50%; box-shadow: 0 2px 6px #19394d44; color: #8d5d17; display: flex; font-size: 9px; font-weight: 800; height: 25px; justify-content: center; width: 25px; }
+@media (max-width: 950px) { .map-workspace { grid-template-columns: minmax(0, 1fr) 245px; } }
+@media (max-width: 720px) { .map-workspace { grid-template-columns: 1fr; } .gigca-map { min-height: 350px; } .map-inspector { border-left: 1px solid #edf1f3; } }
+@media (max-width: 520px) { .map-panel { padding: 13px; } .map-toolbar { gap: 9px 12px; } .map-updated { flex-basis: 100%; margin-left: 0; } .gigca-map { min-height: 300px; } }
+
 @media (max-width: 1100px) {
   .sidebar { width: 205px; }
   .main-content { margin-left: 205px; padding-left: 25px; padding-right: 25px; }

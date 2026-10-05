@@ -26,6 +26,12 @@
           "notes": "Verify Ho Chi Minh City coverage, motorcycle vehicle value, credentials, quota, and route behavior before selection."
         },
         {
+          "provider": "HERE Routing API v8",
+          "status": "health_checked_route_auth_required",
+          "endpoint": "https://router.hereapi.com/v8/routes",
+          "notes": "On 2026-10-05, /v8/health returned HTTP 200 status=ok. A sample HCMC /v8/routes request using transportMode=scooter returned HTTP 401 No credentials found. No HERE API key is configured in the repo; add HERE_API_KEY locally, then check route coverage, scooter/motorcycle suitability, quota, and terms before selecting."
+        },
+        {
           "provider": "OSRM public demo server",
           "status": "live_checked_prototype_only",
           "notes": "A driving route request returned HTTP 200. This does not verify motorcycle routing or live traffic; public demo server is not selected as production primary."
@@ -38,19 +44,29 @@
         {
           "provider": "OpenStreetMap via overpass-api.de",
           "status": "temporarily_unavailable_at_check",
-          "notes": "Small request returned HTTP 504 due server overload. Keep cached sample; retry with backoff and identify an approved reliable provider before regular ETL."
+          "notes": "Expanded bbox request for cafes, parking, schools, places of worship, malls, parks, and open land returned HTTP 504 on 2026-10-02. Keep cached sample; retry with backoff and identify an approved reliable provider before regular ETL."
         },
         {
           "provider": "OpenStreetMap via overpass.private.coffee",
           "status": "timed_out_at_check",
-          "notes": "Fallback request timed out; do not mark as verified."
+          "notes": "Smaller bbox fallback request timed out on 2026-10-02; do not mark as verified. Derived cafe grid uses the existing 2026-09-26 sample, not a fresh response."
+        },
+        {
+          "provider": "TomTom Search API",
+          "status": "live_checked_prototype_only",
+          "endpoint": "https://api.tomtom.com/search/2/poiSearch",
+          "notes": "On 2026-10-02, POI Search returned 60 parking, 100 school, 29 church, and 100 mall results within 1.5 km of the HCMC demo point. School and mall hit the 100-result request limit and may be truncated. All are unverified waiting candidates; permission, access, hours, exact waiting position, and terms for redistribution/retention remain unverified."
         }
       ]
     },
     "traffic": {
       "primary": null,
       "candidates": [
-        {"provider": "TomTom Traffic API", "status": "not_live_checked"},
+        {
+          "provider": "TomTom Traffic API",
+          "status": "live_checked_for_demo",
+          "notes": "On 2026-10-02, the configured key returned HTTP 200 for Flow Segment Data v4 and Incident Details v5 using sample point/bounding-box requests in central Ho Chi Minh City. The latest local crawl returned currentSpeed 6 km/h, freeFlowSpeed 27 km/h, confidence 1, and 40 incident records; an earlier request returned different values, consistent with changing traffic snapshots. Raw responses are local-only under ignored data/raw/tomtom/. This does not establish citywide coverage or production suitability. The docs recommend newer Orbis APIs for new integrations; verify access, data semantics, terms, and coverage before selecting a primary."
+        },
         {"provider": "Ho Chi Minh City traffic portal", "status": "no_machine_readable_api_verified"}
       ]
     }

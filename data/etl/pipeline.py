@@ -21,6 +21,12 @@ SAMPLE_FILES = {
     "poi": "osm_overpass_pois_hcmc.json",
     "routing": "osrm_route_hcmc.json",
 }
+OPTIONAL_SPATIAL_FILES = {
+    "poi_grid": "osm_poi_grid_hcmc.json",
+    "osm_waiting_candidates": "osm_waiting_candidates_hcmc.json",
+}
+OPTIONAL_WAITING_ROUTES_FILE = "osrm_waiting_candidate_routes_hcmc.json"
+LOCAL_TOMTOM_CANDIDATES = ROOT / "data" / "raw" / "tomtom_search" / "tomtom_waiting_candidates_hcmc.json"
 
 
 class PipelineError(RuntimeError):
@@ -113,7 +119,7 @@ def sample_age_status(
     return "partial", "Forecast is available for one provider grid near the sample point, not area-wide."
 
 
-def build_engine_input(samples_dir: Path) -> dict[str, Any]:
+def build_engine_input(samples_dir: Path, include_local_tomtom_candidates: bool = False) -> dict[str, Any]:
     paths = {name: samples_dir / filename for name, filename in SAMPLE_FILES.items()}
     datasets = {name: load_json(path) for name, path in paths.items()}
     dataset_ids = {
@@ -126,6 +132,30 @@ def build_engine_input(samples_dir: Path) -> dict[str, Any]:
     hourly = validate_weather(weather, paths["weather"])
     poi_items = validate_pois(pois, paths["poi"])
     route = extract_route(routing, paths["routing"])
+
+    spatial_datasets: dict[str, dict[str, Any]] = {}
+    for name, filename in OPTIONAL_SPATIAL_FILES.items():
+        path = samples_dir / filename
+        if path.is_file():
+            spatial_datasets[name] = load_json(path)
+            dataset_ids[name] = require_dataset_id(spatial_datasets[name], path)
+    waiting_routes_path = samples_dir / OPTIONAL_WAITING_ROUTES_FILE
+    waiting_routes_dataset: dict[str, Any] = {}
+    if waiting_routes_path.is_file():
+        waiting_routes_dataset = load_json(waiting_routes_path)
+        dataset_ids["waiting_routes"] = require_dataset_id(waiting_routes_dataset, waiting_routes_path)
+    if include_local_tomtom_candidates and LOCAL_TOMTOM_CANDIDATES.is_file():
+        spatial_datasets["tomtom_waiting_candidates"] = load_json(LOCAL_TOMTOM_CANDIDATES)
+        dataset_ids["tomtom_waiting_candidates"] = require_dataset_id(
+            spatial_datasets["tomtom_waiting_candidates"], LOCAL_TOMTOM_CANDIDATES
+        )
+    poi_grid = spatial_datasets.get("poi_grid", {})
+    osm_waiting_candidates = spatial_datasets.get("osm_waiting_candidates", {})
+    tomtom_waiting_candidates = spatial_datasets.get("tomtom_waiting_candidates", {})
+    poi_grid_cells = poi_grid.get("cells", [])
+    candidate_items = osm_waiting_candidates.get("candidates", []) + tomtom_waiting_candidates.get("candidates", [])
+    if not isinstance(poi_grid_cells, list) or not isinstance(candidate_items, list):
+        raise PipelineError("Spatial POI samples must contain cells/candidates arrays")
 
     location = weather.get("requested_location")
     if not isinstance(location, dict):
@@ -142,6 +172,34 @@ def build_engine_input(samples_dir: Path) -> dict[str, Any]:
     route_request = routing["request"]
     route_source = routing.get("source", {})
     route_profile = route_request.get("profile", route_source.get("profile", "unknown"))
+    routed_candidates = waiting_routes_dataset.get("routes", [])
+    if not isinstance(routed_candidates, list):
+        raise PipelineError(f"{waiting_routes_path}: routes must be an array")
+    if routed_candidates:
+        route_profile = waiting_routes_dataset.get("request", {}).get("profile", "driving")
+        normalized_routes = [
+            {
+                "destination_id": item["destination_id"],
+                "profile": item.get("profile", route_profile),
+                "route_distance_m": item.get("route_distance_m"),
+                "route_duration_s": item.get("route_duration_s"),
+            }
+            for item in routed_candidates
+        ]
+        route_status_source = dataset_ids["waiting_routes"]
+        route_status_reason = (
+            f"{len(normalized_routes)} OSRM {route_profile} route summaries to waiting candidates; "
+            "motorcycle suitability and live traffic are unverified."
+        )
+    else:
+        normalized_routes = [{
+            "destination_id": "sample_destination_01",
+            "profile": route_profile,
+            "route_distance_m": route.get("distance"),
+            "route_duration_s": route.get("duration"),
+        }]
+        route_status_source = dataset_ids["routing"]
+        route_status_reason = f"One {route_profile} route is available; motorcycle suitability and live traffic are unverified."
     generated = [
         data["generated_at"]
         for data in datasets.values()
@@ -163,10 +221,22 @@ def build_engine_input(samples_dir: Path) -> dict[str, Any]:
             "source_dataset_id": dataset_ids["poi"],
         },
         {
+            "dataset": "poi_density_grid",
+            "status": "partial" if poi_grid_cells else "missing",
+            "reason": "Cafe counts are aggregated into local sample cells; POI density is not booking demand." if poi_grid_cells else "No spatial POI grid sample is available.",
+            **({"source_dataset_id": dataset_ids["poi_grid"]} if "poi_grid" in dataset_ids else {}),
+        },
+        {
+            "dataset": "waiting_location_candidates",
+            "status": "partial" if candidate_items else "missing",
+            "reason": "Parking, church, school, mall, park, and open-land candidates are unverified for access and permission." if candidate_items else "No waiting-location candidate sample is available.",
+            **({"source_dataset_id": dataset_ids.get("osm_waiting_candidates") or dataset_ids.get("tomtom_waiting_candidates")} if "osm_waiting_candidates" in dataset_ids or "tomtom_waiting_candidates" in dataset_ids else {}),
+        },
+        {
             "dataset": "routing",
-            "status": "partial",
-            "reason": f"One {route_profile} route is available; motorcycle suitability and live traffic are unverified.",
-            "source_dataset_id": dataset_ids["routing"],
+            "status": "partial" if normalized_routes else "missing",
+            "reason": route_status_reason if normalized_routes else "No candidate routing samples are available.",
+            **({"source_dataset_id": route_status_source} if normalized_routes else {}),
         },
         {"dataset": "traffic", "status": "missing", "reason": "No traffic feed has passed provider and live-response verification."},
         {"dataset": "road_incidents", "status": "missing", "reason": "No incident/closure feed has been verified."},
@@ -230,21 +300,22 @@ def build_engine_input(samples_dir: Path) -> dict[str, Any]:
                     "hourly": hourly,
                 },
                 "poi_counts_by_category": poi_counts,
-                "routing_samples": [
-                    {
-                        "destination_id": "sample_destination_01",
-                        "profile": route_profile,
-                        "route_distance_m": route.get("distance"),
-                        "route_duration_s": route.get("duration"),
-                    }
-                ],
+                "poi_density_grid": {
+                    "cell_size_m": poi_grid.get("grid_method", {}).get("cell_size_m"),
+                    "cells": poi_grid_cells,
+                    "source_dataset_id": dataset_ids.get("poi_grid"),
+                },
+                "waiting_location_candidates": candidate_items,
+                "routing_samples": normalized_routes,
             }
         ],
         "limitations": [
             "This ETL run transforms checked-in samples; it does not fetch live data.",
             f"Samples were collected at {source_date}; verify each data_status before use.",
             "Coverage is one point and a POI search radius, not a city-wide grid.",
+            "Cafe density grid and waiting-location candidates are present only when their optional spatial sample files have been fetched.",
             "OSRM driving route duration is not live traffic or verified motorcycle travel time.",
+            "Waiting-candidate routes come from the public OSRM demo server and are best-effort samples, not a production routing dependency.",
             "POI counts do not imply passenger demand, waiting legality, or trip probability.",
             "Unverified providers are not silently substituted; fallback requires comparable fields and coverage.",
         ],
@@ -260,6 +331,11 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Fetch a fresh Open-Meteo forecast before transforming samples",
     )
+    parser.add_argument(
+        "--include-local-tomtom-candidates",
+        action="store_true",
+        help="Include ignored local TomTom Search POIs; check account terms before sharing output",
+    )
     return parser.parse_args()
 
 
@@ -271,7 +347,10 @@ def main() -> int:
 
             weather_path = fetch_weather_sample(args.samples_dir)
             print(f"Weather sample refreshed: {weather_path}")
-        snapshot = build_engine_input(args.samples_dir)
+        snapshot = build_engine_input(
+            args.samples_dir,
+            include_local_tomtom_candidates=args.include_local_tomtom_candidates,
+        )
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(
             json.dumps(snapshot, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"

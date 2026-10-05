@@ -11,11 +11,11 @@ GigCa hỗ trợ tài xế chọn khu vực nên chờ hoặc nghỉ dựa trên
 | Backend | `api/`, `contracts/` | API, xác thực đầu vào, nạp snapshot và trả kết quả theo contract chung. |
 | Frontend | `web/` | Bản đồ, tùy chọn tài xế, danh sách gợi ý và giải thích/trạng thái dữ liệu. |
 
-Chi tiết cấu trúc, quy ước, API và schema nằm trong [`RULES.md`](RULES.md) và [`docs/`](docs/).
+Chi tiết cấu trúc, quy ước, API và schema nằm trong [`RULES.md`](RULES.md) và [`docs/`](docs/). Thiết kế database MVP đang ở trạng thái đề xuất trong [`docs/07_DATABASE_DESIGN.md`](docs/07_DATABASE_DESIGN.md); PostgreSQL/PostGIS chưa được cài hoặc kết nối trong pipeline.
 
 Luồng ETL MVP nằm trong `data/etl/`, đọc các JSON mẫu, kiểm tra, chuẩn hóa theo contract rồi ghi snapshot vào `data/processed/`. Tạo môi trường bằng `python3 -m venv .venv`, sau đó chạy `.venv/bin/python -m data.etl.pipeline`. Xem [`data/etl/README.md`](data/etl/README.md); trạng thái kiểm tra API và thứ tự nguồn/backup theo từng dataset nằm trong [`data/etl/config/source_registry.json`](data/etl/config/source_registry.json).
 
-Web Data Explorer chưa có bản đồ, đọc snapshot và JSON mẫu để xem trạng thái mưa, POI, routing và provider. Chạy `.venv/bin/python -m http.server 8000` từ thư mục gốc rồi mở `http://localhost:8000/web/`; xem thêm [`web/README.md`](web/README.md).
+Web Data Explorer có bản đồ demo, lớp mật độ cafe theo ô, POI ứng viên điểm chờ, traffic/incidents, dự báo mưa và routing. Chạy `.venv/bin/python -m web.server` từ thư mục gốc rồi mở `http://localhost:8000/web/`; cần `API_TOMTOM` trong `.env` cho các lớp TomTom. Xem thêm [`web/README.md`](web/README.md).
 
 Data dictionary và hướng dẫn bàn giao cho Decision Engine nằm trong [`data/README.md`](data/README.md); tài liệu giải thích chi tiết kiến trúc và code Decision Engine nằm trong [`engine/README.md`](engine/README.md); contract draft ở [`contracts/engine_input.schema.json`](contracts/engine_input.schema.json). Danh sách nguồn chờ kiểm chứng nằm trong `docs/05_DATA_SOURCES_TO_VERIFY.md`. Có thể tạo/cập nhật JSON mẫu bằng `python3 scripts/fetch_sample_data.py`; mục lục file mẫu ở [`data/samples/README.md`](data/samples/README.md).
 

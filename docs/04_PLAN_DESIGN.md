@@ -24,6 +24,12 @@ POI nghỉ/chờ và lịch sự kiện có thể được thêm làm context n�
 3. Backend kiểm tra request, chọn snapshot, gọi engine và trả kết quả theo API contract.
 4. Frontend hiển thị ứng viên trên bản đồ, thời gian dữ liệu, lý do, độ tin cậy và cảnh báo.
 
+## Nhịp lấy dữ liệu MVP
+
+- **Traffic Flow:** gọi theo request cần gợi ý/hiển thị, cache ngắn 45 giây và ghi mỗi lần provider được gọi thành một observation có `fetched_at`. Endpoint mẫu hiện chỉ lấy đoạn gần một tọa độ; chưa bao phủ toàn mạng đường. Không dựng Kafka hay luồng push riêng ở MVP.
+- **Dự báo mưa:** cập nhật theo lịch khoảng mỗi giờ, lưu forecast theo `issued_at`/`valid_at`/`fetched_at`; Engine đọc vintage mới nhất. Dữ liệu đã quá hạn phải được đánh dấu stale.
+- **Lịch chạy:** `data.etl.refresh_weather` là lệnh một lần để cron/systemd gọi định kỳ; cấu hình lịch và thông tin DB trong môi trường chạy, không commit secrets.
+
 ## Cần chốt trong buổi làm việc
 
 - Nguồn/API và quyền sử dụng cho đường, traffic, thời tiết, POI và event.
@@ -33,3 +39,4 @@ POI nghỉ/chờ và lịch sự kiện có thể được thêm làm context n�
 - Tín hiệu nào khả dụng cho giữ vị trí tốt; nếu không có booking data thì giới hạn kết luận.
 - Vai trò của mục tiêu “giá trị/cuốc” cho đến khi có dữ liệu hợp pháp, đủ tin cậy.
 - Định dạng snapshot, schema/API response và cách biểu diễn độ tin cậy.
+- **Traffic:** giữ tốc độ hiện tại/tốc độ tự do và chỉ số ùn tắc liên tục; “thông thoáng/chậm/ùn tắc” là nhãn hiển thị suy ra từ chỉ số, không phải dữ liệu gốc one-hot. Ngưỡng phân loại của Engine hiện là tạm thời; cần kiểm định/hiệu chỉnh bằng dữ liệu đủ phủ tại TP.HCM trước khi dùng vận hành. Xem [báo cáo chỉ số CI](08_TRAFFIC_CONGESTION_INDEX.md).

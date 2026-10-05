@@ -1,0 +1,1571 @@
+{
+  "schema_version": "1.0",
+  "dataset_id": "gigca_hcmc_demo_osm_waiting_location_candidates",
+  "generated_at": "2026-10-02T12:02:01+00:00",
+  "coverage": {
+    "center": {
+      "latitude": 10.7769,
+      "longitude": 106.7009
+    },
+    "bbox": {
+      "south": 10.767856282670428,
+      "west": 106.69175560599072,
+      "north": 10.785943717329571,
+      "east": 106.71004439400929
+    },
+    "half_width_m": 1000,
+    "shape": "circle",
+    "cell_size_m": 250,
+    "cell_count": 32,
+    "poi_element_count": 284,
+    "cafe_count": 230,
+    "waiting_candidate_count": 54,
+    "minimum_open_area_candidate_m2": 2500
+  },
+  "source_generated_at": "2026-09-26T10:20:30+00:00",
+  "source": {
+    "provider": "OpenStreetMap via Overpass API",
+    "endpoint": "https://overpass-api.de/api/interpreter",
+    "documentation": "https://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide",
+    "license": "Open Database License (ODbL) 1.0",
+    "attribution": "© OpenStreetMap contributors",
+    "query": "[out:json][timeout:45];\n(\n  node(around:1000,10.7769,106.7009)[\"amenity\"~\"^(cafe|restaurant|fast_food|food_court|toilets|bench|shelter|parking|fuel|bus_station)$\"];\n  node(around:1000,10.7769,106.7009)[\"shop\"~\"^(convenience|supermarket|mall)$\"];\n  node(around:1000,10.7769,106.7009)[\"public_transport\"~\"^(platform|station)$\"];\n  way(around:1000,10.7769,106.7009)[\"amenity\"~\"^(cafe|restaurant|fast_food|food_court|toilets|bench|shelter|parking|fuel|bus_station)$\"];\n  way(around:1000,10.7769,106.7009)[\"shop\"~\"^(convenience|supermarket|mall)$\"];\n  way(around:1000,10.7769,106.7009)[\"public_transport\"~\"^(platform|station)$\"];\n  relation(around:1000,10.7769,106.7009)[\"amenity\"~\"^(cafe|restaurant|fast_food|food_court|toilets|bench|shelter|parking|fuel|bus_station)$\"];\n  relation(around:1000,10.7769,106.7009)[\"shop\"~\"^(convenience|supermarket|mall)$\"];\n  relation(around:1000,10.7769,106.7009)[\"public_transport\"~\"^(platform|station)$\"];\n);\nout center tags;",
+    "result_count": 920,
+    "point_note": "Way/relation coordinates use the bounding-box center and are approximate, not entrances or legal stopping locations.",
+    "derivation": "Normalized from osm_overpass_pois_hcmc.json; source sample generated at 2026-09-26T10:20:30+00:00.",
+    "scope": "Existing circular POI sample; cells are retained only when fully inside its source radius."
+  },
+  "candidate_policy": {
+    "candidate_status": "unverified_candidate",
+    "permission_to_wait": "unknown",
+    "categories": [
+      "parking",
+      "church",
+      "place_of_worship",
+      "school",
+      "shopping_center",
+      "open_land",
+      "park",
+      "fuel_station",
+      "transit_or_rest_area"
+    ],
+    "open_land_min_area_m2": 2500,
+    "note": "OSM tags generate candidates for review only; they do not prove public access, motorcycle access, waiting/parking permission, or suitable operating hours."
+  },
+  "candidates": [
+    {
+      "candidate_id": "osm_node_729604786",
+      "osm_type": "node",
+      "osm_id": 729604786,
+      "name": null,
+      "poi_type": "fuel_station",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7753118,
+      "longitude": 106.7048514,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "fuel",
+        "operator": "Cong Ty CP TM Dai Ly Dau Tinh Ba Ria Vung Tau - CN"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "node:729604786",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_node_1969358658",
+      "osm_type": "node",
+      "osm_id": 1969358658,
+      "name": "Cửa Hàng Xăng Dầu Petrolimex",
+      "poi_type": "fuel_station",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7807762,
+      "longitude": 106.6958072,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "fuel",
+        "brand": "Petrolimex",
+        "brand:wikidata": "Q10831598",
+        "compressed_air": "no",
+        "name": "Cửa Hàng Xăng Dầu Petrolimex"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "node:1969358658",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_node_729604816",
+      "osm_type": "node",
+      "osm_id": 729604816,
+      "name": "Cửa Hàng Xăng Dầu Satra",
+      "poi_type": "fuel_station",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7689585,
+      "longitude": 106.6966613,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "fuel",
+        "name": "Cửa Hàng Xăng Dầu Satra",
+        "operator": "Tran Thien Trading Services Pte."
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "node:729604816",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_718492440",
+      "osm_type": "way",
+      "osm_id": 718492440,
+      "name": "Cửa hàng Xăng dầu Petrolimex Số 01",
+      "poi_type": "fuel_station",
+      "role": "waiting_location_candidate",
+      "latitude": 10.784144,
+      "longitude": 106.6970604,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "addr:street": "Hai Bà Trưng",
+        "amenity": "fuel",
+        "brand": "Petrolimex",
+        "building": "roof",
+        "fuel:biodiesel": "yes",
+        "fuel:diesel": "yes",
+        "name": "Cửa hàng Xăng dầu Petrolimex Số 01",
+        "not:brand:wikidata": "Q10831598",
+        "operator": "Petrolimex"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:718492440",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_1483716978",
+      "osm_type": "way",
+      "osm_id": 1483716978,
+      "name": "Cửa hàng Xăng dầu Petrolimex Số 03",
+      "poi_type": "fuel_station",
+      "role": "waiting_location_candidate",
+      "latitude": 10.771437,
+      "longitude": 106.6951692,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "fuel",
+        "brand": "Petrolimex",
+        "brand:wikidata": "Q10831598",
+        "building": "yes",
+        "name": "Cửa hàng Xăng dầu Petrolimex Số 03"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:1483716978",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_1153472355",
+      "osm_type": "way",
+      "osm_id": 1153472355,
+      "name": "Cửa hàng Xăng dầu Petrolimex Số 38",
+      "poi_type": "fuel_station",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7808133,
+      "longitude": 106.6958029,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "188",
+        "addr:province": "Thành phố Hồ Chí Minh",
+        "addr:street": "Pasteur",
+        "addr:subdistrict": "Phường Xuân Hòa",
+        "amenity": "fuel",
+        "brand": "Petrolimex",
+        "brand:wikidata": "Q10831598",
+        "building": "roof",
+        "compressed_air": "no",
+        "name": "Cửa hàng Xăng dầu Petrolimex Số 38"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:1153472355",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_node_860700661",
+      "osm_type": "node",
+      "osm_id": 860700661,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7812499,
+      "longitude": 106.6983279,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "layer": "-1",
+        "parking": "underground"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "node:860700661",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_node_1769456892",
+      "osm_type": "node",
+      "osm_id": 1769456892,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7734144,
+      "longitude": 106.6937048,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "node:1769456892",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_node_1770193810",
+      "osm_type": "node",
+      "osm_id": 1770193810,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7814261,
+      "longitude": 106.6969159,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "parking": "surface"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "node:1770193810",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_node_1770193902",
+      "osm_type": "node",
+      "osm_id": 1770193902,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7810892,
+      "longitude": 106.6965647,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "parking": "surface"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "node:1770193902",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_node_1770193965",
+      "osm_type": "node",
+      "osm_id": 1770193965,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7825263,
+      "longitude": 106.6974271,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "layer": "-1",
+        "parking": "underground"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "node:1770193965",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_node_1770305088",
+      "osm_type": "node",
+      "osm_id": 1770305088,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7754919,
+      "longitude": 106.6984902,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "node:1770305088",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_node_1770305235",
+      "osm_type": "node",
+      "osm_id": 1770305235,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7761981,
+      "longitude": 106.6977285,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "node:1770305235",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_node_1969392557",
+      "osm_type": "node",
+      "osm_id": 1969392557,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7760071,
+      "longitude": 106.702098,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "layer": "-4",
+        "parking": "underground"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "node:1969392557",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_node_1969598926",
+      "osm_type": "node",
+      "osm_id": 1969598926,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7771916,
+      "longitude": 106.6962032,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "node:1969598926",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_node_1969599005",
+      "osm_type": "node",
+      "osm_id": 1969599005,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7720545,
+      "longitude": 106.697625,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "parking": "surface"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "node:1969599005",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_node_7513022941",
+      "osm_type": "node",
+      "osm_id": 7513022941,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7727335,
+      "longitude": 106.7029363,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "node:7513022941",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_node_13039147367",
+      "osm_type": "node",
+      "osm_id": 13039147367,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.769641,
+      "longitude": 106.7054782,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "access": "yes",
+        "amenity": "parking",
+        "parking": "surface"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "node:13039147367",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_node_13039147369",
+      "osm_type": "node",
+      "osm_id": 13039147369,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7705198,
+      "longitude": 106.7056119,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "access": "yes",
+        "amenity": "parking",
+        "parking": "surface"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "node:13039147369",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_165567727",
+      "osm_type": "way",
+      "osm_id": 165567727,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7830824,
+      "longitude": 106.7001036,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:165567727",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_165582262",
+      "osm_type": "way",
+      "osm_id": 165582262,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7809425,
+      "longitude": 106.6995393,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:165582262",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_165887836",
+      "osm_type": "way",
+      "osm_id": 165887836,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.777978,
+      "longitude": 106.7064217,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "building": "yes",
+        "parking": "multi-storey"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:165887836",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_801958384",
+      "osm_type": "way",
+      "osm_id": 801958384,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7818001,
+      "longitude": 106.7036077,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "building": "roof"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:801958384",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_802105042",
+      "osm_type": "way",
+      "osm_id": 802105042,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.776407,
+      "longitude": 106.6997597,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:802105042",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_802105045",
+      "osm_type": "way",
+      "osm_id": 802105045,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7753217,
+      "longitude": 106.6996533,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:802105045",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_802105051",
+      "osm_type": "way",
+      "osm_id": 802105051,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7757097,
+      "longitude": 106.6998551,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:802105051",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_802105052",
+      "osm_type": "way",
+      "osm_id": 802105052,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7759462,
+      "longitude": 106.7000023,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:802105052",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_802328109",
+      "osm_type": "way",
+      "osm_id": 802328109,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7765955,
+      "longitude": 106.7027721,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "parking": "surface"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:802328109",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_802328110",
+      "osm_type": "way",
+      "osm_id": 802328110,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7762524,
+      "longitude": 106.7031428,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "parking": "surface"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:802328110",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_1150209719",
+      "osm_type": "way",
+      "osm_id": 1150209719,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7758036,
+      "longitude": 106.7070089,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "access": "yes",
+        "amenity": "parking",
+        "parking": "surface"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:1150209719",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_1150240110",
+      "osm_type": "way",
+      "osm_id": 1150240110,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.774612,
+      "longitude": 106.7063431,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "parking": "street_side"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:1150240110",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_1153459798",
+      "osm_type": "way",
+      "osm_id": 1153459798,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7809459,
+      "longitude": 106.6951796,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:1153459798",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_1153505736",
+      "osm_type": "way",
+      "osm_id": 1153505736,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7801034,
+      "longitude": 106.6956798,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "access": "private",
+        "amenity": "parking",
+        "parking": "surface"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:1153505736",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_1153511099",
+      "osm_type": "way",
+      "osm_id": 1153511099,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7780818,
+      "longitude": 106.6933495,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:1153511099",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_1154573551",
+      "osm_type": "way",
+      "osm_id": 1154573551,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7805752,
+      "longitude": 106.6961322,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "access": "private",
+        "amenity": "parking",
+        "parking": "surface"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:1154573551",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_1221511604",
+      "osm_type": "way",
+      "osm_id": 1221511604,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7799268,
+      "longitude": 106.7003494,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:1221511604",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_1247781792",
+      "osm_type": "way",
+      "osm_id": 1247781792,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7727493,
+      "longitude": 106.7013702,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "covered": "yes"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:1247781792",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_1275090322",
+      "osm_type": "way",
+      "osm_id": 1275090322,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7706126,
+      "longitude": 106.6954568,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "operator": "VETC",
+        "orientation": "perpendicular",
+        "parking": "street_side",
+        "wheelchair": "yes"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:1275090322",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_1477771419",
+      "osm_type": "way",
+      "osm_id": 1477771419,
+      "name": null,
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7741976,
+      "longitude": 106.7016436,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "access": "yes",
+        "amenity": "parking"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:1477771419",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_804926055",
+      "osm_type": "way",
+      "osm_id": 804926055,
+      "name": "Bãi giữ xe 42 Chu Mạnh Trinh",
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7834556,
+      "longitude": 106.7032945,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "name": "Bãi giữ xe 42 Chu Mạnh Trinh"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:804926055",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_node_4445200893",
+      "osm_type": "node",
+      "osm_id": 4445200893,
+      "name": "Bãi Đậu Xe Nguyễn Văn Chiêm",
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7817942,
+      "longitude": 106.6988031,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "name": "Bãi Đậu Xe Nguyễn Văn Chiêm"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "node:4445200893",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_165626211",
+      "osm_type": "way",
+      "osm_id": 165626211,
+      "name": "Lavenue Crown Hotel",
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.781474,
+      "longitude": 106.6989854,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "amenity": "parking",
+        "barrier": "fence",
+        "name": "Lavenue Crown Hotel"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:165626211",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_node_13437482021",
+      "osm_type": "node",
+      "osm_id": 13437482021,
+      "name": "Nhà Xe Phúc Bình Dương",
+      "poi_type": "parking",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7779142,
+      "longitude": 106.7060295,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "3",
+        "addr:street": "Thái Văn Lung",
+        "amenity": "parking",
+        "name": "Nhà Xe Phúc Bình Dương",
+        "operator": "Nhà Xe Phúc Bình Dương"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "node:13437482021",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_802125675",
+      "osm_type": "way",
+      "osm_id": 802125675,
+      "name": null,
+      "poi_type": "shopping_center",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7735909,
+      "longitude": 106.7009736,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "building:part": "yes",
+        "shop": "mall"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:802125675",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_802125676",
+      "osm_type": "way",
+      "osm_id": 802125676,
+      "name": null,
+      "poi_type": "shopping_center",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7735471,
+      "longitude": 106.7009763,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "building": "yes",
+        "building:part": "yes",
+        "height": "170",
+        "shop": "mall"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:802125676",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_827000695",
+      "osm_type": "way",
+      "osm_id": 827000695,
+      "name": null,
+      "poi_type": "shopping_center",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7731512,
+      "longitude": 106.7005724,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "building:part": "yes",
+        "shop": "mall"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:827000695",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_187895187",
+      "osm_type": "way",
+      "osm_id": 187895187,
+      "name": "Lucky Plaza",
+      "poi_type": "shopping_center",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7741404,
+      "longitude": 106.7045043,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "building": "yes",
+        "building:levels": "3",
+        "name": "Lucky Plaza",
+        "name:ja": "ラッキープラザ",
+        "shop": "mall"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:187895187",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_802125674",
+      "osm_type": "way",
+      "osm_id": 802125674,
+      "name": "Saigon Centre",
+      "poi_type": "shopping_center",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7729521,
+      "longitude": 106.7006604,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "building": "yes",
+        "building:levels": "39",
+        "building:part": "yes",
+        "height": "193",
+        "name": "Saigon Centre",
+        "shop": "mall"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:802125674",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_node_13711065242",
+      "osm_type": "node",
+      "osm_id": 13711065242,
+      "name": "Saigon Centre - Cổng Nam Kỳ Khởi Nghĩa - Điểm Đón Trả",
+      "poi_type": "shopping_center",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7725665,
+      "longitude": 106.7006849,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "addr:city": "Hồ Chí Minh",
+        "addr:housenumber": "65-67",
+        "addr:street": "Lê Lợi",
+        "addr:subdistrict": "P. Sài Gòn",
+        "name": "Saigon Centre - Cổng Nam Kỳ Khởi Nghĩa - Điểm Đón Trả",
+        "name:en": "Saigon Centre - Nam Ky Khoi Nghia Gate - Pick-up and Drop-off Point",
+        "opening_hours": "08:00-21:00",
+        "shop": "mall"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "node:13711065242",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_1527137541",
+      "osm_type": "way",
+      "osm_id": 1527137541,
+      "name": "Saigon Garden",
+      "poi_type": "shopping_center",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7733315,
+      "longitude": 106.7037938,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "building": "yes",
+        "name": "Saigon Garden",
+        "shop": "mall"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:1527137541",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_way_802125677",
+      "osm_type": "way",
+      "osm_id": 802125677,
+      "name": "Toà Nhà Saigon Centre",
+      "poi_type": "shopping_center",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7732401,
+      "longitude": 106.7008784,
+      "point_method": "osm_center_approximation",
+      "area_m2": null,
+      "tags": {
+        "addr:housenumber": "65",
+        "addr:postcode": "71006",
+        "addr:street": "Lê Lợi",
+        "building": "commercial",
+        "name": "Toà Nhà Saigon Centre",
+        "name:ru": "Сайгон Сентер",
+        "name:zh": "西贡中心",
+        "name:zh-Hant": "西貢中心",
+        "shop": "mall"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "way:802125677",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_node_9586890718",
+      "osm_type": "node",
+      "osm_id": 9586890718,
+      "name": "Trung tâm mua sắm Sài Gòn Garden",
+      "poi_type": "shopping_center",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7733608,
+      "longitude": 106.7038659,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "name": "Trung tâm mua sắm Sài Gòn Garden",
+        "shop": "mall"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "node:9586890718",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_node_9585162923",
+      "osm_type": "node",
+      "osm_id": 9585162923,
+      "name": "Nhà Xe Hoa Mai",
+      "poi_type": "transit_or_rest_area",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7692272,
+      "longitude": 106.6998101,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "bus_station",
+        "bus": "yes",
+        "name": "Nhà Xe Hoa Mai",
+        "public_transport": "station"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "node:9585162923",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    },
+    {
+      "candidate_id": "osm_node_9585162924",
+      "osm_type": "node",
+      "osm_id": 9585162924,
+      "name": "Nhà Xe Toàn Thắng",
+      "poi_type": "transit_or_rest_area",
+      "role": "waiting_location_candidate",
+      "latitude": 10.7701978,
+      "longitude": 106.7009692,
+      "point_method": "node_coordinate",
+      "area_m2": null,
+      "tags": {
+        "amenity": "bus_station",
+        "bus": "yes",
+        "name": "Nhà Xe Toàn Thắng",
+        "public_transport": "station"
+      },
+      "source_provider": "OpenStreetMap via Overpass API",
+      "source_id": "node:9585162924",
+      "candidate_status": "unverified_candidate",
+      "permission_to_wait": "unknown",
+      "verification_needed": [
+        "public_or_owner_access",
+        "motorcycle_access",
+        "waiting_or_parking_permission",
+        "opening_hours",
+        "exact_entrance_or_staging_point"
+      ]
+    }
+  ],
+  "limitations": [
+    "Way/relation point coordinates are approximate centers/centroids, not entrances or curbside waiting points.",
+    "School, church, mall, park, fuel-station, and open-land candidates may be private, restricted, crowded, or unsuitable at particular times.",
+    "Verify access, permission, hours, and exact safe staging position before showing a place as a confirmed waiting spot."
+  ]
+}

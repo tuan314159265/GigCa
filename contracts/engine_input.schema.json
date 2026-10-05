@@ -48,6 +48,25 @@
         "additionalProperties": false
       }
     },
+    "traffic": {
+      "type": "array",
+      "description": "Observed provider road segments in Engine TrafficEdge format. Segments are not graph edges unless explicitly matched.",
+      "items": {
+        "type": "object",
+        "required": ["edge_id", "observed_at"],
+        "properties": {
+          "edge_id": {"type": "string", "minLength": 1, "description": "Stable provider-segment identifier; not necessarily a street name or matched graph edge."},
+          "from_node": {"type": ["string", "null"]},
+          "to_node": {"type": ["string", "null"]},
+          "length_m": {"type": ["number", "null"], "minimum": 0},
+          "current_speed_kmh": {"type": ["number", "null"], "minimum": 0},
+          "free_flow_speed_kmh": {"type": ["number", "null"], "minimum": 0},
+          "congestion_level": {"enum": ["thong_thoang", "dong_xe", "un_tac", null]},
+          "observed_at": {"type": "string", "format": "date-time"}
+        },
+        "additionalProperties": false
+      }
+    },
     "areas": {
       "type": "array",
       "items": {
@@ -90,6 +109,64 @@
           "poi_counts_by_category": {
             "type": "object",
             "additionalProperties": {"type": "integer", "minimum": 0}
+          },
+          "poi_density_grid": {
+            "type": "object",
+            "required": ["cell_size_m", "cells"],
+            "properties": {
+              "cell_size_m": {"type": ["integer", "null"], "minimum": 1},
+              "source_dataset_id": {"type": ["string", "null"]},
+              "cells": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["cell_id", "cell_size_m", "cell_area_km2", "cafe_poi_count", "cafe_density_per_km2", "cafe_poi_count_within_500m", "cafe_count_500m_status", "center", "geometry"],
+                  "properties": {
+                    "cell_id": {"type": "string"},
+                    "row": {"type": "integer", "minimum": 0},
+                    "column": {"type": "integer", "minimum": 0},
+                    "cell_size_m": {"type": "integer", "minimum": 1},
+                    "cell_area_km2": {"type": "number", "minimum": 0},
+                    "cafe_poi_count": {"type": "integer", "minimum": 0},
+                    "cafe_density_per_km2": {"type": "number", "minimum": 0},
+                    "cafe_poi_count_within_500m": {"type": ["integer", "null"], "minimum": 0},
+                    "cafe_count_500m_status": {"enum": ["full_coverage", "partial_coverage"]},
+                    "center": {"$ref": "#/$defs/coordinate"},
+                    "geometry": {"type": "object", "required": ["type", "coordinates"], "properties": {"type": {"const": "Polygon"}, "coordinates": {"type": "array"}}, "additionalProperties": true}
+                  },
+                  "additionalProperties": false
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "waiting_location_candidates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["candidate_id", "poi_type", "role", "candidate_status", "permission_to_wait", "latitude", "longitude", "point_method", "verification_needed"],
+              "properties": {
+                "candidate_id": {"type": "string"},
+                "source_provider": {"type": "string"},
+                "source_id": {"type": "string"},
+                "osm_type": {"type": "string"},
+                "osm_id": {"type": ["integer", "string"]},
+                "name": {"type": ["string", "null"]},
+                "poi_type": {"type": "string"},
+                "role": {"const": "waiting_location_candidate"},
+                "candidate_status": {"const": "unverified_candidate"},
+                "permission_to_wait": {"const": "unknown"},
+                "latitude": {"type": "number", "minimum": -90, "maximum": 90},
+                "longitude": {"type": "number", "minimum": -180, "maximum": 180},
+                "point_method": {"type": "string"},
+                "area_m2": {"type": ["number", "null"], "minimum": 0},
+                "verification_needed": {"type": "array", "items": {"type": "string"}},
+                "categories": {"type": "array", "items": {"type": "string"}},
+                "address": {"type": ["string", "null"]},
+                "tags": {"type": "object"}
+              },
+              "additionalProperties": false
+            }
           },
           "routing_samples": {
             "type": "array",

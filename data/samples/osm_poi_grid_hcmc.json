@@ -1,0 +1,1397 @@
+{
+  "schema_version": "1.0",
+  "dataset_id": "gigca_hcmc_demo_osm_cafe_grid",
+  "generated_at": "2026-10-02T12:02:01+00:00",
+  "coverage": {
+    "center": {
+      "latitude": 10.7769,
+      "longitude": 106.7009
+    },
+    "bbox": {
+      "south": 10.767856282670428,
+      "west": 106.69175560599072,
+      "north": 10.785943717329571,
+      "east": 106.71004439400929
+    },
+    "half_width_m": 1000,
+    "shape": "circle",
+    "cell_size_m": 250,
+    "cell_count": 32,
+    "poi_element_count": 284,
+    "cafe_count": 230,
+    "waiting_candidate_count": 54,
+    "minimum_open_area_candidate_m2": 2500
+  },
+  "source_generated_at": "2026-09-26T10:20:30+00:00",
+  "source": {
+    "provider": "OpenStreetMap via Overpass API",
+    "endpoint": "https://overpass-api.de/api/interpreter",
+    "documentation": "https://wiki.openstreetmap.org/wiki/Overpass_API/Language_Guide",
+    "license": "Open Database License (ODbL) 1.0",
+    "attribution": "© OpenStreetMap contributors",
+    "query": "[out:json][timeout:45];\n(\n  node(around:1000,10.7769,106.7009)[\"amenity\"~\"^(cafe|restaurant|fast_food|food_court|toilets|bench|shelter|parking|fuel|bus_station)$\"];\n  node(around:1000,10.7769,106.7009)[\"shop\"~\"^(convenience|supermarket|mall)$\"];\n  node(around:1000,10.7769,106.7009)[\"public_transport\"~\"^(platform|station)$\"];\n  way(around:1000,10.7769,106.7009)[\"amenity\"~\"^(cafe|restaurant|fast_food|food_court|toilets|bench|shelter|parking|fuel|bus_station)$\"];\n  way(around:1000,10.7769,106.7009)[\"shop\"~\"^(convenience|supermarket|mall)$\"];\n  way(around:1000,10.7769,106.7009)[\"public_transport\"~\"^(platform|station)$\"];\n  relation(around:1000,10.7769,106.7009)[\"amenity\"~\"^(cafe|restaurant|fast_food|food_court|toilets|bench|shelter|parking|fuel|bus_station)$\"];\n  relation(around:1000,10.7769,106.7009)[\"shop\"~\"^(convenience|supermarket|mall)$\"];\n  relation(around:1000,10.7769,106.7009)[\"public_transport\"~\"^(platform|station)$\"];\n);\nout center tags;",
+    "result_count": 920,
+    "point_note": "Way/relation coordinates use the bounding-box center and are approximate, not entrances or legal stopping locations.",
+    "derivation": "Normalized from osm_overpass_pois_hcmc.json; source sample generated at 2026-09-26T10:20:30+00:00.",
+    "scope": "Existing circular POI sample; cells are retained only when fully inside its source radius."
+  },
+  "grid_method": {
+    "shape": "square",
+    "cell_size_m": 250,
+    "projection_note": "Local meter approximation using latitude/longitude scale at the sample center; suitable for this small HCMC demo area, not precision surveying.",
+    "cafe_poi_count": "Number of OSM cafe POIs whose point falls inside this cell.",
+    "cafe_density_per_km2": "cafe_poi_count divided by cell area in square kilometers.",
+    "cafe_poi_count_within_500m": "Number of cafe POIs within 500m of the cell center; null where source coverage does not include the full neighborhood."
+  },
+  "cells": [
+    {
+      "cell_id": "hcmc_250m_r01_c02",
+      "row": 1,
+      "column": 2,
+      "center": {
+        "latitude": 10.771247676669018,
+        "longitude": 106.69747085224652
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 5,
+      "cafe_density_per_km2": 80.0,
+      "cafe_poi_count_within_500m": null,
+      "cafe_count_500m_status": "partial_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.69632780299537,
+              10.77011721200282
+            ],
+            [
+              106.6986139014977,
+              10.77011721200282
+            ],
+            [
+              106.6986139014977,
+              10.772378141335212
+            ],
+            [
+              106.69632780299537,
+              10.772378141335212
+            ],
+            [
+              106.69632780299537,
+              10.77011721200282
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r01_c03",
+      "row": 1,
+      "column": 3,
+      "center": {
+        "latitude": 10.771247676669018,
+        "longitude": 106.69975695074885
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 2,
+      "cafe_density_per_km2": 32.0,
+      "cafe_poi_count_within_500m": null,
+      "cafe_count_500m_status": "partial_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.69861390149768,
+              10.77011721200282
+            ],
+            [
+              106.7009,
+              10.77011721200282
+            ],
+            [
+              106.7009,
+              10.772378141335212
+            ],
+            [
+              106.69861390149768,
+              10.772378141335212
+            ],
+            [
+              106.69861390149768,
+              10.77011721200282
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r01_c04",
+      "row": 1,
+      "column": 4,
+      "center": {
+        "latitude": 10.771247676669018,
+        "longitude": 106.70204304925116
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 5,
+      "cafe_density_per_km2": 80.0,
+      "cafe_poi_count_within_500m": null,
+      "cafe_count_500m_status": "partial_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.7009,
+              10.77011721200282
+            ],
+            [
+              106.70318609850233,
+              10.77011721200282
+            ],
+            [
+              106.70318609850233,
+              10.772378141335212
+            ],
+            [
+              106.7009,
+              10.772378141335212
+            ],
+            [
+              106.7009,
+              10.77011721200282
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r01_c05",
+      "row": 1,
+      "column": 5,
+      "center": {
+        "latitude": 10.771247676669018,
+        "longitude": 106.70432914775348
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 9,
+      "cafe_density_per_km2": 144.0,
+      "cafe_poi_count_within_500m": null,
+      "cafe_count_500m_status": "partial_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.70318609850233,
+              10.77011721200282
+            ],
+            [
+              106.70547219700465,
+              10.77011721200282
+            ],
+            [
+              106.70547219700465,
+              10.772378141335212
+            ],
+            [
+              106.70318609850233,
+              10.772378141335212
+            ],
+            [
+              106.70318609850233,
+              10.77011721200282
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r02_c01",
+      "row": 2,
+      "column": 1,
+      "center": {
+        "latitude": 10.77350860600141,
+        "longitude": 106.6951847537442
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 2,
+      "cafe_density_per_km2": 32.0,
+      "cafe_poi_count_within_500m": null,
+      "cafe_count_500m_status": "partial_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.69404170449305,
+              10.772378141335214
+            ],
+            [
+              106.69632780299537,
+              10.772378141335214
+            ],
+            [
+              106.69632780299537,
+              10.774639070667606
+            ],
+            [
+              106.69404170449305,
+              10.774639070667606
+            ],
+            [
+              106.69404170449305,
+              10.772378141335214
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r02_c02",
+      "row": 2,
+      "column": 2,
+      "center": {
+        "latitude": 10.77350860600141,
+        "longitude": 106.69747085224652
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 10,
+      "cafe_density_per_km2": 160.0,
+      "cafe_poi_count_within_500m": null,
+      "cafe_count_500m_status": "partial_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.69632780299537,
+              10.772378141335214
+            ],
+            [
+              106.6986139014977,
+              10.772378141335214
+            ],
+            [
+              106.6986139014977,
+              10.774639070667606
+            ],
+            [
+              106.69632780299537,
+              10.774639070667606
+            ],
+            [
+              106.69632780299537,
+              10.772378141335214
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r02_c03",
+      "row": 2,
+      "column": 3,
+      "center": {
+        "latitude": 10.77350860600141,
+        "longitude": 106.69975695074885
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 12,
+      "cafe_density_per_km2": 192.0,
+      "cafe_poi_count_within_500m": 95,
+      "cafe_count_500m_status": "full_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.69861390149768,
+              10.772378141335214
+            ],
+            [
+              106.7009,
+              10.772378141335214
+            ],
+            [
+              106.7009,
+              10.774639070667606
+            ],
+            [
+              106.69861390149768,
+              10.774639070667606
+            ],
+            [
+              106.69861390149768,
+              10.772378141335214
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r02_c04",
+      "row": 2,
+      "column": 4,
+      "center": {
+        "latitude": 10.77350860600141,
+        "longitude": 106.70204304925116
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 10,
+      "cafe_density_per_km2": 160.0,
+      "cafe_poi_count_within_500m": 95,
+      "cafe_count_500m_status": "full_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.7009,
+              10.772378141335214
+            ],
+            [
+              106.70318609850233,
+              10.772378141335214
+            ],
+            [
+              106.70318609850233,
+              10.774639070667606
+            ],
+            [
+              106.7009,
+              10.774639070667606
+            ],
+            [
+              106.7009,
+              10.772378141335214
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r02_c05",
+      "row": 2,
+      "column": 5,
+      "center": {
+        "latitude": 10.77350860600141,
+        "longitude": 106.70432914775348
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 18,
+      "cafe_density_per_km2": 288.0,
+      "cafe_poi_count_within_500m": null,
+      "cafe_count_500m_status": "partial_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.70318609850233,
+              10.772378141335214
+            ],
+            [
+              106.70547219700465,
+              10.772378141335214
+            ],
+            [
+              106.70547219700465,
+              10.774639070667606
+            ],
+            [
+              106.70318609850233,
+              10.774639070667606
+            ],
+            [
+              106.70318609850233,
+              10.772378141335214
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r02_c06",
+      "row": 2,
+      "column": 6,
+      "center": {
+        "latitude": 10.77350860600141,
+        "longitude": 106.70661524625581
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 5,
+      "cafe_density_per_km2": 80.0,
+      "cafe_poi_count_within_500m": null,
+      "cafe_count_500m_status": "partial_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.70547219700465,
+              10.772378141335214
+            ],
+            [
+              106.70775829550698,
+              10.772378141335214
+            ],
+            [
+              106.70775829550698,
+              10.774639070667606
+            ],
+            [
+              106.70547219700465,
+              10.774639070667606
+            ],
+            [
+              106.70547219700465,
+              10.772378141335214
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r03_c01",
+      "row": 3,
+      "column": 1,
+      "center": {
+        "latitude": 10.775769535333803,
+        "longitude": 106.6951847537442
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 3,
+      "cafe_density_per_km2": 48.0,
+      "cafe_poi_count_within_500m": null,
+      "cafe_count_500m_status": "partial_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.69404170449305,
+              10.774639070667606
+            ],
+            [
+              106.69632780299537,
+              10.774639070667606
+            ],
+            [
+              106.69632780299537,
+              10.776899999999998
+            ],
+            [
+              106.69404170449305,
+              10.776899999999998
+            ],
+            [
+              106.69404170449305,
+              10.774639070667606
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r03_c02",
+      "row": 3,
+      "column": 2,
+      "center": {
+        "latitude": 10.775769535333803,
+        "longitude": 106.69747085224652
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 4,
+      "cafe_density_per_km2": 64.0,
+      "cafe_poi_count_within_500m": 68,
+      "cafe_count_500m_status": "full_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.69632780299537,
+              10.774639070667606
+            ],
+            [
+              106.6986139014977,
+              10.774639070667606
+            ],
+            [
+              106.6986139014977,
+              10.776899999999998
+            ],
+            [
+              106.69632780299537,
+              10.776899999999998
+            ],
+            [
+              106.69632780299537,
+              10.774639070667606
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r03_c03",
+      "row": 3,
+      "column": 3,
+      "center": {
+        "latitude": 10.775769535333803,
+        "longitude": 106.69975695074885
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 4,
+      "cafe_density_per_km2": 64.0,
+      "cafe_poi_count_within_500m": 85,
+      "cafe_count_500m_status": "full_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.69861390149768,
+              10.774639070667606
+            ],
+            [
+              106.7009,
+              10.774639070667606
+            ],
+            [
+              106.7009,
+              10.776899999999998
+            ],
+            [
+              106.69861390149768,
+              10.776899999999998
+            ],
+            [
+              106.69861390149768,
+              10.774639070667606
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r03_c04",
+      "row": 3,
+      "column": 4,
+      "center": {
+        "latitude": 10.775769535333803,
+        "longitude": 106.70204304925116
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 4,
+      "cafe_density_per_km2": 64.0,
+      "cafe_poi_count_within_500m": 96,
+      "cafe_count_500m_status": "full_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.7009,
+              10.774639070667606
+            ],
+            [
+              106.70318609850233,
+              10.774639070667606
+            ],
+            [
+              106.70318609850233,
+              10.776899999999998
+            ],
+            [
+              106.7009,
+              10.776899999999998
+            ],
+            [
+              106.7009,
+              10.774639070667606
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r03_c05",
+      "row": 3,
+      "column": 5,
+      "center": {
+        "latitude": 10.775769535333803,
+        "longitude": 106.70432914775348
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 8,
+      "cafe_density_per_km2": 128.0,
+      "cafe_poi_count_within_500m": 79,
+      "cafe_count_500m_status": "full_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.70318609850233,
+              10.774639070667606
+            ],
+            [
+              106.70547219700465,
+              10.774639070667606
+            ],
+            [
+              106.70547219700465,
+              10.776899999999998
+            ],
+            [
+              106.70318609850233,
+              10.776899999999998
+            ],
+            [
+              106.70318609850233,
+              10.774639070667606
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r03_c06",
+      "row": 3,
+      "column": 6,
+      "center": {
+        "latitude": 10.775769535333803,
+        "longitude": 106.70661524625581
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 2,
+      "cafe_density_per_km2": 32.0,
+      "cafe_poi_count_within_500m": null,
+      "cafe_count_500m_status": "partial_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.70547219700465,
+              10.774639070667606
+            ],
+            [
+              106.70775829550698,
+              10.774639070667606
+            ],
+            [
+              106.70775829550698,
+              10.776899999999998
+            ],
+            [
+              106.70547219700465,
+              10.776899999999998
+            ],
+            [
+              106.70547219700465,
+              10.774639070667606
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r04_c01",
+      "row": 4,
+      "column": 1,
+      "center": {
+        "latitude": 10.778030464666196,
+        "longitude": 106.6951847537442
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 1,
+      "cafe_density_per_km2": 16.0,
+      "cafe_poi_count_within_500m": null,
+      "cafe_count_500m_status": "partial_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.69404170449305,
+              10.7769
+            ],
+            [
+              106.69632780299537,
+              10.7769
+            ],
+            [
+              106.69632780299537,
+              10.779160929332392
+            ],
+            [
+              106.69404170449305,
+              10.779160929332392
+            ],
+            [
+              106.69404170449305,
+              10.7769
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r04_c02",
+      "row": 4,
+      "column": 2,
+      "center": {
+        "latitude": 10.778030464666196,
+        "longitude": 106.69747085224652
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 10,
+      "cafe_density_per_km2": 160.0,
+      "cafe_poi_count_within_500m": 54,
+      "cafe_count_500m_status": "full_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.69632780299537,
+              10.7769
+            ],
+            [
+              106.6986139014977,
+              10.7769
+            ],
+            [
+              106.6986139014977,
+              10.779160929332392
+            ],
+            [
+              106.69632780299537,
+              10.779160929332392
+            ],
+            [
+              106.69632780299537,
+              10.7769
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r04_c03",
+      "row": 4,
+      "column": 3,
+      "center": {
+        "latitude": 10.778030464666196,
+        "longitude": 106.69975695074885
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 10,
+      "cafe_density_per_km2": 160.0,
+      "cafe_poi_count_within_500m": 69,
+      "cafe_count_500m_status": "full_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.69861390149768,
+              10.7769
+            ],
+            [
+              106.7009,
+              10.7769
+            ],
+            [
+              106.7009,
+              10.779160929332392
+            ],
+            [
+              106.69861390149768,
+              10.779160929332392
+            ],
+            [
+              106.69861390149768,
+              10.7769
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r04_c04",
+      "row": 4,
+      "column": 4,
+      "center": {
+        "latitude": 10.778030464666196,
+        "longitude": 106.70204304925116
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 4,
+      "cafe_density_per_km2": 64.0,
+      "cafe_poi_count_within_500m": 67,
+      "cafe_count_500m_status": "full_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.7009,
+              10.7769
+            ],
+            [
+              106.70318609850233,
+              10.7769
+            ],
+            [
+              106.70318609850233,
+              10.779160929332392
+            ],
+            [
+              106.7009,
+              10.779160929332392
+            ],
+            [
+              106.7009,
+              10.7769
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r04_c05",
+      "row": 4,
+      "column": 5,
+      "center": {
+        "latitude": 10.778030464666196,
+        "longitude": 106.70432914775348
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 7,
+      "cafe_density_per_km2": 112.0,
+      "cafe_poi_count_within_500m": 57,
+      "cafe_count_500m_status": "full_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.70318609850233,
+              10.7769
+            ],
+            [
+              106.70547219700465,
+              10.7769
+            ],
+            [
+              106.70547219700465,
+              10.779160929332392
+            ],
+            [
+              106.70318609850233,
+              10.779160929332392
+            ],
+            [
+              106.70318609850233,
+              10.7769
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r04_c06",
+      "row": 4,
+      "column": 6,
+      "center": {
+        "latitude": 10.778030464666196,
+        "longitude": 106.70661524625581
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 0,
+      "cafe_density_per_km2": 0.0,
+      "cafe_poi_count_within_500m": null,
+      "cafe_count_500m_status": "partial_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.70547219700465,
+              10.7769
+            ],
+            [
+              106.70775829550698,
+              10.7769
+            ],
+            [
+              106.70775829550698,
+              10.779160929332392
+            ],
+            [
+              106.70547219700465,
+              10.779160929332392
+            ],
+            [
+              106.70547219700465,
+              10.7769
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r05_c01",
+      "row": 5,
+      "column": 1,
+      "center": {
+        "latitude": 10.780291393998588,
+        "longitude": 106.6951847537442
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 3,
+      "cafe_density_per_km2": 48.0,
+      "cafe_poi_count_within_500m": null,
+      "cafe_count_500m_status": "partial_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.69404170449305,
+              10.779160929332392
+            ],
+            [
+              106.69632780299537,
+              10.779160929332392
+            ],
+            [
+              106.69632780299537,
+              10.781421858664784
+            ],
+            [
+              106.69404170449305,
+              10.781421858664784
+            ],
+            [
+              106.69404170449305,
+              10.779160929332392
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r05_c02",
+      "row": 5,
+      "column": 2,
+      "center": {
+        "latitude": 10.780291393998588,
+        "longitude": 106.69747085224652
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 5,
+      "cafe_density_per_km2": 80.0,
+      "cafe_poi_count_within_500m": null,
+      "cafe_count_500m_status": "partial_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.69632780299537,
+              10.779160929332392
+            ],
+            [
+              106.6986139014977,
+              10.779160929332392
+            ],
+            [
+              106.6986139014977,
+              10.781421858664784
+            ],
+            [
+              106.69632780299537,
+              10.781421858664784
+            ],
+            [
+              106.69632780299537,
+              10.779160929332392
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r05_c03",
+      "row": 5,
+      "column": 3,
+      "center": {
+        "latitude": 10.780291393998588,
+        "longitude": 106.69975695074885
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 1,
+      "cafe_density_per_km2": 16.0,
+      "cafe_poi_count_within_500m": 56,
+      "cafe_count_500m_status": "full_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.69861390149768,
+              10.779160929332392
+            ],
+            [
+              106.7009,
+              10.779160929332392
+            ],
+            [
+              106.7009,
+              10.781421858664784
+            ],
+            [
+              106.69861390149768,
+              10.781421858664784
+            ],
+            [
+              106.69861390149768,
+              10.779160929332392
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r05_c04",
+      "row": 5,
+      "column": 4,
+      "center": {
+        "latitude": 10.780291393998588,
+        "longitude": 106.70204304925116
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 2,
+      "cafe_density_per_km2": 32.0,
+      "cafe_poi_count_within_500m": 56,
+      "cafe_count_500m_status": "full_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.7009,
+              10.779160929332392
+            ],
+            [
+              106.70318609850233,
+              10.779160929332392
+            ],
+            [
+              106.70318609850233,
+              10.781421858664784
+            ],
+            [
+              106.7009,
+              10.781421858664784
+            ],
+            [
+              106.7009,
+              10.779160929332392
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r05_c05",
+      "row": 5,
+      "column": 5,
+      "center": {
+        "latitude": 10.780291393998588,
+        "longitude": 106.70432914775348
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 3,
+      "cafe_density_per_km2": 48.0,
+      "cafe_poi_count_within_500m": null,
+      "cafe_count_500m_status": "partial_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.70318609850233,
+              10.779160929332392
+            ],
+            [
+              106.70547219700465,
+              10.779160929332392
+            ],
+            [
+              106.70547219700465,
+              10.781421858664784
+            ],
+            [
+              106.70318609850233,
+              10.781421858664784
+            ],
+            [
+              106.70318609850233,
+              10.779160929332392
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r05_c06",
+      "row": 5,
+      "column": 6,
+      "center": {
+        "latitude": 10.780291393998588,
+        "longitude": 106.70661524625581
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 5,
+      "cafe_density_per_km2": 80.0,
+      "cafe_poi_count_within_500m": null,
+      "cafe_count_500m_status": "partial_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.70547219700465,
+              10.779160929332392
+            ],
+            [
+              106.70775829550698,
+              10.779160929332392
+            ],
+            [
+              106.70775829550698,
+              10.781421858664784
+            ],
+            [
+              106.70547219700465,
+              10.781421858664784
+            ],
+            [
+              106.70547219700465,
+              10.779160929332392
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r06_c02",
+      "row": 6,
+      "column": 2,
+      "center": {
+        "latitude": 10.78255232333098,
+        "longitude": 106.69747085224652
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 4,
+      "cafe_density_per_km2": 64.0,
+      "cafe_poi_count_within_500m": null,
+      "cafe_count_500m_status": "partial_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.69632780299537,
+              10.781421858664784
+            ],
+            [
+              106.6986139014977,
+              10.781421858664784
+            ],
+            [
+              106.6986139014977,
+              10.783682787997176
+            ],
+            [
+              106.69632780299537,
+              10.783682787997176
+            ],
+            [
+              106.69632780299537,
+              10.781421858664784
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r06_c03",
+      "row": 6,
+      "column": 3,
+      "center": {
+        "latitude": 10.78255232333098,
+        "longitude": 106.69975695074885
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 1,
+      "cafe_density_per_km2": 16.0,
+      "cafe_poi_count_within_500m": null,
+      "cafe_count_500m_status": "partial_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.69861390149768,
+              10.781421858664784
+            ],
+            [
+              106.7009,
+              10.781421858664784
+            ],
+            [
+              106.7009,
+              10.783682787997176
+            ],
+            [
+              106.69861390149768,
+              10.783682787997176
+            ],
+            [
+              106.69861390149768,
+              10.781421858664784
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r06_c04",
+      "row": 6,
+      "column": 4,
+      "center": {
+        "latitude": 10.78255232333098,
+        "longitude": 106.70204304925116
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 3,
+      "cafe_density_per_km2": 48.0,
+      "cafe_poi_count_within_500m": null,
+      "cafe_count_500m_status": "partial_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.7009,
+              10.781421858664784
+            ],
+            [
+              106.70318609850233,
+              10.781421858664784
+            ],
+            [
+              106.70318609850233,
+              10.783682787997176
+            ],
+            [
+              106.7009,
+              10.783682787997176
+            ],
+            [
+              106.7009,
+              10.781421858664784
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "cell_id": "hcmc_250m_r06_c05",
+      "row": 6,
+      "column": 5,
+      "center": {
+        "latitude": 10.78255232333098,
+        "longitude": 106.70432914775348
+      },
+      "cell_size_m": 250,
+      "cell_area_km2": 0.0625,
+      "cafe_poi_count": 3,
+      "cafe_density_per_km2": 48.0,
+      "cafe_poi_count_within_500m": null,
+      "cafe_count_500m_status": "partial_coverage",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              106.70318609850233,
+              10.781421858664784
+            ],
+            [
+              106.70547219700465,
+              10.781421858664784
+            ],
+            [
+              106.70547219700465,
+              10.783682787997176
+            ],
+            [
+              106.70318609850233,
+              10.783682787997176
+            ],
+            [
+              106.70318609850233,
+              10.781421858664784
+            ]
+          ]
+        ]
+      }
+    }
+  ],
+  "limitations": [
+    "POI count/density describes mapped cafe features, not passenger demand, booking probability, or driver competition.",
+    "The square extent is a local sample area and does not represent city-wide data.",
+    "Cafe mapping may be incomplete or duplicated where point and building features are separately mapped."
+  ]
+}

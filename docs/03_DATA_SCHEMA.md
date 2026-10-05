@@ -27,3 +27,8 @@ Do not conflate these distinct concepts:
 
 Use explicit `null` or omit an unavailable measure; document which behavior the API selects. Synthetic fixtures must say so in metadata and UI.
 
+## Cafe-density grid and waiting-location candidates
+
+The Engine input may include `areas[].poi_density_grid.cells[]` with `cell_id`, metric `cell_size_m`, polygon geometry, `cafe_poi_count`, `cafe_density_per_km2`, and `cafe_poi_count_within_500m`. The current sample uses 250 m cells inside the available OSM radius. Cell counts describe mapped cafes and must not be treated as booking probability.
+
+`areas[].waiting_location_candidates[]` contains place candidates derived from OSM tags, including parking, schools, places of worship, malls, parks/open land, fuel stations, and rest/transit areas. Every item currently uses `candidate_status="unverified_candidate"` and `permission_to_wait="unknown"`. A POI center or polygon centroid does not identify a legal waiting position or entrance; candidate data alone must not be presented as confirmed safe/allowed waiting spots.
