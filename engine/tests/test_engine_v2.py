@@ -58,8 +58,12 @@ def prefs(level: str = "medium", weights=None) -> DriverPreferences:
 
 class TestWeatherAnchoring(unittest.TestCase):
     def test_window_starts_at_current_time_not_at_first_list_item(self) -> None:
-        """The demo snapshot lists forecasts from 00:00; 'now' is 17:20 local. Old engine judged midnight hours."""
-        inp = load_engine_input_from_file(DEMO_SNAPSHOT)
+        """Anchor the rain window to generated_at, independent of shared sample edits."""
+        hours = [WeatherHour(f"2026-09-27T{hour:02}:00", 3.0, 90.0) for hour in range(24)]
+        inp = replace(
+            create_mock_engine_input(weather_hourly=hours),
+            generated_at="2026-09-27T17:20:00+07:00",
+        )
         out = run_driver_engine(inp, ctx(idle_min=15), prefs())
         flags = out.objectives["safety_comfort"].rain_flags or []
         self.assertTrue(flags)
