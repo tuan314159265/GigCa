@@ -2,7 +2,7 @@
 
 ## Current status
 
-The repository now contains PostgreSQL/PostGIS migrations and a sample loader under [`data/db/`](../data/db/README.md), plus an Engine adapter in [`data/engine_interface.py`](../data/engine_interface.py). The database is not provisioned by this repository: a PostgreSQL server with PostGIS and a local `GIGCA_DATABASE_URL` are still needed to run it. The existing JSON ETL remains available independently.
+The repository contains PostgreSQL/PostGIS migrations, a sample loader, and a local PostGIS service in [`compose.yaml`](../compose.yaml), plus an Engine adapter in [`data/engine_interface.py`](../data/engine_interface.py). Start the local service, apply migrations, and set `GIGCA_DATABASE_URL` before using it. Production database provisioning remains a deployment task. The existing JSON ETL remains available independently.
 
 ## Recommendation
 
@@ -27,7 +27,158 @@ This is a spatial relational store, not a full star-schema data warehouse yet. A
 | `traffic_flow_hourly_summary` | One provider and coarse geohash cell in one hour | Sample count and median current/free-flow speed and ratio | Produced by retention when old detail is compacted. |
 | `traffic_incident_daily_summary` | One provider/category/severity group in one day | Incident count, observed delay and affected length | Produced by retention before detail is deleted. |
 
-The migrations create these tables. The checked-in loader currently populates `etl_run`, `area`, rain forecasts, POIs, cafe grid cells, waiting candidates, and route summaries from demo fixtures. Traffic table ingestion is not connected yet: verify coverage/terms and implement provider-to-column mapping before collecting observations. Store route responses as provider payloads only if terms allow; a route response is not a traffic observation.
+The migrations create these tables. The checked-in loader populates `etl_run`, `area`, rain forecasts, POIs, cafe grid cells, waiting candidates, and route summaries from checked-in samples. The web flow can persist normalized TomTom Flow observations on an upstream `/api/traffic` fetch when the database is configured; this is request-triggered polling, not a stream. Incident observations are not currently part of that ingestion path. Store route responses as provider payloads only if terms allow; a route response is not a traffic observation.
+
+## Entity relationship diagram
+
+The diagram below follows the foreign keys in the current SQL migrations. Spatial containment is not shown as a relationship: for example, waiting-place candidates and traffic observations are associated with an area by spatial query, not by an `area_id` foreign key. The road graph is a future design and is not a migrated table.
+
+```mermaid
+erDiagram
+    ETL_RUN {
+        UUID run_id PK
+        TIMESTAMPTZ started_at
+        TIMESTAMPTZ finished_at
+        TEXT status
+        TEXT code_version
+        JSONB source_dataset_ids
+    }
+
+    PROVIDER_PAYLOAD {
+        BIGINT payload_id PK
+        TEXT provider
+        TEXT dataset
+        TIMESTAMPTZ fetched_at
+        JSONB payload
+        TIMESTAMPTZ expires_at
+        BOOLEAN terms_verified
+    }
+
+    AREA {
+        TEXT area_id PK
+        TEXT spatial_scope
+        GEOMETRY representative_point
+        GEOMETRY coverage
+        TEXT timezone_name
+        UUID etl_run_id FK
+    }
+
+    WEATHER_FORECAST {
+        BIGINT observation_id PK
+        TEXT provider
+        TEXT area_id FK
+        TIMESTAMPTZ issued_at
+        TIMESTAMPTZ valid_at
+        TIMESTAMPTZ fetched_at
+        NUMERIC precipitation_probability_pct
+        NUMERIC precipitation_mm
+        UUID etl_run_id FK
+        BIGINT raw_payload_id FK
+    }
+
+    POI_FEATURE {
+        BIGINT poi_id PK
+        TEXT provider
+        TEXT source_feature_id
+        TEXT category
+        GEOMETRY geom
+        JSONB tags
+        UUID etl_run_id FK
+    }
+
+    POI_GRID_CELL {
+        TEXT cell_id PK
+        TEXT parent_area_id FK
+        GEOMETRY geom
+        INTEGER cell_size_m
+        INTEGER cafe_poi_count
+        NUMERIC cafe_density_per_km2
+        UUID etl_run_id FK
+    }
+
+    WAITING_LOCATION_CANDIDATE {
+        TEXT candidate_id PK
+        TEXT provider
+        TEXT poi_type
+        TEXT candidate_status
+        TEXT permission_to_wait
+        GEOMETRY geom
+        UUID etl_run_id FK
+    }
+
+    ROUTE_OBSERVATION {
+        BIGINT route_id PK
+        TEXT area_id FK
+        TEXT destination_id
+        TEXT provider
+        TEXT profile
+        NUMERIC route_distance_m
+        NUMERIC route_duration_s
+        TIMESTAMPTZ fetched_at
+        UUID etl_run_id FK
+        BIGINT raw_payload_id FK
+    }
+
+    TRAFFIC_FLOW_OBSERVATION {
+        BIGINT observation_id PK
+        TEXT provider
+        TIMESTAMPTZ fetched_at
+        GEOMETRY query_point
+        GEOMETRY segment_geom
+        NUMERIC current_speed_kph
+        NUMERIC free_flow_speed_kph
+        UUID etl_run_id FK
+        BIGINT raw_payload_id FK
+    }
+
+    TRAFFIC_INCIDENT_OBSERVATION {
+        BIGINT observation_id PK
+        TEXT provider
+        TEXT provider_incident_id
+        TIMESTAMPTZ fetched_at
+        TEXT category
+        GEOMETRY geom
+        UUID etl_run_id FK
+        BIGINT raw_payload_id FK
+    }
+
+    TRAFFIC_FLOW_HOURLY_SUMMARY {
+        TIMESTAMPTZ bucket_start PK
+        TEXT provider PK
+        TEXT cell_key PK
+        INTEGER sample_count
+        NUMERIC median_current_speed_kph
+        NUMERIC median_free_flow_speed_kph
+    }
+
+    TRAFFIC_INCIDENT_DAILY_SUMMARY {
+        DATE bucket_date PK
+        TEXT provider PK
+        TEXT category PK
+        TEXT severity PK
+        INTEGER incident_count
+    }
+
+    ETL_RUN ||--o{ AREA : creates
+    ETL_RUN ||--o{ WEATHER_FORECAST : loads
+    ETL_RUN ||--o{ POI_FEATURE : loads
+    ETL_RUN ||--o{ POI_GRID_CELL : loads
+    ETL_RUN ||--o{ WAITING_LOCATION_CANDIDATE : loads
+    ETL_RUN ||--o{ ROUTE_OBSERVATION : loads
+    ETL_RUN ||--o{ TRAFFIC_FLOW_OBSERVATION : loads
+    ETL_RUN ||--o{ TRAFFIC_INCIDENT_OBSERVATION : loads
+
+    AREA ||--o{ WEATHER_FORECAST : scopes
+    AREA ||--o{ POI_GRID_CELL : contains
+    AREA ||--o{ ROUTE_OBSERVATION : origin_area
+
+    PROVIDER_PAYLOAD o|--o{ WEATHER_FORECAST : optional_raw_payload
+    PROVIDER_PAYLOAD o|--o{ ROUTE_OBSERVATION : optional_raw_payload
+    PROVIDER_PAYLOAD o|--o{ TRAFFIC_FLOW_OBSERVATION : optional_raw_payload
+    PROVIDER_PAYLOAD o|--o{ TRAFFIC_INCIDENT_OBSERVATION : optional_raw_payload
+```
+
+`TRAFFIC_FLOW_HOURLY_SUMMARY` and `TRAFFIC_INCIDENT_DAILY_SUMMARY` are retention aggregates, so they do not reference the detail rows or an ETL run. Their compound primary keys are shown as multiple `PK` attributes.
 
 ## Realtime meaning and retention
 

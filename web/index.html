@@ -23,6 +23,7 @@
           <a class="nav-link" href="#places"><span class="nav-icon">⌖</span>POI khu vực</a>
           <a class="nav-link" href="#routing"><span class="nav-icon">↗</span>Routing</a>
           <a class="nav-link" href="#sources"><span class="nav-icon">▤</span>Nguồn dữ liệu</a>
+          <a class="nav-link" href="#database"><span class="nav-icon">▦</span>Lược đồ DB</a>
         </nav>
         <div class="sidebar-bottom">
           <span class="status-dot"></span>
@@ -162,10 +163,22 @@
           <div class="source-policy"><strong>Fallback policy</strong><span>Chỉ bật fallback sau khi xác nhận cùng ý nghĩa dữ liệu, độ phủ, độ mới, quota và điều khoản. Luôn ghi lại provider thực dùng.</span></div>
         </section>
 
+        <section id="database" class="panel database-panel">
+          <div class="panel-heading">
+            <div><p class="eyebrow">POSTGRESQL · POSTGIS</p><h2>Lược đồ cơ sở dữ liệu</h2></div>
+            <a class="text-link" href="../docs/07_DATABASE_DESIGN.md" target="_blank" rel="noreferrer">Mở tài liệu thiết kế ↗</a>
+          </div>
+          <p class="database-intro">Sơ đồ được đọc trực tiếp từ Mermaid trong tài liệu thiết kế để bản xem và tài liệu không lệch nhau. Kéo ngang để xem hết các bảng.</p>
+          <div id="database-diagram-status" class="diagram-status" aria-live="polite">Đang tải sơ đồ…</div>
+          <div id="database-diagram" class="database-diagram-scroll" aria-label="Sơ đồ quan hệ cơ sở dữ liệu"></div>
+          <noscript><p class="fine-print">Cần bật JavaScript để dựng sơ đồ.</p></noscript>
+        </section>
+
         <footer class="page-footer"><span>GigCa · Data Explorer</span><span id="footer-snapshot">Snapshot sample · chưa phải khuyến nghị vận hành</span></footer>
       </main>
     </div>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.3/dist/mermaid.min.js" defer></script>
     <script src="./app.js" defer></script>
   </body>
 </html>

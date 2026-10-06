@@ -250,6 +250,29 @@ function renderSources(registry) {
   }
 }
 
+async function renderDatabaseDiagram() {
+  const status = $('database-diagram-status');
+  const container = $('database-diagram');
+  try {
+    const response = await fetch('../docs/07_DATABASE_DESIGN.md', { cache: 'no-store' });
+    if (!response.ok) throw new Error(`Không đọc được tài liệu DB (HTTP ${response.status}).`);
+    const markdown = await response.text();
+    const match = markdown.match(/```mermaid\s*([\s\S]*?)```/i);
+    if (!match) throw new Error('Tài liệu DB chưa có khối Mermaid.');
+    if (!window.mermaid) throw new Error('Không tải được Mermaid; kiểm tra kết nối CDN.');
+
+    window.mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme: 'neutral' });
+    const rendered = await window.mermaid.render('gigca-database-erd', match[1].trim());
+    container.innerHTML = rendered.svg;
+    rendered.bindFunctions?.(container);
+    status.textContent = 'Sơ đồ lấy từ docs/07_DATABASE_DESIGN.md · quan hệ theo khóa ngoại trong migrations.';
+    status.className = 'diagram-status available';
+  } catch (error) {
+    status.textContent = `${error.message} Mở tài liệu thiết kế để xem mã Mermaid.`;
+    status.className = 'diagram-status partial';
+  }
+}
+
 async function loadDashboard() {
   $("load-error").hidden = true;
   try {
@@ -553,4 +576,5 @@ $("reload-button").addEventListener("click", () => {
 });
 $("poi-search").addEventListener("input", () => renderPoiList(allPois));
 loadDashboard();
+renderDatabaseDiagram();
 initLiveMap();
