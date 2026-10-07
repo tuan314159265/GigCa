@@ -62,14 +62,14 @@ class DashboardTests(unittest.TestCase):
                 with self.assertRaises(HTTPError) as error:
                     urlopen(base + path)
                 self.assertEqual(error.exception.code, 400)
-            with patch("web.server.read_tomtom_key", return_value="test-secret"), patch("api.dashboard.request_upstream", return_value=(b"test-image", "image/png")) as upstream:
+            with patch("api.provider_proxy.read_tomtom_key", return_value="test-secret"), patch("api.dashboard.request_upstream", return_value=(b"test-image", "image/png")) as upstream:
                 with urlopen(base + "/api/traffic/tiles/12/2044/1360.png") as response:
                     self.assertEqual(response.headers["Content-Type"], "image/png")
                     self.assertEqual(response.read(), b"test-image")
                     self.assertNotIn("test-secret", str(response.headers))
                 self.assertIn("/tile/flow/relative/12/2044/1360.png", upstream.call_args.args[0])
                 self.assertIn("key=test-secret", upstream.call_args.args[0])
-            with patch("web.server.read_tomtom_key", side_effect=RuntimeError("TomTom chưa cấu hình")), patch("api.dashboard.request_upstream") as upstream:
+            with patch("api.provider_proxy.read_tomtom_key", side_effect=RuntimeError("TomTom chưa cấu hình")), patch("api.dashboard.request_upstream") as upstream:
                 with self.assertRaises(HTTPError) as error:
                     urlopen(base + "/api/traffic/tiles/12/2045/1360.png")
                 self.assertEqual(error.exception.code, 502)

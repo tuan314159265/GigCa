@@ -1,0 +1,70 @@
+/*
+label: Purple
+value: tangerine
+*/
+
+:root[data-theme-preset="tangerine"],
+.dark:root[data-theme-preset="tangerine"] {
+  --radius: 4px;
+  --background: #09090B;
+  --foreground: #FAFAFA;
+  --card: #18181B;
+  --card-foreground: #FAFAFA;
+  --popover: #18181B;
+  --popover-foreground: #FAFAFA;
+  --primary: #A855F7;
+  --primary-foreground: #FFFFFF;
+  --secondary: #27272A;
+  --secondary-foreground: #FAFAFA;
+  --muted: #27272A;
+  --muted-foreground: #E4E4E7;
+  --accent: #30213F;
+  --accent-foreground: #F3E8FF;
+  --destructive: #F87171;
+  --border: #45454D;
+  --input: #52525B;
+  --ring: #C084FC;
+  --chart-1: #A855F7;
+  --chart-2: #818CF8;
+  --chart-3: #C084FC;
+  --chart-4: #6366F1;
+  --chart-5: #D8B4FE;
+  --sidebar: #18181B;
+  --sidebar-foreground: #FAFAFA;
+  --sidebar-primary: #A855F7;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #30213F;
+  --sidebar-accent-foreground: #F3E8FF;
+  --sidebar-border: #45454D;
+  --sidebar-ring: #C084FC;
+  --primary-hover: #9333EA;
+  --heading: #E9D5FF;
+  --location: #E9D5FF;
+  --header-background: #18181B;
+  --header-foreground: #FAFAFA;
+}
+:root[data-theme-preset="tangerine"] [data-slot="button"][data-variant="default"]:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+}
+
+/* Reference palette: blue headings, cyan destinations, neutral reading text. */
+:root[data-theme-preset="tangerine"] .gigca-content :is(h1, h2, [data-slot="card-title"]) {
+  color: var(--heading);
+}
+:root[data-theme-preset="tangerine"] .gigca-destination {
+  color: var(--location);
+}
+:root[data-theme-preset="tangerine"] .gigca-content h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+:root[data-theme-preset="tangerine"] .gigca-header {
+  background: var(--header-background);
+  color: var(--header-foreground);
+}
+:root[data-theme-preset="tangerine"] .gigca-header [data-slot="button"][data-variant="ghost"]:hover {
+  background: var(--primary-hover);
+  color: var(--header-foreground);
+}
+
+:root[data-theme-preset="tangerine"] [data-slot="sidebar-group-label"] { color: var(--sidebar-foreground); }

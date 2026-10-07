@@ -1,0 +1,14 @@
+.git
+**/.git
+.env
+.env.*
+**/.env
+**/.env.*
+.cache
+**/node_modules
+**/.next
+**/__pycache__
+**/*.pyc
+**/.venv
+**/.agents
+**/.codex

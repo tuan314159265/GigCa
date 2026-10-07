@@ -38,6 +38,8 @@ CACHE_LOCK = threading.Lock()
 
 
 def read_tomtom_key() -> str:
+    if os.environ.get("API_TOMTOM", "").strip():
+        return os.environ["API_TOMTOM"].strip()
     env_path = ROOT / ".env"
     if not env_path.is_file():
         raise RuntimeError("Thiếu file .env chứa API_TOMTOM.")
@@ -182,7 +184,7 @@ class GigCaHandler(SimpleHTTPRequestHandler):
     server_version = "GigCaDataExplorer/0.1"
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, directory=str(ROOT), **kwargs)
+        super().__init__(*args, directory=str(ROOT / "docs" / "legacy-data-explorer"), **kwargs)
 
     def log_message(self, format_string: str, *args) -> None:
         # Avoid logging query values (coordinates and provider parameters).
@@ -245,7 +247,8 @@ class GigCaHandler(SimpleHTTPRequestHandler):
                 response = request_json(
                     tomtom_url(
                         f"{TOMTOM_ROUTE}/{locations}/json",
-                        {"traffic": "true", "travelMode": "motorcycle", "sectionType": ["traffic", "travelMode"]},
+                        {"traffic": "true", "travelMode": "motorcycle", "instructionsType": "coded",
+                         "sectionType": ["traffic", "travelMode", "importantRoadStretch"]},
                     )
                 )
                 routes = response.get("routes", [])

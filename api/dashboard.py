@@ -12,14 +12,14 @@ from urllib.parse import urlsplit
 from data.engine_bridge import load_for_engine
 from data.engine_interface import EngineDataInterface
 from data.etl.pipeline import build_engine_input
-from engine.src.engine import run_driver_engine
+from engine.src.engine import run_driver_engine, select_weather
 from engine.src.types import DriverContext, DriverPreferences
-from web.server import GigCaHandler, ROOT, read_tomtom_key, tomtom_url, request_upstream, cached, get_traffic
+from api.provider_proxy import GigCaHandler, ROOT, read_tomtom_key, tomtom_url, request_upstream, cached, get_traffic
 
 
-def recommend(payload: dict) -> dict:
+def recommend(payload: dict, *, include_snapshot: bool = False) -> dict:
     mode = payload.get("mode", "simulation")
-    if mode not in ("simulation", "sample", "pipeline", "database"):
+    if mode not in ("simulation", "sample", "pipeline", "database", "live"):
         raise ValueError("Chế độ dữ liệu không hợp lệ.")
     raw = payload.get("context", {})
     limits = {"current_lat": (-90, 90, 10.7769), "current_lng": (-180, 180, 106.7009),
@@ -34,7 +34,12 @@ def recommend(payload: dict) -> dict:
             raise ValueError(f"Giá trị {name} phải là số nguyên.")
         values[name] = value
     prefs = DriverPreferences(rain_tolerance_level=payload.get("rain_tolerance_level", "medium"))
-    if mode == "database":
+    if mode == "live":
+        if "current_lat" not in raw or "current_lng" not in raw:
+            raise ValueError("Cần tọa độ hiện tại để lấy dữ liệu live.")
+        from data.live_collector import collect_for_origin
+        snapshot = collect_for_origin(values["current_lat"], values["current_lng"], values["horizon_min"], values["max_reposition_km"])
+    elif mode == "database":
         if not os.environ.get("GIGCA_DATABASE_URL"):
             raise RuntimeError("Chưa cấu hình PostgreSQL/PostGIS. Đặt GIGCA_DATABASE_URL trên máy chủ.")
         traffic_warning = None
@@ -70,13 +75,19 @@ def recommend(payload: dict) -> dict:
     result["snapshot"] = {"id": data.snapshot_id, "mode": mode, "as_of": data.generated_at,
                           "sources": snapshot.get("data_status", []),
                           "limitations": snapshot.get("limitations", [])}
-    result["weather"] = [asdict(hour) for hour in (data.weather_hourly or next((a.weather_hourly for a in data.areas if a.weather_hourly), []))]
+    selected_weather, _ = select_weather(data, DriverContext(**values))
+    result["weather"] = [asdict(hour) for hour in selected_weather]
+    result["origin_used"] = {"lat": values["current_lat"], "lng": values["current_lng"]}
+    result["is_demo"] = mode == "simulation"
+
     result["places"] = [{"id": p.poi_id, "name": p.name, "lat": p.latitude, "lng": p.longitude,
                          "category": p.category, "verified": p.verified, "parking_allowed": p.parking_allowed}
                         for p in data.poi_candidates]
     result["areas"] = [{"id": a.area_id, "name": a.area_name or a.area_id,
                         "lat": a.representative_point.get("latitude"), "lng": a.representative_point.get("longitude")}
                        for a in data.areas]
+    if include_snapshot:
+        result["_input_snapshot"] = snapshot
     return result
 
 
@@ -109,7 +120,7 @@ class DashboardHandler(GigCaHandler):
             except RuntimeError:
                 tomtom = False
             self.send_json({"tomtom": tomtom, "database": bool(os.environ.get("GIGCA_DATABASE_URL")),
-                            "recommendations": True, "modes": ["simulation", "sample", "pipeline", "database"]})
+                            "recommendations": True, "modes": ["simulation", "sample", "pipeline", "database", "live"]})
             return
         # Serve only APIs here, not repository files.
         path = urlsplit(self.path).path
@@ -146,7 +157,7 @@ def load_local_settings():
         return
     for line in path.read_text(encoding="utf-8").splitlines():
         name, sep, value = line.strip().partition("=")
-        if sep and name.strip() in {"GIGCA_DATABASE_URL", "GIGCA_AREA_ID"}:
+        if sep and name.strip() in {"GIGCA_DATABASE_URL", "GIGCA_AREA_ID", "GIGCA_DATA_MODE", "GIGCA_SESSION_DB", "SSL_CERT_FILE"}:
             value = value.strip().strip("\"'")
             if value:
                 os.environ.setdefault(name.strip(), value)

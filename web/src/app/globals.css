@@ -1,0 +1,412 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "leaflet/dist/leaflet.css";
+
+/* Theme preset styles: these override CSS variables based on the selected data-theme-preset */
+@import "../styles/presets/brutalist.css";
+@import "../styles/presets/soft-pop.css";
+@import "../styles/presets/navy.css";
+@import "../styles/presets/tangerine.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+  --radius-xl: 4px;
+  --radius-2xl: 4px;
+  --radius-3xl: 4px;
+  --radius-4xl: 4px;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --font-heading: var(--font-sans);
+  --font-sans: var(--font-sans);
+}
+
+/* Default theme styles (used when no data-theme-preset is set or when 'default' is selected).
+These serve as the fallback; there is no separate default.css file. */
+:root {
+  --radius: 4px;
+  --card: #FFFFFF;
+  --card-foreground: #0F172A;
+  --popover: #FFFFFF;
+  --popover-foreground: #0F172A;
+  --primary: #2563EB;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F1F5F9;
+  --secondary-foreground: #0F172A;
+  --muted: #F1F5F9;
+  --muted-foreground: #64748B;
+  --accent: #EFF6FF;
+  --accent-foreground: #2563EB;
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: #E2E8F0;
+  --input: #E2E8F0;
+  --ring: #2563EB;
+  --chart-1: #2563EB;
+  --chart-2: #0891B2;
+  --chart-3: #38BDF8;
+  --chart-4: #64748B;
+  --chart-5: #1D4ED8;
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #0F172A;
+  --sidebar-primary: #2563EB;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #EFF6FF;
+  --sidebar-accent-foreground: #2563EB;
+  --sidebar-border: #E2E8F0;
+  --sidebar-ring: #2563EB;
+
+  /* fonts */
+  --font-sans: var(--font-geist);
+  --font-mono: var(--font-geist-mono);
+  --background: #F8FAFC;
+  --foreground: #0F172A;
+  --primary-hover: #1D4ED8;
+  --highlight: #0891B2;
+}
+
+.dark {
+  --background: #0B1120;
+  --foreground: #F1F5F9;
+  --card: #111827;
+  --card-foreground: #F1F5F9;
+  --popover: #111827;
+  --popover-foreground: #F1F5F9;
+  --primary: #3B82F6;
+  --primary-foreground: #FFFFFF;
+  --secondary: #1E293B;
+  --secondary-foreground: #F1F5F9;
+  --muted: #1E293B;
+  --muted-foreground: #94A3B8;
+  --accent: #172554;
+  --accent-foreground: #93C5FD;
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: #253247;
+  --input: #253247;
+  --ring: #3B82F6;
+  --chart-1: #3B82F6;
+  --chart-2: #38BDF8;
+  --chart-3: #0891B2;
+  --chart-4: #94A3B8;
+  --chart-5: #60A5FA;
+  --sidebar: #111827;
+  --sidebar-foreground: #F1F5F9;
+  --sidebar-primary: #3B82F6;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #172554;
+  --sidebar-accent-foreground: #93C5FD;
+  --sidebar-border: #253247;
+  --sidebar-ring: #3B82F6;
+  --primary-hover: #2563EB;
+  --highlight: #38BDF8;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans), system-ui, sans-serif;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+
+@layer utilities {
+  [data-theme-preset]:not([data-theme-preset="default"]) .shadow-2xs {
+    box-shadow: var(--shadow-2xs);
+  }
+
+  [data-theme-preset]:not([data-theme-preset="default"]) .shadow-xs {
+    box-shadow: var(--shadow-xs);
+  }
+
+  [data-theme-preset]:not([data-theme-preset="default"]) .shadow-sm {
+    box-shadow: var(--shadow-sm);
+  }
+
+  [data-theme-preset]:not([data-theme-preset="default"]) .shadow {
+    box-shadow: var(--shadow);
+  }
+
+  [data-theme-preset]:not([data-theme-preset="default"]) .shadow-md {
+    box-shadow: var(--shadow-md);
+  }
+
+  [data-theme-preset]:not([data-theme-preset="default"]) .shadow-lg {
+    box-shadow: var(--shadow-lg);
+  }
+
+  [data-theme-preset]:not([data-theme-preset="default"]) .shadow-xl {
+    box-shadow: var(--shadow-xl);
+  }
+
+  [data-theme-preset]:not([data-theme-preset="default"]) .shadow-2xl {
+    box-shadow: var(--shadow-2xl);
+  }
+
+  html[data-font="inter"] body {
+    --font-sans: var(--font-inter);
+  }
+  html[data-font="notoSans"] body {
+    --font-sans: var(--font-noto-sans);
+  }
+  html[data-font="nunitoSans"] body {
+    --font-sans: var(--font-nunito-sans);
+  }
+  html[data-font="figtree"] body {
+    --font-sans: var(--font-figtree);
+  }
+  html[data-font="roboto"] body {
+    --font-sans: var(--font-roboto);
+  }
+  html[data-font="geist"] body {
+    --font-sans: var(--font-geist);
+  }
+  html[data-font="raleway"] body {
+    --font-sans: var(--font-raleway);
+  }
+  html[data-font="dmSans"] body {
+    --font-sans: var(--font-dm-sans);
+  }
+  html[data-font="publicSans"] body {
+    --font-sans: var(--font-public-sans);
+  }
+  html[data-font="outfit"] body {
+    --font-sans: var(--font-outfit);
+  }
+  html[data-font="geistMono"] body {
+    --font-sans: var(--font-geist-mono);
+  }
+  html[data-font="geistPixelSquare"] body {
+    --font-sans: var(--font-geist-pixel-square);
+  }
+  html[data-font="jetBrainsMono"] body {
+    --font-sans: var(--font-jetbrains-mono);
+  }
+  html[data-font="notoSerif"] body {
+    --font-sans: var(--font-noto-serif);
+  }
+  html[data-font="robotoSlab"] body {
+    --font-sans: var(--font-roboto-slab);
+  }
+  html[data-font="merriweather"] body {
+    --font-sans: var(--font-merriweather);
+  }
+  html[data-font="lora"] body {
+    --font-sans: var(--font-lora);
+  }
+  html[data-font="playfairDisplay"] body {
+    --font-sans: var(--font-playfair-display);
+  }
+
+  html body:has([data-landing-page]) {
+    --font-sans: var(--font-geist);
+  }
+}
+
+html {
+  overscroll-behavior: none;
+}
+
+html:has([data-landing-page]) {
+  view-transition-name: none;
+}
+
+[data-landing-dashboard-preview] {
+  view-transition-name: landing-dashboard-preview;
+}
+
+::view-transition-group(landing-dashboard-preview) {
+  animation-duration: 360ms;
+  animation-timing-function: ease-out;
+}
+
+.disable-transitions * {
+  transition: none !important;
+}
+
+[data-print-root] {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: Letter;
+    margin: 0;
+  }
+
+  html,
+  body {
+    width: 8.5in !important;
+    height: 11in !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+  }
+
+  body > *:not([data-print-root]) {
+    display: none !important;
+  }
+
+  [data-print-root] {
+    display: block !important;
+    width: 8.5in !important;
+    height: 11in !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+    background: white !important;
+  }
+
+  [data-print-root] [data-print-paper] {
+    width: 8.5in !important;
+    height: 11in !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+
+  [data-print-root] [data-print-paper],
+  [data-print-root] [data-print-paper] * {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}
+
+/* The map stays inside its section; UI overlays retain their template stacking. */
+.gigca-map {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  /* The basemap is a light geographic snapshot in both interface themes. */
+  --gigca-map-foreground: var(--color-neutral-800);
+  --gigca-map-background: var(--color-neutral-50);
+}
+
+/* GigCa palette: preserve the template button shape and interaction. */
+:root:not([data-theme-preset]) [data-slot="button"][data-variant="default"]:hover:not(:disabled),
+:root[data-theme-preset="default"] [data-slot="button"][data-variant="default"]:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+}
+
+/* Reading text remains legible across every GigCa screen and theme. */
+.gigca-content .text-muted-foreground {
+  color: var(--foreground);
+}
+.gigca-content [data-slot="field-label"],
+.gigca-content [data-slot="field-legend"] {
+  opacity: 1;
+}
+.gigca-content :is([data-slot="input"], [data-slot="select-trigger"]):disabled {
+  opacity: 1;
+  color: var(--foreground);
+}
+.gigca-destination {
+  display: block;
+  padding: 0.75rem 1rem;
+  border-inline-start: 3px solid var(--primary);
+  background: var(--accent);
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+.gigca-key-metric {
+  color: var(--primary);
+  font-weight: 600;
+}
+:root[data-theme-preset="tangerine"] [data-slot="sidebar-group-label"] {
+  color: var(--sidebar-foreground);
+}
+
+/* Compact direction selector, matching the reference segmented control. */
+.gigca-direction-switch {
+  background: var(--muted);
+  padding: 4px;
+  border-radius: 6px;
+}
+.gigca-direction-switch [data-slot="toggle-group-item"] {
+  padding-inline: 16px;
+  height: 36px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--muted-foreground);
+  transition: none;
+}
+.gigca-direction-switch [data-slot="toggle-group-item"][data-state="on"] {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-color: var(--primary);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgb(15 23 42 / 12%);
+}
+
+.gigca-direction-cards [data-slot="toggle-group-item"] {
+  height: auto;
+  min-height: 56px;
+  padding: 12px;
+  justify-content: space-between;
+  gap: 8px;
+  white-space: normal;
+  text-align: left;
+  background: var(--card);
+  color: var(--card-foreground);
+  border-color: var(--border);
+}
+.gigca-direction-cards [data-slot="toggle-group-item"][data-state="on"] {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-color: var(--primary);
+}
+
+/* One joined selector; preserve each direction's existing information. */
+.gigca-direction-cards {
+  gap: 0;
+  padding: 4px;
+  overflow: hidden;
+}
+.gigca-direction-cards [data-slot="toggle-group-item"] {
+  background: transparent;
+  border-color: transparent;
+  border-radius: 4px;
+  opacity: 0.55;
+}
+.gigca-direction-cards [data-slot="toggle-group-item"][data-state="on"] {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-foreground);
+  opacity: 1;
+}
+.gigca-direction-cards [data-slot="toggle-group-item"]:not(:disabled):hover,
+.gigca-direction-cards [data-slot="toggle-group-item"]:focus-visible {
+  opacity: 1;
+}

@@ -1,0 +1,693 @@
+{
+  "generated_at": "2026-09-27T14:00:00+07:00",
+  "objectives": {
+    "max_trip_value": {
+      "objective": "max_trip_value",
+      "status": "available",
+      "confidence": "medium",
+      "plan": {
+        "plan_id": "max_trip_value",
+        "direction_title": "Hướng 1: Săn cuốc giá trị cao (Max Trip Value)",
+        "objective_focus": "Tối đa hóa thu nhập ròng theo giờ, đã trừ chi phí dịch chuyển",
+        "summary": "Ưu tiên Khu vực Bến Thành - Phố Đi Bộ: năng suất ước tính ~146,742đ/giờ (cước ròng ~78,000đ/chuyến; ~24 phút/chuyến; chỉ số cầu 4.8).",
+        "target_location": "Khu vực Bến Thành - Phố Đi Bộ",
+        "steps": [
+          {
+            "step_number": 1,
+            "time_window": "Bây giờ",
+            "action": "Tiến tới Khu vực Bến Thành - Phố Đi Bộ",
+            "instruction": "Dịch chuyển ước tính ~0.8km (~2 phút, ~1,515đ nhiên liệu — đây là ước tính, hãy kiểm tra lộ trình thật).",
+            "expected_outcome": "Vào khu vực mục tiêu với chi phí dịch chuyển thấp nhất có thể"
+          },
+          {
+            "step_number": 2,
+            "time_window": "Tối đa 20 phút",
+            "action": "Chỉ nhận cuốc đạt ngưỡng",
+            "instruction": "Cân nhắc nhận cuốc có cước ròng từ ~62,400đ (80% cước ròng bình quân 78,000đ của khu vực); giới hạn chờ 20 phút (tham số cấu hình).",
+            "expected_outcome": "Giữ cước ròng mỗi chuyến ở mức bình quân khu vực trở lên"
+          }
+        ],
+        "key_metrics": {
+          "expected_net_value_vnd": 78000.0,
+          "yield_vnd_per_hour": 146742,
+          "reposition_km_estimated": 0.76,
+          "wait_min_used": 5.0,
+          "demand_index": 4.8,
+          "pareto_optimal": true,
+          "areas_ranked": 3,
+          "areas_excluded": 1
+        },
+        "trade_offs": "Chi phí dịch chuyển và thời gian chờ là ước tính; cước thực tế phụ thuộc thời điểm và cầu. Engine không dự báo xác suất có cuốc — chỉ số cầu chỉ để tham khảo. Hạng 1 (Khu vực Bến Thành - Phố Đi Bộ) giữ vị trí ở 100% kịch bản giả định dao động ±20% (hơn hạng 2 ~22.5%).",
+        "contingency_fallback": "Nếu Khu vực Bến Thành - Phố Đi Bộ không có cuốc đạt ngưỡng sau 20 phút, cân nhắc Khu vực Hồ Con Rùa - Võ Thị Sáu (~113,685đ/giờ ước tính)."
+      },
+      "candidates": [
+        {
+          "area_id": "area_ben_thanh_q1",
+          "area_name": "Khu vực Bến Thành - Phố Đi Bộ",
+          "expected_net_value_vnd": 78000.0,
+          "gross_fare_vnd": 95000.0,
+          "estimated_duration_min": 24,
+          "demand_index": 4.8,
+          "avg_trip_distance_km": null,
+          "long_trip_rate_pct": null,
+          "hotspot_features": [],
+          "source_confidence": "medium",
+          "explanation": "Khu vực Bến Thành - Phố Đi Bộ: cước ròng ~78,000đ/chuyến (~24 phút); dịch chuyển ước tính ~0.8km/~2 phút/~1,515đ (đường chim bay x1.3, KHÔNG phải routing); chờ cuốc ~5 phút; năng suất ước tính ~146,742đ/giờ.",
+          "rank": 1,
+          "reposition_km": 0.76,
+          "reposition_min": 2.3,
+          "reposition_cost_vnd": 1515,
+          "wait_min": 5.0,
+          "yield_vnd_per_hour": 146742,
+          "pareto_optimal": true
+        },
+        {
+          "area_id": "area_vo_thi_sau_q3",
+          "area_name": "Khu vực Hồ Con Rùa - Võ Thị Sáu",
+          "expected_net_value_vnd": 56000.0,
+          "gross_fare_vnd": 68000.0,
+          "estimated_duration_min": 16,
+          "demand_index": 3.5,
+          "avg_trip_distance_km": null,
+          "long_trip_rate_pct": null,
+          "hotspot_features": [],
+          "source_confidence": "medium",
+          "explanation": "Khu vực Hồ Con Rùa - Võ Thị Sáu: cước ròng ~56,000đ/chuyến (~16 phút); dịch chuyển ước tính ~1.1km/~3 phút/~2,246đ (đường chim bay x1.3, KHÔNG phải routing); chờ cuốc ~9 phút; năng suất ước tính ~113,685đ/giờ.",
+          "rank": 2,
+          "reposition_km": 1.12,
+          "reposition_min": 3.4,
+          "reposition_cost_vnd": 2246,
+          "wait_min": 9.0,
+          "yield_vnd_per_hour": 113685,
+          "pareto_optimal": false
+        },
+        {
+          "area_id": "area_tan_dinh_q1",
+          "area_name": "Khu vực Chợ Tân Định - Hai Bà Trưng",
+          "expected_net_value_vnd": 63000.0,
+          "gross_fare_vnd": 76000.0,
+          "estimated_duration_min": 18,
+          "demand_index": 3.9,
+          "avg_trip_distance_km": null,
+          "long_trip_rate_pct": null,
+          "hotspot_features": [],
+          "source_confidence": "medium",
+          "explanation": "Khu vực Chợ Tân Định - Hai Bà Trưng: cước ròng ~63,000đ/chuyến (~18 phút); dịch chuyển ước tính ~2.2km/~7 phút/~4,488đ (đường chim bay x1.3, KHÔNG phải routing); chờ cuốc ~8 phút; năng suất ước tính ~107,256đ/giờ.",
+          "rank": 3,
+          "reposition_km": 2.24,
+          "reposition_min": 6.7,
+          "reposition_cost_vnd": 4488,
+          "wait_min": 8.0,
+          "yield_vnd_per_hour": 107256,
+          "pareto_optimal": false
+        }
+      ],
+      "context_only": null,
+      "rain_flags": null,
+      "safe_window_min": null,
+      "peak_rain_time": null,
+      "weather_action_signal": null,
+      "traffic_note": null,
+      "avoid_zones": null,
+      "safe_corridors": null,
+      "caveat": "Chi phí/thời gian dịch chuyển là ước tính từ đường chim bay; dữ liệu cước có thể là mô phỏng. Hạng 1 (Khu vực Bến Thành - Phố Đi Bộ) giữ vị trí ở 100% kịch bản giả định dao động ±20% (hơn hạng 2 ~22.5%).",
+      "reason_for_insufficiency": null,
+      "excluded": [
+        {
+          "id": "area_hang_xanh_bt",
+          "name": "Khu vực Ngã Tư Hàng Xanh (Vùng ven)",
+          "reason": "ngoài bán kính dịch chuyển tối đa: ước tính ~3.8km > 3km"
+        }
+      ],
+      "robustness": {
+        "method": "dao động từng tham số ±20% (một-tham-số-một-lần)",
+        "parameters": ["cost_vnd_per_km", "detour_factor", "speed_kmh"],
+        "runs": 7,
+        "perturbation_pct": 20.0,
+        "top1": "area_ben_thanh_q1",
+        "top1_share": 1.0,
+        "runner_up": "area_vo_thi_sau_q3",
+        "margin_pct": 22.53,
+        "stable": true,
+        "contested": false,
+        "flips_to": {}
+      }
+    },
+    "maintain_position": {
+      "objective": "maintain_position",
+      "status": "available",
+      "confidence": "medium",
+      "plan": {
+        "plan_id": "maintain_position",
+        "direction_title": "Hướng 2: Giữ vị trí thuận lợi (Maintain Position)",
+        "objective_focus": "Giảm chạy rỗng, ở lại khu vực trả khách thuận lợi",
+        "summary": "Ưu tiên ở lại/quay về Khu vực Bến Thành - Phố Đi Bộ: điểm giữ vị trí 75.0/100 (84% trả khách thuận lợi, chờ cuốc kế ~5 phút).",
+        "target_location": "Khu vực Bến Thành - Phố Đi Bộ",
+        "steps": [
+          {
+            "step_number": 1,
+            "time_window": "Sau khi trả khách",
+            "action": "Hướng về Khu vực Bến Thành - Phố Đi Bộ",
+            "instruction": "Quãng dịch chuyển ước tính ~0.8km (~2 phút) — ước tính từ đường chim bay, hãy kiểm tra lộ trình thật.",
+            "expected_outcome": "Nằm ở khu vực có tỷ lệ trả khách thuận lợi cao nhất trong phạm vi dịch chuyển"
+          },
+          {
+            "step_number": 2,
+            "time_window": "Trong khi chờ",
+            "action": "Nhận cuốc kế tiếp trong khu vực",
+            "instruction": "Dữ liệu cho thấy thời gian chờ cuốc kế ước tính ~5 phút; nếu chờ lâu hơn rõ rệt, xét lại vị trí.",
+            "expected_outcome": "Giảm quãng chạy rỗng giữa hai cuốc"
+          }
+        ],
+        "key_metrics": {
+          "position_score": 75.0,
+          "favorable_dropoff_pct": 84.0,
+          "avg_next_wait_min": 5,
+          "reposition_km_estimated": 0.76,
+          "areas_ranked": 3,
+          "areas_excluded": 1
+        },
+        "trade_offs": "Điểm là thước đo nội bộ 0-100: tỷ lệ trả khách thuận lợi trừ phạt chờ (1.5/phút) và phạt dịch chuyển (2/km); tham số đề xuất tạm, chưa hiệu chỉnh. Hạng 1 (Khu vực Bến Thành - Phố Đi Bộ) giữ vị trí ở 100% kịch bản giả định dao động ±20% (hơn hạng 2 ~18.0%).",
+        "contingency_fallback": "Nếu chờ quá lâu tại Khu vực Bến Thành - Phố Đi Bộ, cân nhắc Khu vực Chợ Tân Định - Hai Bà Trưng (điểm 61.5)."
+      },
+      "candidates": [
+        {
+          "area_id": "area_ben_thanh_q1",
+          "area_name": "Khu vực Bến Thành - Phố Đi Bộ",
+          "position_score": 75.0,
+          "favorable_dropoff_pct": 84.0,
+          "avg_next_wait_min": 5,
+          "source_confidence": "medium",
+          "explanation": "Khu vực Bến Thành - Phố Đi Bộ: 84% cuốc trả khách ở vùng thuận lợi, chờ cuốc kế ~5 phút; dịch chuyển ước tính ~0.8km (đường chim bay x1.3) → điểm giữ vị trí 75.0/100.",
+          "rank": 1,
+          "reposition_km": 0.76
+        },
+        {
+          "area_id": "area_tan_dinh_q1",
+          "area_name": "Khu vực Chợ Tân Định - Hai Bà Trưng",
+          "position_score": 61.5,
+          "favorable_dropoff_pct": 78.0,
+          "avg_next_wait_min": 8,
+          "source_confidence": "medium",
+          "explanation": "Khu vực Chợ Tân Định - Hai Bà Trưng: 78% cuốc trả khách ở vùng thuận lợi, chờ cuốc kế ~8 phút; dịch chuyển ước tính ~2.2km (đường chim bay x1.3) → điểm giữ vị trí 61.5/100.",
+          "rank": 2,
+          "reposition_km": 2.24
+        },
+        {
+          "area_id": "area_vo_thi_sau_q3",
+          "area_name": "Khu vực Hồ Con Rùa - Võ Thị Sáu",
+          "position_score": 56.3,
+          "favorable_dropoff_pct": 72.0,
+          "avg_next_wait_min": 9,
+          "source_confidence": "medium",
+          "explanation": "Khu vực Hồ Con Rùa - Võ Thị Sáu: 72% cuốc trả khách ở vùng thuận lợi, chờ cuốc kế ~9 phút; dịch chuyển ước tính ~1.1km (đường chim bay x1.3) → điểm giữ vị trí 56.3/100.",
+          "rank": 3,
+          "reposition_km": 1.12
+        }
+      ],
+      "context_only": null,
+      "rain_flags": null,
+      "safe_window_min": null,
+      "peak_rain_time": null,
+      "weather_action_signal": null,
+      "traffic_note": null,
+      "avoid_zones": null,
+      "safe_corridors": null,
+      "caveat": "Dữ liệu phân bố điểm đến có thể là mô phỏng; quãng dịch chuyển là ước tính. Hạng 1 (Khu vực Bến Thành - Phố Đi Bộ) giữ vị trí ở 100% kịch bản giả định dao động ±20% (hơn hạng 2 ~18.0%).",
+      "reason_for_insufficiency": null,
+      "excluded": [
+        {
+          "id": "area_hang_xanh_bt",
+          "name": "Khu vực Ngã Tư Hàng Xanh (Vùng ven)",
+          "reason": "ngoài bán kính dịch chuyển tối đa: ước tính ~3.8km > 3km"
+        }
+      ],
+      "robustness": {
+        "method": "dao động từng tham số ±20% (một-tham-số-một-lần)",
+        "parameters": ["cost_vnd_per_km", "detour_factor", "reposition_penalty", "speed_kmh", "wait_penalty"],
+        "runs": 11,
+        "perturbation_pct": 20.0,
+        "top1": "area_ben_thanh_q1",
+        "top1_share": 1.0,
+        "runner_up": "area_tan_dinh_q1",
+        "margin_pct": 17.97,
+        "stable": true,
+        "contested": false,
+        "flips_to": {}
+      }
+    },
+    "rest_spot": {
+      "objective": "rest_spot",
+      "status": "available",
+      "confidence": "medium",
+      "plan": {
+        "plan_id": "rest_spot",
+        "direction_title": "Hướng 3: Nghỉ ngơi & phục hồi (Rest & Recharge)",
+        "objective_focus": "Dừng chân ở điểm gần, còn mở cửa, phục hồi trước khi chạy tiếp",
+        "summary": "Tạm dừng nhận cuốc và di chuyển 510m (~1 phút) đến Highlands Coffee Nhà Thờ Đức Bà (Có bãi đỗ xe máy riêng) để nghỉ khoảng 25 phút.",
+        "target_location": "Highlands Coffee Nhà Thờ Đức Bà (Có bãi đỗ xe máy riêng)",
+        "steps": [
+          {
+            "step_number": 1,
+            "time_window": "1 - 2 phút tới",
+            "action": "Tạm dừng ứng dụng (Chế độ tạm nghỉ)",
+            "instruction": "Tắt chế độ nhận cuốc trên app để tránh nhận cuốc khi đang di chuyển tới điểm nghỉ.",
+            "expected_outcome": "Chủ động chuyển sang trạng thái nghỉ."
+          },
+          {
+            "step_number": 2,
+            "time_window": "2 - 3 phút tới",
+            "action": "Di chuyển theo lộ trình ngắn 510m đến Highlands Coffee Nhà Thờ Đức Bà (Có bãi đỗ xe máy riêng)",
+            "instruction": "Điểm này được dữ liệu ghi nhận đã xác minh và cho phép đỗ xe máy. Giờ mở cửa ghi nhận: 07:00 - 23:00 (đã kiểm tra với giờ tới ~14:01).",
+            "expected_outcome": "Đến điểm nghỉ theo khoảng cách routing đã đo."
+          },
+          {
+            "step_number": 3,
+            "time_window": "3 - 28 phút tới (25 phút)",
+            "action": "Nghỉ ngơi và nạp năng lượng",
+            "instruction": "Uống nước, nghỉ mắt, duỗi cơ; dùng các tiện ích có tại điểm (dữ liệu ghi nhận: có_chỗ_ngồi, đồ_uống_nghỉ_ngơi).",
+            "expected_outcome": "Hồi phục thể lực trước khi chạy tiếp."
+          },
+          {
+            "step_number": 4,
+            "time_window": "Sau 28 phút",
+            "action": "Bật lại ứng dụng khi đã sẵn sàng",
+            "instruction": "Khởi động lại xe và bật lại ứng dụng khi bạn thấy đủ tỉnh táo.",
+            "expected_outcome": "Quay lại nhận cuốc."
+          }
+        ],
+        "key_metrics": {
+          "target_spot": "Highlands Coffee Nhà Thờ Đức Bà (Có bãi đỗ xe máy riêng)",
+          "distance_m": 510.0,
+          "duration_min": 1,
+          "verified_parking": true,
+          "recommended_rest_min": 25,
+          "amenities": ["có_chỗ_ngồi", "đồ_uống_nghỉ_ngơi"],
+          "fit_score": 0.937,
+          "arrival_time": "14:01",
+          "candidates_excluded": 0
+        },
+        "trade_offs": "Tạm dừng nhận cuốc khoảng 25 phút. Hạng 1 (Highlands Coffee Nhà Thờ Đức Bà (Có bãi đỗ xe máy riêng)) chỉ hơn hạng 2 (Cà phê Trung Nguyên Legend Lê Duẩn (Có chỗ nghỉ & sạc điện thoại)) ~0.1% — hai lựa chọn gần như ngang nhau, đừng coi thứ hạng là chắc chắn.",
+        "contingency_fallback": "Nếu Highlands Coffee Nhà Thờ Đức Bà (Có bãi đỗ xe máy riêng) hết chỗ hoặc không đỗ được, chuyển sang Cà phê Trung Nguyên Legend Lê Duẩn (Có chỗ nghỉ & sạc điện thoại) (620m theo routing)."
+      },
+      "candidates": [
+        {
+          "poi_id": "poi_highlands_01",
+          "name": "Highlands Coffee Nhà Thờ Đức Bà (Có bãi đỗ xe máy riêng)",
+          "category": "cafe",
+          "distance_m": 510.0,
+          "duration_s": 70.0,
+          "verified": true,
+          "parking_allowed": true,
+          "opening_hours": "07:00 - 23:00",
+          "suitability_tier": "toi_uu",
+          "synergy_tags": ["có_chỗ_ngồi", "đồ_uống_nghỉ_ngơi"],
+          "explanation": "Highlands Coffee Nhà Thờ Đức Bà (Có bãi đỗ xe máy riêng) cách vị trí hiện tại 510m (~1 phút theo motorcycle_verified), đã xác minh và ghi nhận cho phép đỗ xe máy.",
+          "rank": 1,
+          "fit_score": 0.937,
+          "is_open": true,
+          "arrival_time": "14:01"
+        },
+        {
+          "poi_id": "poi_trung_nguyen_02",
+          "name": "Cà phê Trung Nguyên Legend Lê Duẩn (Có chỗ nghỉ & sạc điện thoại)",
+          "category": "cafe",
+          "distance_m": 620.0,
+          "duration_s": 85.0,
+          "verified": true,
+          "parking_allowed": true,
+          "opening_hours": "06:30 - 22:30",
+          "suitability_tier": "toi_uu",
+          "synergy_tags": ["có_chỗ_ngồi", "đồ_uống_nghỉ_ngơi"],
+          "explanation": "Cà phê Trung Nguyên Legend Lê Duẩn (Có chỗ nghỉ & sạc điện thoại) cách vị trí hiện tại 620m (~1 phút theo motorcycle_verified), đã xác minh và ghi nhận cho phép đỗ xe máy.",
+          "rank": 2,
+          "fit_score": 0.926,
+          "is_open": true,
+          "arrival_time": "14:01"
+        },
+        {
+          "poi_id": "poi_parking_23_9_04",
+          "name": "Bãi giữ xe Công viên 23/9 (Có mái che mưa & bảo vệ)",
+          "category": "parking",
+          "distance_m": 420.0,
+          "duration_s": 60.0,
+          "verified": true,
+          "parking_allowed": true,
+          "opening_hours": "05:00 - 23:30",
+          "suitability_tier": "toi_uu",
+          "synergy_tags": ["bãi_đỗ_xe_máy"],
+          "explanation": "Bãi giữ xe Công viên 23/9 (Có mái che mưa & bảo vệ) cách vị trí hiện tại 420m (~1 phút theo motorcycle_verified), đã xác minh và ghi nhận cho phép đỗ xe máy.",
+          "rank": 3,
+          "fit_score": 0.865,
+          "is_open": true,
+          "arrival_time": "14:01"
+        },
+        {
+          "poi_id": "poi_petrolimex_03",
+          "name": "Cây xăng Petrolimex Số 1 Nguyễn Thị Minh Khai (Có bơm lốp & WC miễn phí)",
+          "category": "gas_station",
+          "distance_m": 850.0,
+          "duration_s": 115.0,
+          "verified": true,
+          "parking_allowed": true,
+          "opening_hours": "24/7",
+          "suitability_tier": "kha",
+          "synergy_tags": ["nạp_nhiên_liệu", "dừng_chân_nhanh"],
+          "explanation": "Cây xăng Petrolimex Số 1 Nguyễn Thị Minh Khai (Có bơm lốp & WC miễn phí) cách vị trí hiện tại 850m (~2 phút theo motorcycle_verified), đã xác minh và ghi nhận cho phép đỗ xe máy.",
+          "rank": 4,
+          "fit_score": 0.703,
+          "is_open": true,
+          "arrival_time": "14:01"
+        }
+      ],
+      "context_only": null,
+      "rain_flags": null,
+      "safe_window_min": null,
+      "peak_rain_time": null,
+      "weather_action_signal": null,
+      "traffic_note": null,
+      "avoid_zones": null,
+      "safe_corridors": null,
+      "caveat": "Các điểm nghỉ được liệt kê đều có cờ đã xác minh trong dữ liệu đầu vào; vẫn nên tự kiểm tra biển báo/chỗ đỗ. Hạng 1 (Highlands Coffee Nhà Thờ Đức Bà (Có bãi đỗ xe máy riêng)) chỉ hơn hạng 2 (Cà phê Trung Nguyên Legend Lê Duẩn (Có chỗ nghỉ & sạc điện thoại)) ~0.1% — hai lựa chọn gần như ngang nhau, đừng coi thứ hạng là chắc chắn.",
+      "reason_for_insufficiency": null,
+      "excluded": null,
+      "robustness": {
+        "method": "dao động từng tham số ±20% (một-tham-số-một-lần)",
+        "parameters": ["ref_s", "w_cat", "w_time"],
+        "runs": 7,
+        "perturbation_pct": 20.0,
+        "top1": "poi_highlands_01",
+        "top1_share": 1.0,
+        "runner_up": "poi_trung_nguyen_02",
+        "margin_pct": 0.11,
+        "stable": true,
+        "contested": true,
+        "flips_to": {}
+      }
+    },
+    "safety_comfort": {
+      "objective": "safety_comfort",
+      "status": "available",
+      "confidence": "medium",
+      "plan": {
+        "plan_id": "safety_comfort",
+        "direction_title": "Hướng 4: Lưu thông an toàn — né mưa & né kẹt xe (Safe Corridor & Traffic-Weather Defense)",
+        "objective_focus": "Giảm tiếp xúc với mưa vượt mức chịu đựng và đoạn đường ùn tắc theo dữ liệu hiện có",
+        "summary": "Cửa sổ thời tiết còn an toàn trong ~60 phút trước khi mưa vượt mức chịu đựng 'medium' (từ 15:00; khung 15:00–16:00: 80%, 2.5mm — vượt mức chịu mưa 'medium' (ngưỡng 55% / 2.0mm)). Đường: đoạn đang thông thoáng theo dữ liệu: Dong Khoi, Le Duan.",
+        "target_location": "Chạy các đoạn thông thoáng theo dữ liệu",
+        "steps": [
+          {
+            "step_number": 1,
+            "time_window": "0 - 45 phút",
+            "action": "Chỉ nhận cuốc ngắn (kết thúc trước 15:00)",
+            "instruction": "Tận dụng cửa sổ an toàn còn ~60 phút: ưu tiên cuốc có thể hoàn thành trước 15:00; đoạn đang thông thoáng theo dữ liệu: Dong Khoi, Le Duan.",
+            "expected_outcome": "Hoàn thành chuyến trước khi mưa vượt ngưỡng."
+          },
+          {
+            "step_number": 2,
+            "time_window": "45 - 60 phút",
+            "action": "Chuẩn bị sẵn sàng áo mưa và điểm trú",
+            "instruction": "Mặc sẵn áo mưa, bọc điện thoại chống nước, xác định nơi có mái che gần vị trí.",
+            "expected_outcome": "Sẵn sàng khi mưa tới."
+          },
+          {
+            "step_number": 3,
+            "time_window": "Từ 15:00",
+            "action": "Giảm tốc độ, tăng khoảng cách an toàn hoặc tấp vào chỗ trú",
+            "instruction": "Khi mưa vượt ngưỡng, giảm tốc độ và tăng khoảng cách phanh; nếu đường phía trước ngập hoặc tầm nhìn kém thì dừng ở nơi an toàn.",
+            "expected_outcome": "Giảm nguy cơ trượt ngã."
+          },
+          {
+            "step_number": 4,
+            "time_window": "Sau đợt mưa",
+            "action": "Kiểm tra lại dự báo trước khi chạy tiếp",
+            "instruction": "Xem lại dự báo và mặt đường trước khi nhận cuốc trở lại.",
+            "expected_outcome": "Quay lại ca chạy khi điều kiện đã ổn."
+          }
+        ],
+        "key_metrics": {
+          "safe_corridors": ["Trục Dong Khoi", "Trục Le Duan"],
+          "avoid_zones": ["Khung mưa vượt ngưỡng 15:00–16:00"],
+          "safe_window_min": 60,
+          "peak_rain_time": "2026-09-27T17:00",
+          "weather_action_signal": "DI_CHUYEN_TRUOC_KHI_MUA",
+          "rain_tolerance_level": "medium",
+          "forecast_coverage_pct": 100,
+          "traffic_speed_kmh": 30.2,
+          "traffic_mean_ratio": 0.93,
+          "traffic_congestion_index_mean": 0.069,
+          "traffic_congestion_index_aggregation": "segment_mean",
+          "traffic_segments_by_congestion": [
+            {
+              "edge_id": "edge_le_duan_01",
+              "class": "smooth",
+              "ratio": 0.93,
+              "congestion_index": 0.071,
+              "speed_kmh": 32.5
+            },
+            {
+              "edge_id": "edge_dong_khoi_02",
+              "class": "smooth",
+              "ratio": 0.93,
+              "congestion_index": 0.067,
+              "speed_kmh": 28.0
+            }
+          ],
+          "traffic_edges_used": 2
+        },
+        "trade_offs": "Né đoạn ùn tắc có thể làm quãng đường dài hơn; engine không có routing né kẹt nên không tính được chênh lệch cự ly/thời gian.",
+        "contingency_fallback": "Nếu mưa lớn kèm gió mạnh hoặc đường ngập, tấp vào nơi có mái che và chờ; engine không có dữ liệu ngập/gió nên hãy tự đánh giá."
+      },
+      "candidates": [],
+      "context_only": null,
+      "rain_flags": [
+        {
+          "valid_time": "2026-09-27T15:00",
+          "prob_pct": 45.0,
+          "mm": 0.3,
+          "exceeds_tolerance": false,
+          "severity": "none",
+          "minutes_from_now": 0,
+          "window": "14:00–15:00"
+        },
+        {
+          "valid_time": "2026-09-27T16:00",
+          "prob_pct": 80.0,
+          "mm": 2.5,
+          "exceeds_tolerance": true,
+          "severity": "exceeds",
+          "minutes_from_now": 60,
+          "window": "15:00–16:00"
+        },
+        {
+          "valid_time": "2026-09-27T17:00",
+          "prob_pct": 95.0,
+          "mm": 3.8,
+          "exceeds_tolerance": true,
+          "severity": "heavy",
+          "minutes_from_now": 120,
+          "window": "16:00–17:00"
+        }
+      ],
+      "safe_window_min": 60,
+      "peak_rain_time": "2026-09-27T17:00",
+      "weather_action_signal": "DI_CHUYEN_TRUOC_KHI_MUA",
+      "traffic_note": "Giao thông trên 2/2 đoạn có dữ liệu: 2 thông thoáng, 0 chậm, 0 ùn tắc, tốc độ TB ~30 km/h (~93% tốc độ tự do); dữ liệu mới nhất cách 0 phút.",
+      "avoid_zones": ["Khung mưa vượt ngưỡng 15:00–16:00"],
+      "safe_corridors": ["Trục Dong Khoi", "Trục Le Duan"],
+      "caveat": "Chỉ dựa trên dự báo mưa theo giờ và tốc độ đoạn đường trong dữ liệu; không có dữ liệu gió, nhiệt, UV, ngập úng. Dự báo lấy ở cấp snapshot; phạm vi địa lý của dự báo không được ghi rõ.",
+      "reason_for_insufficiency": null,
+      "excluded": null,
+      "robustness": null
+    }
+  },
+  "assumptions_used": [
+    "Dữ liệu đầu vào là dữ liệu demo/mô phỏng (Bộ dữ liệu mô phỏng hoàn chỉnh cả 4 lăng kính cho Decision Engine) — không phản ánh thị trường thực.",
+    "Mức chịu mưa 'medium' = ngưỡng 55% xác suất hoặc 2.0mm (tham số đề xuất tạm, chưa hiệu chỉnh thực nghiệm).",
+    "Chi phí/thời gian dịch chuyển giữa các khu vực là ƯỚC TÍNH từ đường chim bay x1.3, tốc độ 20 km/h, 2000đ/km — không phải routing.",
+    "Khoảng cách tới điểm nghỉ chỉ lấy từ mẫu routing xuất phát trong 800m quanh bạn; không ước lượng đường chim bay cho điểm nghỉ.",
+    "Độ vững của thứ hạng được kiểm bằng cách dao động từng tham số giả định ±20%.",
+    "Dự báo lấy ở cấp snapshot; phạm vi địa lý của dự báo không được ghi rõ."
+  ],
+  "final_note": "Đây là gợi ý dựa trên dữ liệu hiện có, không phải quyết định thay bạn — hãy tự kiểm tra trước khi hành động, đặc biệt với các mục còn đang thiếu dữ liệu.",
+  "synthesized_action": null,
+  "direction_priority": [
+    {
+      "objective": "safety_comfort",
+      "tier": 2,
+      "rankable": true,
+      "weight": 0.0,
+      "reason": "Mưa vượt mức chịu đựng sau ~60 phút — giới hạn thời gian cho các kế hoạch kiếm tiền",
+      "rank": 1
+    },
+    {
+      "objective": "max_trip_value",
+      "tier": 3,
+      "rankable": true,
+      "weight": 0.0,
+      "reason": "Không có trọng số ưu tiên — giữ thứ tự mặc định của engine",
+      "rank": 2
+    },
+    {
+      "objective": "maintain_position",
+      "tier": 3,
+      "rankable": true,
+      "weight": 0.0,
+      "reason": "Không có trọng số ưu tiên — giữ thứ tự mặc định của engine",
+      "rank": 3
+    },
+    {
+      "objective": "rest_spot",
+      "tier": 4,
+      "rankable": true,
+      "weight": 0.0,
+      "reason": "Tham khảo — chưa có tín hiệu khẩn cấp",
+      "rank": 4
+    }
+  ],
+  "data_quality_warnings": [],
+  "snapshot": {
+    "id": "hcmc_full_simulated_district1",
+    "mode": "simulation",
+    "as_of": "2026-09-27T14:00:00+07:00",
+    "sources": [
+      {
+        "dataset": "weather",
+        "status": "available",
+        "reason": "Dự báo thời tiết chi tiết theo giờ (Open-Meteo mô phỏng)"
+      },
+      {
+        "dataset": "poi",
+        "status": "available",
+        "reason": "Dữ liệu địa điểm dừng nghỉ OSM đã kiểm tra danh mục"
+      },
+      {
+        "dataset": "routing",
+        "status": "available",
+        "reason": "Đồ thị định tuyến xe máy đã kiểm chứng cự ly và thời gian"
+      },
+      {
+        "dataset": "traffic",
+        "status": "available",
+        "reason": "Dữ liệu tốc độ lưu thông thời gian thực từ cảm biến đường phố"
+      },
+      {
+        "dataset": "road_incidents",
+        "status": "available",
+        "reason": "Không ghi nhận điểm đóng đường hoặc sự cố ngập úng"
+      },
+      {
+        "dataset": "verified_waiting_places",
+        "status": "available",
+        "reason": "Điểm dừng nghỉ đã xác minh thực địa quyền đỗ xe máy và giờ mở cửa"
+      },
+      {
+        "dataset": "vehicle_density",
+        "status": "available",
+        "reason": "Mật độ xe cạnh tranh trong ngưỡng cân bằng"
+      },
+      {
+        "dataset": "booking_and_destinations",
+        "status": "available",
+        "reason": "Phân bố điểm đến và tỷ lệ giữ vị trí trung tâm sau chuyến"
+      },
+      {
+        "dataset": "trip_value",
+        "status": "available",
+        "reason": "Giá cước bình quân và doanh thu ròng dự kiến theo từng khu vực"
+      }
+    ],
+    "limitations": []
+  },
+  "weather": [
+    {
+      "valid_time": "2026-09-27T14:00",
+      "precipitation_mm": 0.0,
+      "precipitation_probability_pct": 20.0
+    },
+    {
+      "valid_time": "2026-09-27T15:00",
+      "precipitation_mm": 0.3,
+      "precipitation_probability_pct": 45.0
+    },
+    {
+      "valid_time": "2026-09-27T16:00",
+      "precipitation_mm": 2.5,
+      "precipitation_probability_pct": 80.0
+    },
+    {
+      "valid_time": "2026-09-27T17:00",
+      "precipitation_mm": 3.8,
+      "precipitation_probability_pct": 95.0
+    },
+    {
+      "valid_time": "2026-09-27T18:00",
+      "precipitation_mm": 1.2,
+      "precipitation_probability_pct": 65.0
+    }
+  ],
+  "places": [
+    {
+      "id": "poi_highlands_01",
+      "name": "Highlands Coffee Nhà Thờ Đức Bà (Có bãi đỗ xe máy riêng)",
+      "lat": 10.7798,
+      "lng": 106.699,
+      "category": "cafe",
+      "verified": true,
+      "parking_allowed": true
+    },
+    {
+      "id": "poi_trung_nguyen_02",
+      "name": "Cà phê Trung Nguyên Legend Lê Duẩn (Có chỗ nghỉ & sạc điện thoại)",
+      "lat": 10.7785,
+      "lng": 106.698,
+      "category": "cafe",
+      "verified": true,
+      "parking_allowed": true
+    },
+    {
+      "id": "poi_parking_23_9_04",
+      "name": "Bãi giữ xe Công viên 23/9 (Có mái che mưa & bảo vệ)",
+      "lat": 10.7695,
+      "lng": 106.6935,
+      "category": "parking",
+      "verified": true,
+      "parking_allowed": true
+    },
+    {
+      "id": "poi_petrolimex_03",
+      "name": "Cây xăng Petrolimex Số 1 Nguyễn Thị Minh Khai (Có bơm lốp & WC miễn phí)",
+      "lat": 10.781,
+      "lng": 106.702,
+      "category": "gas_station",
+      "verified": true,
+      "parking_allowed": true
+    }
+  ],
+  "areas": [
+    {
+      "id": "area_ben_thanh_q1",
+      "name": "Khu vực Bến Thành - Phố Đi Bộ",
+      "lat": 10.7725,
+      "lng": 106.698
+    },
+    {
+      "id": "area_tan_dinh_q1",
+      "name": "Khu vực Chợ Tân Định - Hai Bà Trưng",
+      "lat": 10.789,
+      "lng": 106.691
+    },
+    {
+      "id": "area_vo_thi_sau_q3",
+      "name": "Khu vực Hồ Con Rùa - Võ Thị Sáu",
+      "lat": 10.783,
+      "lng": 106.696
+    },
+    {
+      "id": "area_hang_xanh_bt",
+      "name": "Khu vực Ngã Tư Hàng Xanh (Vùng ven)",
+      "lat": 10.801,
+      "lng": 106.711
+    }
+  ]
+}

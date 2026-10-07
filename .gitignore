@@ -29,3 +29,8 @@ data/processed/**
 .idea/
 .vscode/
 
+
+# Next.js frontend generated output
+.next/
+out/
+*.tsbuildinfo
