@@ -17,14 +17,20 @@ import json
 from typing import Any
 
 
-def load_for_engine(snapshot: dict[str, Any], *, traffic_edges: list[dict[str, Any]] | None = None):
+def load_for_engine(
+    snapshot: dict[str, Any],
+    *,
+    traffic_edges: list[dict[str, Any]] | None = None,
+    trip_log: list[dict[str, Any]] | None = None,
+):
     """Convert a Data contract snapshot to the Engine's typed ``EngineInput``.
 
     Existing top-level ``pois`` remain authoritative if present. Otherwise,
     area-scoped waiting candidates are supplied through the Engine's fallback
     parameter. ``traffic_edges`` is an optional Engine-runtime extension because
     contract 0.1 has no traffic field; callers must pass normalized observations
-    with a real segment identity and fetch time. No mock fares or booking data
+    with a real segment identity and fetch time. ``trip_log`` is likewise an optional runtime extension: the driver's own
+    completed trips, used by the Engine's personal model for the earning lenses when no market fare data exists. No mock fares or booking data
     are synthesized here.
     """
     try:
@@ -56,6 +62,10 @@ def load_for_engine(snapshot: dict[str, Any], *, traffic_edges: list[dict[str, A
                 )
 
     runtime_payload = dict(snapshot)
+    if trip_log:
+        # Driver-contributed trip log (not part of contract 0.1): started_at, pickup_lat/lng, net_vnd, duration_min,
+        # optional dropoff_lat/lng. The Engine rejects incomplete rows and never fills in missing fields.
+        runtime_payload["trip_log"] = trip_log
     if traffic_edges:
         runtime_payload["traffic"] = traffic_edges
         statuses = [dict(item) for item in snapshot.get("data_status", []) if isinstance(item, dict)]

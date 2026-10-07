@@ -19,6 +19,7 @@ from engine.src.types import (
     PoiCandidate,
     RoutingSample,
     TrafficEdge,
+    TripRecord,
     WeatherHour,
 )
 
@@ -110,6 +111,38 @@ def parse_areas(areas_raw: list[dict[str, Any]]) -> list[AreaSample]:
     return areas
 
 
+def parse_trip_log(raw: Any) -> tuple[list[TripRecord], int]:
+    """Parse the driver's own trip log. A trip missing any required field is REJECTED and counted, never defaulted."""
+    if not isinstance(raw, list):
+        return [], 0
+    trips: list[TripRecord] = []
+    rejected = 0
+    for i, t in enumerate(raw):
+        try:
+            if not isinstance(t, dict) or not t.get("started_at"):
+                raise ValueError("started_at")
+            lat, lng = float(t["pickup_lat"]), float(t["pickup_lng"])
+            net, dur = float(t["net_vnd"]), float(t["duration_min"])
+            if not (-90 <= lat <= 90 and -180 <= lng <= 180) or net < 0 or dur <= 0 or net != net or dur != dur:
+                raise ValueError("range")
+            d_lat, d_lng = t.get("dropoff_lat"), t.get("dropoff_lng")
+            if d_lat is not None and d_lng is not None:
+                d_lat, d_lng = float(d_lat), float(d_lng)
+                if not (-90 <= d_lat <= 90 and -180 <= d_lng <= 180):
+                    d_lat = d_lng = None
+            else:
+                d_lat = d_lng = None
+        except (KeyError, TypeError, ValueError):
+            rejected += 1
+            continue
+        trips.append(TripRecord(
+            trip_id=str(t.get("trip_id", f"trip_{i}")), started_at=str(t["started_at"]),
+            pickup_lat=lat, pickup_lng=lng, net_vnd=net, duration_min=dur,
+            dropoff_lat=d_lat, dropoff_lng=d_lng,
+        ))
+    return trips, rejected
+
+
 def load_engine_input_from_dict(
     payload: dict[str, Any],
     fallback_pois: list[PoiCandidate] | None = None,
@@ -175,6 +208,10 @@ def load_engine_input_from_dict(
                 )
             )
 
+    trip_log, rejected = parse_trip_log(payload.get("trip_log"))
+    if rejected:
+        adapter_notes.append(f"Bỏ {rejected} chuyến trong nhật ký thiếu/sai trường bắt buộc (không tự điền giá trị)")
+
     reasons = extract_status_reasons(payload.get("data_status", []))
     if adapter_notes:
         reasons["adapter"] = "; ".join(adapter_notes)
@@ -194,6 +231,7 @@ def load_engine_input_from_dict(
         data_label=str(label) if label else None,
         is_demo=is_demo,
         data_status_reasons=reasons,
+        trip_log=trip_log,
     )
 
 

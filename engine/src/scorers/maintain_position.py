@@ -72,7 +72,9 @@ def score_maintain_position(
                 "reason": f"ngoài bán kính dịch chuyển tối đa: ước tính ~{rep.km:.1f}km > {max_km:g}km",
             })
             continue
-        rows.append({"area": area, "name": name, "fav": fav, "wait": wait, "straight": straight, "rep": rep})
+        ev = num(dd.get("evidence_n"))
+        rows.append({"area": area, "name": name, "fav": fav, "wait": wait, "straight": straight, "rep": rep,
+                     "evidence_n": int(ev) if ev is not None else None, "source": dd.get("data_source")})
 
     if not rows:
         return _insufficient(
@@ -109,6 +111,7 @@ def score_maintain_position(
             ),
             rank=rank,
             reposition_km=None if rep is None else round(rep.km, 2),
+            evidence_n=r["evidence_n"], data_source=r["source"],
         ))
 
     by_id = {r["area"].area_id: r for r in rows}
@@ -169,6 +172,9 @@ def score_maintain_position(
         ),
     )
     caveat = "Dữ liệu phân bố điểm đến có thể là mô phỏng; quãng dịch chuyển là ước tính."
+    if top.data_source == "driver_trip_log":
+        caveat = (f"Tỷ lệ thuận lợi và thời gian chờ học từ {top.evidence_n} cặp chuyến liên tiếp trong nhật ký của chính bạn "
+                  "(không phải thị trường); quãng dịch chuyển là ước tính.")
     if rb_text:
         caveat += " " + rb_text
     return ObjectiveResult(

@@ -105,6 +105,23 @@ class EngineInput:
     data_label: str | None = None  # Nhãn nguồn (vd. simulation_label) — dữ liệu demo phải được gắn nhãn
     is_demo: bool = False
     data_status_reasons: dict[str, str] = field(default_factory=dict)
+    trip_log: list["TripRecord"] = field(default_factory=list)  # nhật ký chuyến của chính tài xế (tùy chọn)
+
+
+@dataclass(frozen=True)
+class TripRecord:
+    """One completed trip from the DRIVER'S OWN log (user-contributed data, not market data).
+
+    `net_vnd` is income after platform fees, before fuel. A trip without net_vnd/duration/pickup/start time is
+    rejected by the adapter (reported, never defaulted)."""
+    trip_id: str
+    started_at: str
+    pickup_lat: float
+    pickup_lng: float
+    net_vnd: float
+    duration_min: float
+    dropoff_lat: float | None = None
+    dropoff_lng: float | None = None
 
 
 @dataclass(frozen=True)
@@ -144,6 +161,11 @@ class TripValueCandidate:
     wait_min: float | None = None  # avg_next_wait_min của khu vực, None nếu không đủ dữ liệu cho mọi ứng viên
     yield_vnd_per_hour: float | None = None  # (cước ròng - chi phí dịch chuyển) / giờ (chạy + dịch chuyển + chờ)
     pareto_optimal: bool | None = None  # không bị khu vực khác vượt trội đồng thời về năng suất và demand_index
+    # --- Nâng cấp v3: bằng chứng và bất định (chỉ có khi dữ liệu cho biết số mẫu / sai số) ---
+    evidence_n: int | None = None  # số chuyến thật đứng sau ước lượng của khu vực (nhật ký tài xế)
+    yield_low_vnd_per_hour: int | None = None  # cận dưới khoảng bất định của năng suất (chỉ lan truyền sai số cước)
+    yield_high_vnd_per_hour: int | None = None
+    data_source: str | None = None  # vd. "driver_trip_log"
 
 
 @dataclass(frozen=True)
@@ -158,6 +180,8 @@ class PositionCandidate:
     explanation: str | None = None
     rank: int | None = None
     reposition_km: float | None = None  # ƯỚC TÍNH, xem TripValueCandidate.reposition_km
+    evidence_n: int | None = None  # số cặp (trả khách -> cuốc kế) thật đứng sau ước lượng
+    data_source: str | None = None
 
 
 @dataclass(frozen=True)
@@ -271,4 +295,9 @@ class DriverRecommendationOutput:
     synthesized_action: SynthesizedAction | None = None
     direction_priority: list[dict[str, Any]] | None = None  # THỨ TỰ xét 4 hướng (không phải điểm tổng)
     data_quality_warnings: list[str] = field(default_factory=list)
+    # --- v3 (đều tùy chọn, thêm vào không phá tương thích) ---
+    personal_model: dict[str, Any] | None = None  # tóm tắt mô hình cá nhân từ nhật ký chuyến (None nếu không có nhật ký)
+    tradeoff_matrix: dict[str, Any] | None = None  # đánh đổi định lượng giữa 4 hướng trên cùng thước đo
+    data_roadmap: list[dict[str, Any]] | None = None  # dữ liệu nào đang chặn hướng nào và cách mở khóa
+    decision_boundaries: dict[str, Any] | None = None  # "điều gì làm khuyến nghị đổi" (chỉ khi explain=True)
 

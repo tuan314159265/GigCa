@@ -11,10 +11,14 @@ data-driven assumptions and a rule-based ordering of the four directions (an ord
 
 from __future__ import annotations
 
+from dataclasses import replace
 from datetime import datetime
 
 from engine.src.config import TIME_CFG, WEATHER_CFG
 from engine.src.geo import haversine_m, valid_point
+from engine.src.personal_model import build_personal_model
+from engine.src.roadmap import build_data_roadmap
+from engine.src.tradeoff import build_tradeoff_matrix
 from engine.src.priority import build_priority
 from engine.src.readiness_gate import resolve_readiness
 from engine.src.scorers.maintain_position import score_maintain_position
@@ -76,8 +80,11 @@ def run_driver_engine(
     input_data: EngineInput,
     ctx: DriverContext,
     prefs: DriverPreferences,
+    explain: bool = False,
 ) -> DriverRecommendationOutput:
     """Execute the Decision Engine against normalized input and driver context.
+
+    `explain=True` additionally computes `decision_boundaries` (re-runs the engine with one input changed at a time).
 
     Returns DriverRecommendationOutput with 4 strictly independent objective blocks plus an ordering
     (`direction_priority`) that says which lens to look at first — it never picks the action for the driver.
@@ -92,13 +99,24 @@ def run_driver_engine(
 
     objectives: dict[ObjectiveKey, ObjectiveResult] = {}
 
+    # v3: the driver's own trip log fills the two earning lenses ONLY where no market-side data exists.
+    pm = build_personal_model(input_data.trip_log, now_local)
+    areas_trip = areas_pos = input_data.areas
+    pm_used: list[str] = []
+
     # 1. max_trip_value (Section 5.1)
     mode_trip = resolve_readiness("max_trip_value", input_data.data_status, input_data.objective_readiness)
-    objectives["max_trip_value"] = score_max_trip_value(mode=mode_trip, areas=input_data.areas, driver_ctx=ctx)
+    if pm.usable and not any(a.trip_value for a in input_data.areas):
+        areas_trip, pm_used = pm.areas, pm_used + ["max_trip_value"]
+        mode_trip = "PARTIAL"
+    objectives["max_trip_value"] = score_max_trip_value(mode=mode_trip, areas=areas_trip, driver_ctx=ctx)
 
     # 2. maintain_position (Section 5.2)
     mode_pos = resolve_readiness("maintain_position", input_data.data_status, input_data.objective_readiness)
-    objectives["maintain_position"] = score_maintain_position(mode=mode_pos, areas=input_data.areas, driver_ctx=ctx)
+    if pm.usable and not any(a.destination_distribution for a in input_data.areas):
+        areas_pos, pm_used = pm.areas, pm_used + ["maintain_position"]
+        mode_pos = "PARTIAL"
+    objectives["maintain_position"] = score_maintain_position(mode=mode_pos, areas=areas_pos, driver_ctx=ctx)
 
     # 3. rest_spot (Section 5.3) — routing samples are filtered by origin inside the scorer
     mode_rest = resolve_readiness("rest_spot", input_data.data_status, input_data.objective_readiness)
@@ -132,9 +150,22 @@ def run_driver_engine(
     extra = list(weather_notes)
     if now_local is None:
         extra.append("Không đọc được generated_at nên không neo được thời điểm hiện tại; kiểm tra giờ mở cửa và cửa sổ mưa bị hạn chế.")
+    pm_summary: dict | None = None
+    if input_data.trip_log:
+        pm_summary = {**pm.summary, "used_for": pm_used}
+        if pm_used:
+            extra.append(
+                f"Hướng {' & '.join('1' if k == 'max_trip_value' else '2' for k in pm_used)} dùng NHẬT KÝ CHUYẾN CỦA CHÍNH BẠN "
+                f"({pm.summary['trips_in_daypart']} chuyến trong khung giờ, {pm.summary['zones_built']} vùng) — "
+                "không phải dữ liệu thị trường; vùng ít chuyến bị kéo về mức trung bình cá nhân."
+            )
+        elif pm.summary.get("status") != "ok":
+            extra.append(f"Nhật ký chuyến chưa dùng được: {pm.summary.get('reason', 'không đủ dữ liệu')}")
+        else:
+            extra.append("Đã có dữ liệu cước/điểm đến ở cấp khu vực nên nhật ký chuyến cá nhân không được trộn vào để tránh so sánh hai nguồn khác bản chất.")
     assumptions = build_assumptions(input_data, prefs, extra)
 
-    return DriverRecommendationOutput(
+    output = DriverRecommendationOutput(
         generated_at=input_data.generated_at or "",
         objectives=objectives,
         assumptions_used=assumptions,
@@ -142,4 +173,12 @@ def run_driver_engine(
         synthesized_action=None,
         direction_priority=build_priority(objectives, ctx, prefs),
         data_quality_warnings=warnings,
+        personal_model=pm_summary,
+        tradeoff_matrix=build_tradeoff_matrix(objectives, ctx, pm_summary),
+        data_roadmap=build_data_roadmap(input_data, objectives, pm_summary),
     )
+    if explain:
+        from engine.src.counterfactual import build_decision_boundaries  # local import: avoids a cycle
+
+        output = replace(output, decision_boundaries=build_decision_boundaries(input_data, ctx, prefs, output))
+    return output

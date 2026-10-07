@@ -97,6 +97,9 @@ def score_max_trip_value(
             "wait": num(dd.get("avg_next_wait_min")),
             "avg_km": num(tv.get("avg_trip_distance_km")), "long_pct": num(tv.get("long_trip_rate_pct")),
             "hotspots": [str(x) for x in (tv.get("hotspot_features") or [])],
+            "net_se": num(tv.get("net_se_vnd")), "z": num(tv.get("interval_z")),
+            "evidence_n": int(tv["evidence_n"]) if num(tv.get("evidence_n")) is not None else None,
+            "source": tv.get("data_source"),
         })
 
     if not rows:
@@ -107,12 +110,19 @@ def score_max_trip_value(
     # Wait time enters the yield only if EVERY ranked area has it — otherwise the comparison would be unfair.
     use_wait = all(r["wait"] is not None and r["wait"] >= 0 for r in rows)
 
-    def yield_of(r: dict, params: dict[str, float] | None = None) -> float:
+    def yield_of(r: dict, params: dict[str, float] | None = None, net: float | None = None) -> float:
         rep = reposition_for(r["straight"], params) if r["straight"] is not None else None
         cost = rep.cost_vnd if rep else 0.0
         rep_min = rep.minutes if rep else 0.0
         minutes = r["dur"] + rep_min + (r["wait"] if use_wait else 0.0)
-        return (r["net"] - cost) / (minutes / 60.0)
+        return ((r["net"] if net is None else net) - cost) / (minutes / 60.0)
+
+    def yield_interval(r: dict) -> tuple[int, int] | None:
+        """Only the fare-noise part: net +/- z*se propagated through the same formula. Not a full prediction interval."""
+        if r["net_se"] is None or r["z"] is None:
+            return None
+        half = r["z"] * r["net_se"]
+        return round(yield_of(r, None, max(r["net"] - half, 0.0))), round(yield_of(r, None, r["net"] + half))
 
     for r in rows:
         r["yield"] = yield_of(r)
@@ -134,6 +144,9 @@ def score_max_trip_value(
         if use_wait:
             parts.append(f"chờ cuốc ~{r['wait']:.0f} phút")
         parts.append(f"năng suất ước tính ~{r['yield']:,.0f}đ/giờ")
+        iv = yield_interval(r)
+        if iv is not None:
+            parts.append(f"khoảng ~80% do dao động cước {iv[0]:,}–{iv[1]:,}đ/giờ (dựa trên {r['evidence_n']} chuyến thật)")
         candidates.append(TripValueCandidate(
             area_id=r["area"].area_id, area_name=r["name"],
             expected_net_value_vnd=r["net"], gross_fare_vnd=r["gross"],
@@ -148,6 +161,10 @@ def score_max_trip_value(
             wait_min=r["wait"] if use_wait else None,
             yield_vnd_per_hour=round(r["yield"]),
             pareto_optimal=pareto[r["area"].area_id],
+            evidence_n=r["evidence_n"],
+            yield_low_vnd_per_hour=None if iv is None else iv[0],
+            yield_high_vnd_per_hour=None if iv is None else iv[1],
+            data_source=r["source"],
         ))
 
     by_id = {r["area"].area_id: r for r in rows}
@@ -215,6 +232,17 @@ def score_max_trip_value(
     if rb_text:
         trade.append(rb_text)
     second = candidates[1] if len(candidates) > 1 else None
+    if (second is not None and top.yield_low_vnd_per_hour is not None and second.yield_high_vnd_per_hour is not None):
+        if top.yield_low_vnd_per_hour <= second.yield_high_vnd_per_hour:
+            trade.append(
+                f"Khoảng bất định của {top.area_name} ({top.yield_low_vnd_per_hour:,}–{top.yield_high_vnd_per_hour:,}đ/giờ) "
+                f"chồng lấn với {second.area_name} ({second.yield_low_vnd_per_hour:,}–{second.yield_high_vnd_per_hour:,}đ/giờ) "
+                "— với số chuyến hiện có chưa đủ cơ sở nói hai vùng khác nhau."
+            )
+        else:
+            trade.append(
+                f"Khoảng bất định của {top.area_name} nằm hoàn toàn trên {second.area_name} — chênh lệch đủ rõ so với dao động cước."
+            )
     fallback = (
         f"Nếu {top.area_name} không có cuốc đạt ngưỡng sau {TRIP_CFG['max_wait_min']} phút, cân nhắc {second.area_name} "
         f"(~{second.yield_vnd_per_hour:,.0f}đ/giờ ước tính)."
@@ -237,11 +265,19 @@ def score_max_trip_value(
             "pareto_optimal": top.pareto_optimal,
             "areas_ranked": len(candidates),
             "areas_excluded": len(excluded),
+            "evidence_n": top.evidence_n,
+            "yield_interval_vnd_per_hour": (
+                None if top.yield_low_vnd_per_hour is None else [top.yield_low_vnd_per_hour, top.yield_high_vnd_per_hour]
+            ),
+            "data_source": top.data_source,
         },
         trade_offs=" ".join(trade),
         contingency_fallback=fallback,
     )
     caveat = "Chi phí/thời gian dịch chuyển là ước tính từ đường chim bay; dữ liệu cước có thể là mô phỏng."
+    if top.data_source == "driver_trip_log":
+        caveat = ("Dữ liệu cước lấy từ nhật ký chuyến của chính bạn (không phải thị trường); chi phí/thời gian dịch chuyển "
+                  "là ước tính từ đường chim bay.")
     if rb_text:
         caveat += " " + rb_text
     return ObjectiveResult(

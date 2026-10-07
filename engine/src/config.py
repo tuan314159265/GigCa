@@ -91,6 +91,24 @@ DEFAULTS: dict[str, Any] = {
     },
     "robustness": {"perturbation_pct": 20.0, "top1_share_min": 0.8, "tie_margin_pct": 5.0},
     "priority": {"rain_lead_min": 45, "fatigue_idle_min": 45},
+    "personal_model": {
+        "min_trips_total": 20,
+        "min_trips_per_zone": 4,
+        "zone_cell_m": 600,
+        "daypart_window_h": 2.0,
+        "shrinkage_k": 5.0,
+        "interval_z": 1.2816,
+        "follow_up_max_min": 20,
+        "follow_up_max_km": 1.5,
+        "session_gap_max_min": 180,
+        "max_age_days": 60,
+    },
+    "counterfactual": {
+        "idle_scan_max_min": 120,
+        "idle_scan_step_min": 5,
+        "horizon_scan_min": [30, 60, 120, 180, 240],
+        "max_position_points": 12,
+    },
     "final_note": DEFAULT_FINAL_NOTE,
 }
 
@@ -148,6 +166,14 @@ def validate_config(cfg: dict[str, Any]) -> list[str]:
     rb = cfg["robustness"]
     if not 0 < rb["perturbation_pct"] < 100 or not 0 < rb["top1_share_min"] <= 1:
         problems.append("robustness: perturbation_pct trong (0,100), top1_share_min trong (0,1]")
+    pm = cfg["personal_model"]
+    if pm["min_trips_per_zone"] < 2 or pm["min_trips_total"] < pm["min_trips_per_zone"]:
+        problems.append("personal_model: cần min_trips_per_zone >= 2 và min_trips_total >= min_trips_per_zone")
+    if pm["zone_cell_m"] <= 0 or pm["shrinkage_k"] < 0 or pm["interval_z"] <= 0 or pm["daypart_window_h"] <= 0:
+        problems.append("personal_model: zone_cell_m, daypart_window_h, interval_z phải > 0 và shrinkage_k >= 0")
+    cf = cfg["counterfactual"]
+    if cf["idle_scan_step_min"] <= 0 or cf["idle_scan_max_min"] < cf["idle_scan_step_min"]:
+        problems.append("counterfactual: idle_scan_step_min > 0 và idle_scan_max_min >= idle_scan_step_min")
     return problems
 
 
@@ -184,3 +210,5 @@ POSITION_CFG = ENGINE_CONFIG["maintain_position"]
 REST_CFG = ENGINE_CONFIG["rest_spot"]
 ROBUSTNESS_CFG = ENGINE_CONFIG["robustness"]
 PRIORITY_CFG = ENGINE_CONFIG["priority"]
+PERSONAL_CFG = ENGINE_CONFIG["personal_model"]
+COUNTERFACTUAL_CFG = ENGINE_CONFIG["counterfactual"]

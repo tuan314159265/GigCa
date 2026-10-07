@@ -172,6 +172,44 @@ def run_verification() -> int:
     else:
         print(f"[NOTE] Full fixture not found at {FULL_FIXTURE_PATH}")
 
+    # 5. v3: the driver's own trip log unlocks the earning lenses on REAL collected data (synthetic log, test only)
+    real_path = ROOT / "data" / "processed" / "engine_input_snapshot.json"
+    if real_path.exists():
+        import random
+        from datetime import datetime, timedelta
+
+        from engine.src.adapter import load_engine_input_from_dict
+
+        print_banner("Kịch bản 5 (v3): Dữ liệu thật + nhật ký chuyến mô phỏng của tài xế -> mô hình cá nhân")
+        payload = json.loads(real_path.read_text(encoding="utf-8"))
+        rng = random.Random(7)
+        zones = [(10.7725, 106.6980, 78000, 22), (10.7830, 106.6850, 64000, 18), (10.8010, 106.6790, 91000, 31)]
+        now = datetime(2026, 10, 6, 19, 35)
+        log = []
+        for day in range(12):
+            cur = (now - timedelta(days=12 - day)).replace(hour=17, minute=30, second=0, microsecond=0)
+            for i in range(6):
+                la, lo, net, dur = rng.choice(zones)
+                d_la, d_lo = rng.choice(zones)[:2]
+                d = dur * rng.uniform(0.8, 1.2)
+                log.append({"trip_id": f"v{day}_{i}", "started_at": cur.isoformat(), "pickup_lat": la, "pickup_lng": lo,
+                            "net_vnd": net * rng.uniform(0.7, 1.3), "duration_min": d, "dropoff_lat": d_la, "dropoff_lng": d_lo})
+                cur += timedelta(minutes=d + rng.randint(3, 15))
+        for label, extra in (("không có nhật ký", {}), ("có nhật ký 72 chuyến", {"trip_log": log})):
+            o = run_driver_engine(load_engine_input_from_dict({**payload, **extra}), ctx, prefs_med, explain=True)
+            r1 = o.objectives["max_trip_value"]
+            top = r1.candidates[0] if r1.candidates else None
+            print(f"[{label}] Hướng 1: {r1.status}/{r1.confidence}"
+                  + (f" | top ~{top.yield_vnd_per_hour:,}đ/giờ, khoảng {top.yield_low_vnd_per_hour:,}-{top.yield_high_vnd_per_hour:,} (n={top.evidence_n})" if top else ""))
+            if o.tradeoff_matrix:
+                for line in o.tradeoff_matrix["comparisons"]:
+                    print(f"    ⇄ {line}")
+            for line in (o.decision_boundaries or {}).get("summary", []):
+                print(f"    ? {line}")
+            for item in o.data_roadmap or []:
+                if item.get("fastest_unlock"):
+                    print(f"    ▸ [{item['objective']}] {item['fastest_unlock']}")
+
     print("\n✓ Hoàn thành kiểm tra Decision Engine.")
     return 0
 

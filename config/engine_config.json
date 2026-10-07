@@ -159,5 +159,31 @@
     "fatigue_idle_min": 45,
     "note": "Đề xuất tạm. Dùng để SẮP THỨ TỰ 4 hướng, không gộp thành điểm tổng"
   },
+  "personal_model": {
+    "min_trips_total": 20,
+    "min_trips_per_zone": 4,
+    "zone_cell_m": 600,
+    "daypart_window_h": 2.0,
+    "shrinkage_k": 5.0,
+    "interval_z": 1.2816,
+    "follow_up_max_min": 20,
+    "follow_up_max_km": 1.5,
+    "session_gap_max_min": 180,
+    "max_age_days": 60,
+    "note": "Đề xuất tạm — chưa hiệu chỉnh. Nhật ký chuyến do chính tài xế cung cấp: gom vùng đón theo ô lưới zone_cell_m, lọc khung giờ ±daypart_window_h quanh giờ hiện tại, co (shrink) trung bình vùng về trung bình cá nhân với trọng số k chuyến; interval_z=1.2816 ứng với khoảng ~80%. session_gap_max_min: khoảng cách giữa hai chuyến lớn hơn mức này coi là nghỉ ca, không tính là thời gian chờ."
+  },
+  "counterfactual": {
+    "idle_scan_max_min": 120,
+    "idle_scan_step_min": 5,
+    "horizon_scan_min": [
+      30,
+      60,
+      120,
+      180,
+      240
+    ],
+    "max_position_points": 12,
+    "note": "Phân tích 'điều gì làm khuyến nghị đổi': chạy lại engine (hàm thuần) với đầu vào đổi từng biến một."
+  },
   "final_note": "Đây là gợi ý dựa trên dữ liệu hiện có, không phải quyết định thay bạn — hãy tự kiểm tra trước khi hành động, đặc biệt với các mục còn đang thiếu dữ liệu."
 }
