@@ -17,12 +17,12 @@ _NOT_OK = ("missing", "stale", "not_integrated", "partial", None)
 
 _UNLOCK: dict[str, list[str]] = {
     "trip_value": [
-        "Nhật ký chuyến của chính tài xế (giờ bắt đầu, điểm đón, cước ròng, thời lượng) — nguồn hợp pháp, tự nguyện, không cần nền tảng chia sẻ dữ liệu.",
-        "Dữ liệu cước ẩn danh từ đối tác/nền tảng nếu có thỏa thuận.",
+        "Bậc 0: nhập biểu cước (giá mở cửa, đơn giá/km), lít/100km, giá xăng, mục tiêu đ/giờ — engine cho bảng kịch bản và mức cước tối thiểu ngay.",
+        "Bậc 1: nhật ký chuyến của chính tài xế (giờ bắt đầu, điểm đón, cước ròng, thời lượng, cự ly) — ≥ 20 chuyến để fit biểu cước và xếp hạng vùng. Nguồn tự nguyện, không cần nền tảng chia sẻ dữ liệu.",
     ],
     "booking_and_destinations": [
-        "Thêm tọa độ điểm trả khách vào nhật ký chuyến: engine tự tính tỷ lệ cuốc kế thuận lợi và thời gian chờ từ các cặp chuyến liên tiếp.",
-        "Dữ liệu booking/điểm đến tổng hợp ẩn danh nếu được cấp phép.",
+        "Bậc 2: ghi các đợt chờ (app companion nhận diện đứng yên hoặc nút 'bắt đầu chờ') kèm cách kết thúc: có cuốc / offline / đổi chỗ — engine tính thời gian chờ bằng survival, không còn bị nhiễm giờ nghỉ.",
+        "Bậc 3: dữ liệu cộng đồng ẩn danh, gộp theo vùng-giờ với ngưỡng k-ẩn danh — chưa có trong engine.",
     ],
     "verified_waiting_places": [
         "Tài xế xác nhận tại chỗ (cho phép dừng/đỗ, có nhà vệ sinh/ổ sạc) — mỗi lượt xác nhận chuyển 1 điểm từ 'ứng viên' sang 'đã xác minh'.",
@@ -46,6 +46,7 @@ def build_data_roadmap(
     input_data: EngineInput,
     objectives: dict[ObjectiveKey, ObjectiveResult],
     personal_summary: dict[str, Any] | None,
+    tier: dict[str, Any] | None = None,
 ) -> list[dict[str, Any]]:
     out: list[dict[str, Any]] = []
     for key in _ORDER:
@@ -68,6 +69,8 @@ def build_data_roadmap(
             "unlock_paths": [{"dataset": x["dataset"], "options": _UNLOCK.get(x["dataset"], [])} for x in limiting],
         }
         if key in ("max_trip_value", "maintain_position"):
+            if tier is not None:
+                entry["data_tier"] = {"tier": tier["tier"], "label": tier["label"], "next_step": tier["next_step"]}
             need = int(PERSONAL_CFG["min_trips_total"])
             have = (personal_summary or {}).get("trips_in_daypart")
             if personal_summary is None:
@@ -81,8 +84,9 @@ def build_data_roadmap(
                 )
             else:
                 entry["fastest_unlock"] = (
-                    f"Đang dùng nhật ký của bạn ({personal_summary['trips_in_daypart']} chuyến trong khung giờ). "
-                    "Mỗi chuyến ghi thêm làm hẹp khoảng bất định; dữ liệu thị trường sẽ nâng độ tin cậy lên mức 'medium'."
+                    f"Đang dùng dữ liệu của bạn ({personal_summary['trips_in_daypart']} chuyến, "
+                    f"{personal_summary.get('wait_spells_in_daypart', 0)} đợt chờ trong khung giờ). "
+                    "Mỗi chuyến/đợt chờ ghi thêm làm hẹp khoảng bất định; bước mở rộng tiếp theo là dữ liệu cộng đồng ẩn danh (nhiều tài xế, k-ẩn danh)."
                 )
         out.append(entry)
     return out

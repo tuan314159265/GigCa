@@ -7,9 +7,12 @@ FULL, PARTIAL, or INSUFFICIENT based on objective_readiness and data_status.
 
 from __future__ import annotations
 
-from engine.src.config import OBJECTIVE_DATA_DEPENDENCIES
+from typing import Any
+
+from engine.src.config import OBJECTIVE_DATA_DEPENDENCIES, PERSONAL_CFG
 from engine.src.types import (
     DataStatusValue,
+    DriverProfile,
     ObjectiveKey,
     ObjectiveStatus,
     ReadinessMode,
@@ -43,3 +46,41 @@ def resolve_readiness(
             return "PARTIAL"
 
     return "FULL" if declared == "available" else "PARTIAL"
+
+
+def data_tier(personal_summary: dict[str, Any] | None, profile: DriverProfile | None) -> dict[str, Any]:
+    """Readiness ladder for the data the DRIVER contributes (not market data).
+
+    0  no usable log: with a typed tariff the engine gives a what-if table and a break-even fare, no zone ranking.
+    1  >= min_trips_total trips in the current day-part: fit a + b·km, learn zone distance/speed, rank zones (low confidence).
+    2  + >= min_spells_total wait spells (GPS/button): survival wait times, direction 2 and a wait term in direction 1.
+    3  community: many drivers contribute anonymously, merged per zone-hour with k-anonymity. NOT implemented in the
+       engine yet — it is the stated expansion path, so this function never returns it.
+    """
+    ps = personal_summary or {}
+    trips = int(ps.get("trips_in_daypart") or 0)
+    spells = int(ps.get("wait_spells_in_daypart") or 0)
+    need_trips, need_spells = int(PERSONAL_CFG["min_trips_total"]), int(PERSONAL_CFG["min_spells_total"])
+    typed = profile is not None and profile.fare_base_vnd is not None and profile.fare_per_km_vnd is not None
+    if trips >= need_trips and spells >= need_spells:
+        tier = 2
+    elif trips >= need_trips:
+        tier = 1
+    else:
+        tier = 0
+    info = {
+        0: ("Bậc 0 — chưa có nhật ký đủ dùng",
+            ["Bảng kịch bản (what-if) và mức cước tối thiểu theo mục tiêu của bạn"] if typed else [],
+            f"Nhập biểu cước (giá mở cửa, đơn giá/km), lít/100km, giá xăng, mục tiêu đ/giờ; rồi ghi ≥ {need_trips} chuyến (có cự ly) trong khung giờ đang hoạt động."),
+        1: ("Bậc 1 — đủ nhật ký chuyến",
+            ["Fit biểu cước a + b·km", "Cự ly/tốc độ theo vùng, xếp hạng vùng theo thu nhập/giờ (độ tin cậy thấp)"],
+            f"Ghi các đợt chờ (GPS/nút 'bắt đầu chờ'): cần ≥ {need_spells} đợt trong khung giờ để tính thời gian chờ bằng survival."),
+        2: ("Bậc 2 — có nhật ký chuyến và đợt chờ",
+            ["Thời gian chờ theo survival (đợt offline/đổi chỗ là bị kiểm duyệt)", "Hướng 2 (giữ vị trí) và số hạng chờ trong Hướng 1"],
+            "Bậc 3 (cộng đồng): nhiều tài xế đóng góp ẩn danh, gộp theo vùng-giờ với ngưỡng k-ẩn danh — chưa có trong engine."),
+    }[tier]
+    return {
+        "tier": tier, "label": info[0], "unlocked": info[1], "next_step": info[2],
+        "trips_in_daypart": trips, "wait_spells_in_daypart": spells,
+        "needs": {"trips": need_trips, "wait_spells": need_spells},
+    }

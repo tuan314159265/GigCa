@@ -106,14 +106,18 @@ class EngineInput:
     is_demo: bool = False
     data_status_reasons: dict[str, str] = field(default_factory=dict)
     trip_log: list["TripRecord"] = field(default_factory=list)  # nhật ký chuyến của chính tài xế (tùy chọn)
+    driver_profile: "DriverProfile | None" = None  # biểu cước + xe + mục tiêu do CHÍNH tài xế nhập (tùy chọn)
+    wait_spells: list["WaitSpell"] = field(default_factory=list)  # các đợt chờ cuốc do app companion ghi (tùy chọn)
 
 
 @dataclass(frozen=True)
 class TripRecord:
     """One completed trip from the DRIVER'S OWN log (user-contributed data, not market data).
 
-    `net_vnd` is income after platform fees, before fuel. A trip without net_vnd/duration/pickup/start time is
-    rejected by the adapter (reported, never defaulted)."""
+    `net_vnd` is income after platform fees, before fuel (tiền thực nhận từ chuyến, KHÔNG gồm thưởng ngày/tip).
+    A trip without net_vnd/duration/pickup/start time is rejected by the adapter (reported, never defaulted).
+    `distance_km` is the pickup->dropoff distance the driver saw (or a post-trip routing result); when absent the
+    personal model may estimate it from the two coordinates (straight line x detour) and says so."""
     trip_id: str
     started_at: str
     pickup_lat: float
@@ -122,6 +126,59 @@ class TripRecord:
     duration_min: float
     dropoff_lat: float | None = None
     dropoff_lng: float | None = None
+    distance_km: float | None = None
+
+
+@dataclass(frozen=True)
+class DriverProfile:
+    """What the DRIVER tells us about their own tariff, vehicle and goal (never market data).
+
+    net fare per trip ~ fare_base_vnd + fare_per_km_vnd * km (before fuel). Every field is optional: a missing field
+    stays None and the engine says what it cannot do without it."""
+    fare_base_vnd: float | None = None  # a — giá mở cửa/phần cố định mỗi chuyến
+    fare_per_km_vnd: float | None = None  # b — đơn giá theo km mà tài xế thấy hằng ngày
+    fuel_l_per_100km: float | None = None
+    fuel_price_vnd_per_l: float | None = None
+    target_vnd_per_hour: float | None = None  # mục tiêu thu nhập ròng/giờ do tài xế đặt
+
+    @property
+    def fuel_cost_vnd_per_km(self) -> float | None:
+        """c — only when BOTH fuel inputs are given; otherwise None (the engine then labels its fallback)."""
+        if self.fuel_l_per_100km is None or self.fuel_price_vnd_per_l is None:
+            return None
+        return self.fuel_l_per_100km * self.fuel_price_vnd_per_l / 100.0
+
+
+WaitEnd = Literal["trip", "offline", "moved"]
+
+
+@dataclass(frozen=True)
+class DriverEconomics:
+    """Resolved per-driver money parameters the scorers use: net fare = a + b·km (before fuel), fuel c VND/km.
+
+    `tariff_source` says whether (a, b) were fitted from the driver's own log or typed in by the driver;
+    `fuel_source` says whether c comes from the driver's vehicle inputs or from the config fallback."""
+    fare_base_vnd: float  # a
+    fare_per_km_vnd: float  # b
+    fuel_cost_vnd_per_km: float  # c
+    tariff_source: str  # "fitted_from_log" | "driver_input"
+    fuel_source: str  # "driver_input" | "config_default"
+    target_vnd_per_hour: float | None = None
+
+
+@dataclass(frozen=True)
+class WaitSpell:
+    """One stretch where the driver stood still waiting for a request (recorded by the companion app / GPS trace).
+
+    `ended_by == "trip"` is an observed wait; "offline" and "moved" are CENSORED (the real wait was at least this long),
+    so a lunch break no longer counts as a long wait."""
+    spell_id: str
+    start: str
+    end: str
+    lat: float
+    lng: float
+    ended_by: WaitEnd
+    rain_mm: float | None = None  # mưa (mm/giờ) lúc bắt đầu chờ, nếu app ghi được; chỉ dùng làm đặc trưng cho mô hình ML
 
 
 @dataclass(frozen=True)
@@ -144,13 +201,11 @@ class TripValueCandidate:
     """Candidate area evaluated for propensity of long-distance and high-value trips (spec.md 5.1)."""
     area_id: str
     area_name: str = ""
-    expected_net_value_vnd: float | None = None
-    gross_fare_vnd: float | None = None
-    estimated_duration_min: int | None = None
-    demand_index: float | None = None
-    avg_trip_distance_km: float | None = None  # Cự ly cuốc trung bình xuất phát từ khu vực này
-    long_trip_rate_pct: float | None = None  # Tỷ lệ cuốc đi xa (> 8-10km hoặc đi sân bay/liên quận)
-    hotspot_features: list[str] = field(default_factory=list)  # Đặc trưng điểm đón: sảnh khách sạn, tòa nhà hạng A, ga xe...
+    expected_net_value_vnd: float | None = None  # a + b·d̄_z: cước ròng/chuyến TRƯỚC xăng, từ biểu cước của tài xế
+    net_after_fuel_vnd: float | None = None  # expected_net_value_vnd - c·d̄_z (đã trừ xăng chặng chở khách)
+    estimated_duration_min: int | None = None  # thời gian chặng chở khách = d̄_z / v_z
+    avg_trip_distance_km: float | None = None  # d̄_z: cự ly cuốc TB xuất phát từ vùng, TÍNH TỪ NHẬT KÝ của tài xế
+    hotspot_features: list[str] = field(default_factory=list)  # chỉ MÔ TẢ (sự kiện địa lý), KHÔNG phải bằng chứng nhu cầu
     source_confidence: Confidence = "none"
     explanation: str | None = None
     # --- Nâng cấp v2: đều có thể truy vết về dữ liệu đầu vào + tham số cấu hình ---
@@ -158,12 +213,12 @@ class TripValueCandidate:
     reposition_km: float | None = None  # ƯỚC TÍNH từ đường chim bay x detour_factor, KHÔNG phải routing
     reposition_min: float | None = None
     reposition_cost_vnd: float | None = None
-    wait_min: float | None = None  # avg_next_wait_min của khu vực, None nếu không đủ dữ liệu cho mọi ứng viên
-    yield_vnd_per_hour: float | None = None  # (cước ròng - chi phí dịch chuyển) / giờ (chạy + dịch chuyển + chờ)
-    pareto_optimal: bool | None = None  # không bị khu vực khác vượt trội đồng thời về năng suất và demand_index
+    wait_min: float | None = None  # thời gian chờ kỳ vọng w_z của vùng (survival); None nếu không đủ dữ liệu cho mọi ứng viên
+    yield_vnd_per_hour: float | None = None  # [a + (b-c)·d̄ - c·r] / giờ (chặng chở khách + dịch chuyển + chờ)
+    pareto_optimal: bool | None = None  # không bị vùng khác vượt trội đồng thời về năng suất và P10 của năng suất (lợi nhuận vs độ chắc ăn)
     # --- Nâng cấp v3: bằng chứng và bất định (chỉ có khi dữ liệu cho biết số mẫu / sai số) ---
     evidence_n: int | None = None  # số chuyến thật đứng sau ước lượng của khu vực (nhật ký tài xế)
-    yield_low_vnd_per_hour: int | None = None  # cận dưới khoảng bất định của năng suất (chỉ lan truyền sai số cước)
+    yield_low_vnd_per_hour: int | None = None  # P10 của năng suất (chỉ lan truyền dao động mẫu của cự ly cuốc TB và thời gian chờ TB của vùng)
     yield_high_vnd_per_hour: int | None = None
     data_source: str | None = None  # vd. "driver_trip_log"
 
@@ -173,9 +228,12 @@ class PositionCandidate:
     """Candidate area evaluated for post-trip position retention (spec.md 5.2)."""
     area_id: str
     area_name: str = ""
-    position_score: float = 0.0  # Thang điểm 0 - 100
-    favorable_dropoff_pct: float = 0.0  # Tỷ lệ trả khách ở vùng trung tâm thuận lợi
-    avg_next_wait_min: int = 0  # Thời gian chờ ước tính trước cuốc kế tiếp
+    position_score: float = 0.0  # Thang điểm 0 - 100 = 100·P(chờ ≤ ngưỡng) - phạt chờ - phạt dịch chuyển
+    p_wait_le_pct: float | None = None  # 100·P(chờ ≤ wait_threshold_min) từ survival (Kaplan–Meier, có xử lý kiểm duyệt)
+    wait_threshold_min: float | None = None  # ngưỡng phút dùng cho p_wait_le_pct (cấu hình, mặc định 10)
+    p_wait_le_by_min: dict[str, float] = field(default_factory=dict)  # {"10": %, "20": %} mọi ngưỡng cấu hình
+    median_wait_min: float | None = None  # None = chưa đạt 50% trong khung quan sát (chờ thường > khung đó)
+    expected_wait_min: float | None = None  # thời gian chờ kỳ vọng (restricted mean) trong khung quan sát
     source_confidence: Confidence = "none"
     explanation: str | None = None
     rank: int | None = None
@@ -299,5 +357,8 @@ class DriverRecommendationOutput:
     personal_model: dict[str, Any] | None = None  # tóm tắt mô hình cá nhân từ nhật ký chuyến (None nếu không có nhật ký)
     tradeoff_matrix: dict[str, Any] | None = None  # đánh đổi định lượng giữa 4 hướng trên cùng thước đo
     data_roadmap: list[dict[str, Any]] | None = None  # dữ liệu nào đang chặn hướng nào và cách mở khóa
+    data_tier: dict[str, Any] | None = None  # bậc sẵn sàng dữ liệu 0-3 của dữ liệu do chính tài xế cung cấp
+    what_if: dict[str, Any] | None = None  # bảng kịch bản + ngưỡng hòa vốn từ biểu cước tài xế nhập (không xếp hạng vùng)
     decision_boundaries: dict[str, Any] | None = None  # "điều gì làm khuyến nghị đổi" (chỉ khi explain=True)
+    ml_insights: dict[str, Any] | None = None  # v5: mô hình ML trên dữ liệu của tài xế (chờ có ngữ cảnh, khoảng conformal, bandit) + kết quả backtest
 

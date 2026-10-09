@@ -58,8 +58,8 @@ DEFAULTS: dict[str, Any] = {
         "slot_convention": "preceding_hour",
     },
     "traffic": {"smooth_ratio": 0.8, "congested_ratio": 0.5, "max_age_min": 30},
-    "max_trip_value": {"trip_accept_ratio": 0.8, "max_wait_min": 20},
-    "maintain_position": {"wait_penalty_per_min": 1.5, "reposition_penalty_per_km": 2.0},
+    "max_trip_value": {"max_wait_min": 20},
+    "maintain_position": {"wait_penalty_per_min": 1.5, "reposition_penalty_per_km": 2.0, "wait_thresholds_min": [10, 20]},
     "rest_spot": {
         "max_candidates": 5,
         "weights": {"travel_time": 0.6, "category_fit": 0.4},
@@ -98,10 +98,30 @@ DEFAULTS: dict[str, Any] = {
         "daypart_window_h": 2.0,
         "shrinkage_k": 5.0,
         "interval_z": 1.2816,
-        "follow_up_max_min": 20,
-        "follow_up_max_km": 1.5,
-        "session_gap_max_min": 180,
         "max_age_days": 60,
+        "min_spells_total": 20,
+        "min_spells_per_zone": 4,
+        "min_wait_events_per_zone": 2,
+        "wait_horizon_min": 30,
+        "fit_min_distance_sd_km": 0.5,
+    },
+    "what_if": {"trip_km": [2, 5, 10], "wait_min": [5, 10, 20], "assumed_trip_speed_kmh": 22.0},
+    "ml": {
+        "enabled": True,
+        "random_state": 7,
+        "wait_bin_min": 2.0,
+        "min_spells": 60,
+        "holdout_fraction": 0.3,
+        "min_holdout_spells": 15,
+        "min_gain_nll": 0.005,
+        "min_cycles": 60,
+        "conformal_alpha": 0.2,
+        "calibration_fraction": 0.25,
+        "test_fraction": 0.2,
+        "bandit_draws": 4000,
+        "bandit_prior_k": 5.0,
+        "explore_p_best": 0.15,
+        "explore_max_n": 12,
     },
     "counterfactual": {
         "idle_scan_max_min": 120,
@@ -171,6 +191,27 @@ def validate_config(cfg: dict[str, Any]) -> list[str]:
         problems.append("personal_model: cần min_trips_per_zone >= 2 và min_trips_total >= min_trips_per_zone")
     if pm["zone_cell_m"] <= 0 or pm["shrinkage_k"] < 0 or pm["interval_z"] <= 0 or pm["daypart_window_h"] <= 0:
         problems.append("personal_model: zone_cell_m, daypart_window_h, interval_z phải > 0 và shrinkage_k >= 0")
+    if (pm["wait_horizon_min"] <= 0 or pm["min_spells_per_zone"] < 2 or pm["fit_min_distance_sd_km"] < 0
+            or pm["min_wait_events_per_zone"] < 1 or pm["min_wait_events_per_zone"] > pm["min_spells_per_zone"]
+            or pm["min_spells_total"] < pm["min_spells_per_zone"]):
+        problems.append(
+            "personal_model: wait_horizon_min > 0, fit_min_distance_sd_km >= 0, "
+            "1 <= min_wait_events_per_zone <= min_spells_per_zone <= min_spells_total"
+        )
+    wi = cfg["what_if"]
+    if not wi["trip_km"] or not wi["wait_min"] or min(wi["trip_km"]) <= 0 or min(wi["wait_min"]) < 0 or wi["assumed_trip_speed_kmh"] <= 0:
+        problems.append("what_if: trip_km/wait_min không rỗng, trip_km > 0, wait_min >= 0, assumed_trip_speed_kmh > 0")
+    th_w = cfg["maintain_position"]["wait_thresholds_min"]
+    if not th_w or sorted(th_w) != list(th_w) or th_w[0] <= 0 or th_w[-1] > pm["wait_horizon_min"]:
+        problems.append("maintain_position.wait_thresholds_min: danh sách tăng dần, > 0 và <= personal_model.wait_horizon_min")
+    ml = cfg["ml"]
+    if (ml["wait_bin_min"] <= 0 or ml["min_spells"] < 20 or not 0 < ml["holdout_fraction"] < 0.5
+            or not 0 < ml["conformal_alpha"] < 0.5 or ml["calibration_fraction"] + ml["test_fraction"] >= 0.6
+            or ml["bandit_draws"] < 100 or ml["bandit_prior_k"] < 0):
+        problems.append("ml: wait_bin_min > 0, min_spells >= 20, 0 < holdout_fraction < 0.5, 0 < conformal_alpha < 0.5, "
+                        "calibration_fraction + test_fraction < 0.6, bandit_draws >= 100, bandit_prior_k >= 0")
+    if ml["wait_bin_min"] > 0 and cfg["personal_model"]["wait_horizon_min"] / ml["wait_bin_min"] < 2:
+        problems.append("ml.wait_bin_min phải nhỏ hơn nửa personal_model.wait_horizon_min")
     cf = cfg["counterfactual"]
     if cf["idle_scan_step_min"] <= 0 or cf["idle_scan_max_min"] < cf["idle_scan_step_min"]:
         problems.append("counterfactual: idle_scan_step_min > 0 và idle_scan_max_min >= idle_scan_step_min")
@@ -212,3 +253,5 @@ ROBUSTNESS_CFG = ENGINE_CONFIG["robustness"]
 PRIORITY_CFG = ENGINE_CONFIG["priority"]
 PERSONAL_CFG = ENGINE_CONFIG["personal_model"]
 COUNTERFACTUAL_CFG = ENGINE_CONFIG["counterfactual"]
+WHAT_IF_CFG = ENGINE_CONFIG["what_if"]
+ML_CFG = ENGINE_CONFIG["ml"]

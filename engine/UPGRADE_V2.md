@@ -35,8 +35,7 @@ Tài liệu này ghi lại **cái gì đã đổi, vì sao, và chỉnh ở đâ
   hai hướng kiếm tiền theo `goal_weights` → còn lại. Hướng thiếu dữ liệu không xếp hạng. **Đây là thứ tự, không phải điểm tổng.**
 - **Kiểm tra đầu vào (`validation.py`)** — context sai (tọa độ, horizon ≤ 0, weight âm) ⇒ `ValueError`; dữ liệu xấu
   (trùng id, tọa độ sai, `available` nhưng rỗng…) ⇒ `data_quality_warnings`.
-- **Pareto (max_trip_value)** — `pareto_optimal` cho biết khu vực có bị khu vực khác vượt trội đồng thời về năng suất **và** `demand_index`.
-  `demand_index` không bị biến thành xác suất.
+- **Pareto (max_trip_value)** — `pareto_optimal` cho biết khu vực có bị khu vực khác vượt trội đồng thời về năng suất **và** P10 của năng suất (v4; trước đây dùng `demand_index` của sàn, đã bỏ vì không kiểm chứng được).
 
 ## 3. Chỉnh tham số ở đâu
 
@@ -60,15 +59,14 @@ Mọi số đều là **đề xuất tạm, chưa hiệu chỉnh** — cần đ�
 - `load_engine_input_from_dict` không còn chèn POI mock khi snapshot không có `pois`.
 - `weather_hourly` cấp snapshot (nếu có) được ưu tiên; nếu không, dùng điểm mẫu khu vực **gần tài xế nhất trong `area_scope_km`**.
 - Một test cũ (`test_safety_plan_immediate_heavy_rain`) được đổi mốc `14:00 → 15:00` vì ngữ nghĩa "giờ trước" của Open-Meteo (xem mục 1 #2).
-- Tên trường dùng cho Hướng 1/2 là tên trong fixture: `net_value_vnd`, `avg_duration_min`, `favorable_dropoff_pct`, `avg_next_wait_min`.
-  `contracts/engine_input.schema.json` hiện **chưa định nghĩa** các trường này — nên bổ sung vào contract.
+- (v4) Hướng 1/2 chỉ dùng `driver_profile`, `trip_log`, `wait_spells` do tài xế cung cấp; các trường thị trường (`net_value_vnd`, `demand_index`, `favorable_dropoff_pct`, `avg_next_wait_min`…) bị adapter xóa.
 
 ## 5. Giới hạn còn lại (nói thẳng)
 
 - Ngưỡng/trọng số vẫn là giả định; v2 làm chúng **hiển thị và kiểm được độ nhạy**, chưa hiệu chỉnh được (cần log cuốc thật).
 - Dịch chuyển giữa các khu vực là ước tính đường chim bay × hệ số, không phải routing thật.
 - Không dự báo xác suất có cuốc; không có dữ liệu gió/nhiệt/ngập/sự cố.
-- `avg_next_wait_min` được dùng như thời gian chờ đón cuốc trong khu vực — cần Data xác nhận ngữ nghĩa.
+- Thời gian chờ tính từ đợt chờ thật của tài xế (survival); cần app companion/GPS để ghi `wait_spells`.
 
 ## 6. Chạy kiểm tra
 

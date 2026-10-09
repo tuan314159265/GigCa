@@ -2,7 +2,7 @@
   "schema_version": "0.2-demo_simulation",
   "snapshot_id": "hcmc_full_simulated_district1",
   "generated_at": "2026-09-27T14:00:00+07:00",
-  "simulation_label": "Bộ dữ liệu mô phỏng hoàn chỉnh cả 4 lăng kính cho Decision Engine",
+  "simulation_label": "Bộ dữ liệu MÔ PHỎNG: thời tiết/POI/giao thông mô phỏng + biểu cước, nhật ký chuyến và đợt chờ của MỘT tài xế giả lập (sinh tất định bởi scripts/make_demo_driver_log.py). Không chứa dữ liệu thị trường của sàn.",
   "data_status": [
     {
       "dataset": "weather",
@@ -36,32 +36,36 @@
     },
     {
       "dataset": "vehicle_density",
-      "status": "available",
-      "reason": "Mật độ xe cạnh tranh trong ngưỡng cân bằng"
+      "status": "missing",
+      "reason": "Không có feed mật độ xe được cấp phép."
     },
     {
       "dataset": "booking_and_destinations",
-      "status": "available",
-      "reason": "Phân bố điểm đến và tỷ lệ giữ vị trí trung tâm sau chuyến"
+      "status": "not_integrated",
+      "reason": "Không có nguồn booking/điểm đến thị trường kiểm chứng được; thời gian chờ học từ các đợt chờ của chính tài xế (mô phỏng)."
     },
     {
       "dataset": "trip_value",
-      "status": "available",
-      "reason": "Giá cước bình quân và doanh thu ròng dự kiến theo từng khu vực"
+      "status": "not_integrated",
+      "reason": "Không có nguồn cước thị trường kiểm chứng được; thu nhập theo vùng học từ nhật ký chuyến và biểu cước của chính tài xế (mô phỏng)."
     }
   ],
   "objective_readiness": [
     {
       "objective": "max_trip_value",
-      "status": "available",
-      "blocking_datasets": [],
-      "reason": "Đã có dữ liệu giá cước và chỉ số nhu cầu để xếp hạng khu vực giá trị cao."
+      "status": "insufficient_data",
+      "blocking_datasets": [
+        "trip_value"
+      ],
+      "reason": "Không có dữ liệu thị trường; hướng này chỉ chạy được từ dữ liệu của chính tài xế (biểu cước, nhật ký chuyến, đợt chờ)."
     },
     {
       "objective": "maintain_position",
-      "status": "available",
-      "blocking_datasets": [],
-      "reason": "Đã có phân bố điểm đến để đánh giá khả năng giữ vị trí thuận lợi sau chuyến."
+      "status": "insufficient_data",
+      "blocking_datasets": [
+        "booking_and_destinations"
+      ],
+      "reason": "Không có dữ liệu thị trường; hướng này chỉ chạy được từ dữ liệu của chính tài xế (biểu cước, nhật ký chuyến, đợt chờ)."
     },
     {
       "objective": "rest_spot",
@@ -83,22 +87,12 @@
       "spatial_scope": "polygon",
       "representative_point": {
         "latitude": 10.7725,
-        "longitude": 106.6980
+        "longitude": 106.698
       },
       "poi_counts_by_category": {
         "amenity": 820,
         "shop": 210,
         "public_transport": 95
-      },
-      "trip_value": {
-        "gross_fare_vnd": 95000,
-        "net_value_vnd": 78000,
-        "avg_duration_min": 24,
-        "demand_index": 4.8
-      },
-      "destination_distribution": {
-        "favorable_dropoff_pct": 84.0,
-        "avg_next_wait_min": 5
       },
       "routing_samples": [
         {
@@ -132,23 +126,13 @@
       "area_name": "Khu vực Chợ Tân Định - Hai Bà Trưng",
       "spatial_scope": "polygon",
       "representative_point": {
-        "latitude": 10.7890,
-        "longitude": 106.6910
+        "latitude": 10.789,
+        "longitude": 106.691
       },
       "poi_counts_by_category": {
         "amenity": 640,
         "shop": 180,
         "public_transport": 70
-      },
-      "trip_value": {
-        "gross_fare_vnd": 76000,
-        "net_value_vnd": 63000,
-        "avg_duration_min": 18,
-        "demand_index": 3.9
-      },
-      "destination_distribution": {
-        "favorable_dropoff_pct": 78.0,
-        "avg_next_wait_min": 8
       },
       "routing_samples": []
     },
@@ -157,23 +141,13 @@
       "area_name": "Khu vực Hồ Con Rùa - Võ Thị Sáu",
       "spatial_scope": "polygon",
       "representative_point": {
-        "latitude": 10.7830,
-        "longitude": 106.6960
+        "latitude": 10.783,
+        "longitude": 106.696
       },
       "poi_counts_by_category": {
         "amenity": 512,
         "shop": 140,
         "public_transport": 65
-      },
-      "trip_value": {
-        "gross_fare_vnd": 68000,
-        "net_value_vnd": 56000,
-        "avg_duration_min": 16,
-        "demand_index": 3.5
-      },
-      "destination_distribution": {
-        "favorable_dropoff_pct": 72.0,
-        "avg_next_wait_min": 9
       },
       "routing_samples": []
     },
@@ -182,23 +156,13 @@
       "area_name": "Khu vực Ngã Tư Hàng Xanh (Vùng ven)",
       "spatial_scope": "polygon",
       "representative_point": {
-        "latitude": 10.8010,
-        "longitude": 106.7110
+        "latitude": 10.801,
+        "longitude": 106.711
       },
       "poi_counts_by_category": {
         "amenity": 380,
         "shop": 110,
         "public_transport": 50
-      },
-      "trip_value": {
-        "gross_fare_vnd": 115000,
-        "net_value_vnd": 89000,
-        "avg_duration_min": 35,
-        "demand_index": 2.8
-      },
-      "destination_distribution": {
-        "favorable_dropoff_pct": 42.0,
-        "avg_next_wait_min": 18
       },
       "routing_samples": []
     }
@@ -208,7 +172,7 @@
       "poi_id": "poi_highlands_01",
       "name": "Highlands Coffee Nhà Thờ Đức Bà (Có bãi đỗ xe máy riêng)",
       "latitude": 10.7798,
-      "longitude": 106.6990,
+      "longitude": 106.699,
       "category": "cafe",
       "subcategory": "coffee_shop",
       "verified": true,
@@ -224,7 +188,7 @@
       "poi_id": "poi_trung_nguyen_02",
       "name": "Cà phê Trung Nguyên Legend Lê Duẩn (Có chỗ nghỉ & sạc điện thoại)",
       "latitude": 10.7785,
-      "longitude": 106.6980,
+      "longitude": 106.698,
       "category": "cafe",
       "subcategory": "coffee_shop",
       "verified": true,
@@ -254,8 +218,8 @@
     {
       "poi_id": "poi_petrolimex_03",
       "name": "Cây xăng Petrolimex Số 1 Nguyễn Thị Minh Khai (Có bơm lốp & WC miễn phí)",
-      "latitude": 10.7810,
-      "longitude": 106.7020,
+      "latitude": 10.781,
+      "longitude": 106.702,
       "category": "gas_station",
       "subcategory": "fuel",
       "verified": true,
@@ -311,5 +275,185 @@
         "precipitation_probability_pct": 65.0
       }
     ]
-  }
+  },
+  "driver_profile": {
+    "fare_base_vnd": 12000,
+    "fare_per_km_vnd": 4800,
+    "fuel_l_per_100km": 2.2,
+    "fuel_price_vnd_per_l": 24000,
+    "target_vnd_per_hour": 90000
+  },
+  "trip_log": [
+    {"trip_id": "t001", "started_at": "2026-09-15T12:46:39+07:00", "pickup_lat": 10.783118, "pickup_lng": 106.693148, "net_vnd": 24345, "duration_min": 10.1, "dropoff_lat": 10.773344, "dropoff_lng": 106.676483, "distance_km": 2.76},
+    {"trip_id": "t002", "started_at": "2026-09-15T12:58:49+07:00", "pickup_lat": 10.770959, "pickup_lng": 106.699027, "net_vnd": 37430, "duration_min": 17.4, "dropoff_lat": 10.732707, "dropoff_lng": 106.697927, "distance_km": 5.54},
+    {"trip_id": "t003", "started_at": "2026-09-15T13:29:29+07:00", "pickup_lat": 10.7992, "pickup_lng": 106.709904, "net_vnd": 54851, "duration_min": 22.4, "dropoff_lat": 10.778343, "dropoff_lng": 106.649642, "distance_km": 9.08},
+    {"trip_id": "t004", "started_at": "2026-09-15T13:56:34+07:00", "pickup_lat": 10.787298, "pickup_lng": 106.688951, "net_vnd": 31294, "duration_min": 11.8, "dropoff_lat": 10.807644, "dropoff_lng": 106.705134, "distance_km": 3.74},
+    {"trip_id": "t005", "started_at": "2026-09-15T14:08:37+07:00", "pickup_lat": 10.771173, "pickup_lng": 106.699273, "net_vnd": 25066, "duration_min": 6.7, "dropoff_lat": 10.777905, "dropoff_lng": 106.684732, "distance_km": 2.29},
+    {"trip_id": "t006", "started_at": "2026-09-15T14:30:31+07:00", "pickup_lat": 10.799178, "pickup_lng": 106.709541, "net_vnd": 49026, "duration_min": 17.3, "dropoff_lat": 10.767489, "dropoff_lng": 106.754131, "distance_km": 7.82},
+    {"trip_id": "t007", "started_at": "2026-09-16T12:40:41+07:00", "pickup_lat": 10.771581, "pickup_lng": 106.698987, "net_vnd": 36507, "duration_min": 17.7, "dropoff_lat": 10.796743, "dropoff_lng": 106.721514, "distance_km": 4.85},
+    {"trip_id": "t008", "started_at": "2026-09-16T13:21:48+07:00", "pickup_lat": 10.787664, "pickup_lng": 106.688526, "net_vnd": 51822, "duration_min": 28.4, "dropoff_lat": 10.790908, "dropoff_lng": 106.637245, "distance_km": 7.31},
+    {"trip_id": "t009", "started_at": "2026-09-16T13:52:04+07:00", "pickup_lat": 10.798913, "pickup_lng": 106.710142, "net_vnd": 27051, "duration_min": 11.1, "dropoff_lat": 10.826865, "dropoff_lng": 106.715958, "distance_km": 4.13},
+    {"trip_id": "t010", "started_at": "2026-09-16T14:13:43+07:00", "pickup_lat": 10.77173, "pickup_lng": 106.699101, "net_vnd": 42574, "duration_min": 21.0, "dropoff_lat": 10.782849, "dropoff_lng": 106.745917},
+    {"trip_id": "t011", "started_at": "2026-09-16T14:36:55+07:00", "pickup_lat": 10.788062, "pickup_lng": 106.687574, "net_vnd": 23332, "duration_min": 7.2, "dropoff_lat": 10.80361, "dropoff_lng": 106.67936, "distance_km": 2.54},
+    {"trip_id": "t012", "started_at": "2026-09-16T14:46:54+07:00", "pickup_lat": 10.78244, "pickup_lng": 106.693839, "net_vnd": 30985, "duration_min": 12.2, "dropoff_lat": 10.792868, "dropoff_lng": 106.67245, "distance_km": 3.39},
+    {"trip_id": "t013", "started_at": "2026-09-17T12:40:42+07:00", "pickup_lat": 10.772128, "pickup_lng": 106.698599, "net_vnd": 29216, "duration_min": 11.9, "dropoff_lat": 10.785597, "dropoff_lng": 106.719703, "distance_km": 3.58},
+    {"trip_id": "t014", "started_at": "2026-09-17T12:53:38+07:00", "pickup_lat": 10.787797, "pickup_lng": 106.688727, "net_vnd": 21046, "duration_min": 5.1, "dropoff_lat": 10.776476, "dropoff_lng": 106.694823, "distance_km": 1.85},
+    {"trip_id": "t015", "started_at": "2026-09-17T12:59:20+07:00", "pickup_lat": 10.781839, "pickup_lng": 106.693955, "net_vnd": 36895, "duration_min": 16.2, "dropoff_lat": 10.805391, "dropoff_lng": 106.670653, "distance_km": 4.75},
+    {"trip_id": "t016", "started_at": "2026-09-17T13:18:41+07:00", "pickup_lat": 10.771716, "pickup_lng": 106.699202, "net_vnd": 20279, "duration_min": 7.4, "dropoff_lat": 10.78369, "dropoff_lng": 106.712397, "distance_km": 2.55},
+    {"trip_id": "t017", "started_at": "2026-09-17T13:47:03+07:00", "pickup_lat": 10.77145, "pickup_lng": 106.699818, "net_vnd": 31406, "duration_min": 16.2, "dropoff_lat": 10.790356, "dropoff_lng": 106.73036, "distance_km": 5.13},
+    {"trip_id": "t018", "started_at": "2026-09-17T14:09:52+07:00", "pickup_lat": 10.788353, "pickup_lng": 106.688396, "net_vnd": 21392, "duration_min": 8.5, "dropoff_lat": 10.807901, "dropoff_lng": 106.685625, "distance_km": 2.86},
+    {"trip_id": "t019", "started_at": "2026-09-18T12:56:07+07:00", "pickup_lat": 10.787232, "pickup_lng": 106.688626, "net_vnd": 23854, "duration_min": 9.0, "dropoff_lat": 10.796533, "dropoff_lng": 106.705381, "distance_km": 2.74},
+    {"trip_id": "t020", "started_at": "2026-09-18T13:19:54+07:00", "pickup_lat": 10.798463, "pickup_lng": 106.709667, "net_vnd": 47197, "duration_min": 16.5, "dropoff_lat": 10.841692, "dropoff_lng": 106.726015},
+    {"trip_id": "t021", "started_at": "2026-09-18T13:36:30+07:00", "pickup_lat": 10.771495, "pickup_lng": 106.699768, "net_vnd": 31303, "duration_min": 13.0, "dropoff_lat": 10.790364, "dropoff_lng": 106.726338, "distance_km": 4.66},
+    {"trip_id": "t022", "started_at": "2026-09-18T14:59:45+07:00", "pickup_lat": 10.782293, "pickup_lng": 106.693886, "net_vnd": 21883, "duration_min": 6.7, "dropoff_lat": 10.765495, "dropoff_lng": 106.692627, "distance_km": 2.44},
+    {"trip_id": "t023", "started_at": "2026-09-18T15:08:49+07:00", "pickup_lat": 10.798591, "pickup_lng": 106.710138, "net_vnd": 62504, "duration_min": 27.4, "dropoff_lat": 10.840615, "dropoff_lng": 106.654599, "distance_km": 9.97},
+    {"trip_id": "t024", "started_at": "2026-09-18T15:38:09+07:00", "pickup_lat": 10.787395, "pickup_lng": 106.688708, "net_vnd": 21184, "duration_min": 6.2, "dropoff_lat": 10.774308, "dropoff_lng": 106.685592, "distance_km": 1.95},
+    {"trip_id": "t025", "started_at": "2026-09-19T12:47:15+07:00", "pickup_lat": 10.788419, "pickup_lng": 106.68892, "net_vnd": 25754, "duration_min": 10.1, "dropoff_lat": 10.78064, "dropoff_lng": 106.709906, "distance_km": 3.19},
+    {"trip_id": "t026", "started_at": "2026-09-19T12:57:35+07:00", "pickup_lat": 10.772224, "pickup_lng": 106.699038, "net_vnd": 39420, "duration_min": 14.1, "dropoff_lat": 10.775609, "dropoff_lng": 106.73528, "distance_km": 5.18},
+    {"trip_id": "t027", "started_at": "2026-09-19T13:57:16+07:00", "pickup_lat": 10.771202, "pickup_lng": 106.698627, "net_vnd": 24048, "duration_min": 7.5, "dropoff_lat": 10.751772, "dropoff_lng": 106.706928, "distance_km": 3.05},
+    {"trip_id": "t028", "started_at": "2026-09-19T14:23:00+07:00", "pickup_lat": 10.78736, "pickup_lng": 106.688182, "net_vnd": 35132, "duration_min": 18.2, "dropoff_lat": 10.756627, "dropoff_lng": 106.698474, "distance_km": 4.68},
+    {"trip_id": "t029", "started_at": "2026-09-19T15:14:17+07:00", "pickup_lat": 10.771727, "pickup_lng": 106.699641, "net_vnd": 39315, "duration_min": 15.7, "dropoff_lat": 10.759967, "dropoff_lng": 106.665231, "distance_km": 5.18},
+    {"trip_id": "t030", "started_at": "2026-09-19T15:36:00+07:00", "pickup_lat": 10.782098, "pickup_lng": 106.693207, "net_vnd": 21597, "duration_min": 6.4, "dropoff_lat": 10.784328, "dropoff_lng": 106.681015},
+    {"trip_id": "t031", "started_at": "2026-09-20T12:47:11+07:00", "pickup_lat": 10.771315, "pickup_lng": 106.699159, "net_vnd": 44775, "duration_min": 18.8, "dropoff_lat": 10.807846, "dropoff_lng": 106.674491, "distance_km": 6.34},
+    {"trip_id": "t032", "started_at": "2026-09-20T13:12:06+07:00", "pickup_lat": 10.787471, "pickup_lng": 106.688515, "net_vnd": 32468, "duration_min": 11.6, "dropoff_lat": 10.793531, "dropoff_lng": 106.666949, "distance_km": 3.19},
+    {"trip_id": "t033", "started_at": "2026-09-20T13:38:44+07:00", "pickup_lat": 10.798423, "pickup_lng": 106.7104, "net_vnd": 37433, "duration_min": 12.7, "dropoff_lat": 10.829713, "dropoff_lng": 106.691396, "distance_km": 5.27},
+    {"trip_id": "t034", "started_at": "2026-09-20T13:57:19+07:00", "pickup_lat": 10.782053, "pickup_lng": 106.693411, "net_vnd": 20509, "duration_min": 6.6, "dropoff_lat": 10.795236, "dropoff_lng": 106.701113, "distance_km": 2.2},
+    {"trip_id": "t035", "started_at": "2026-09-20T14:12:01+07:00", "pickup_lat": 10.771405, "pickup_lng": 106.699113, "net_vnd": 25741, "duration_min": 9.1, "dropoff_lat": 10.768489, "dropoff_lng": 106.678877, "distance_km": 2.91},
+    {"trip_id": "t036", "started_at": "2026-09-20T14:32:07+07:00", "pickup_lat": 10.798144, "pickup_lng": 106.710686, "net_vnd": 45893, "duration_min": 18.6, "dropoff_lat": 10.834525, "dropoff_lng": 106.746016, "distance_km": 7.28},
+    {"trip_id": "t037", "started_at": "2026-09-21T12:40:53+07:00", "pickup_lat": 10.788205, "pickup_lng": 106.688258, "net_vnd": 30898, "duration_min": 9.9, "dropoff_lat": 10.793781, "dropoff_lng": 106.707687, "distance_km": 2.88},
+    {"trip_id": "t038", "started_at": "2026-09-21T12:53:10+07:00", "pickup_lat": 10.771127, "pickup_lng": 106.698945, "net_vnd": 34405, "duration_min": 15.9, "dropoff_lat": 10.76355, "dropoff_lng": 106.734802, "distance_km": 5.21},
+    {"trip_id": "t039", "started_at": "2026-09-21T13:31:48+07:00", "pickup_lat": 10.771541, "pickup_lng": 106.699714, "net_vnd": 56232, "duration_min": 28.4, "dropoff_lat": 10.710371, "dropoff_lng": 106.700407, "distance_km": 8.85},
+    {"trip_id": "t040", "started_at": "2026-09-21T14:12:05+07:00", "pickup_lat": 10.799237, "pickup_lng": 106.709511, "net_vnd": 59463, "duration_min": 26.1, "dropoff_lat": 10.82402, "dropoff_lng": 106.773758},
+    {"trip_id": "t041", "started_at": "2026-09-21T14:56:05+07:00", "pickup_lat": 10.78274, "pickup_lng": 106.694274, "net_vnd": 25962, "duration_min": 9.0, "dropoff_lat": 10.800138, "dropoff_lng": 106.697759, "distance_km": 2.57},
+    {"trip_id": "t042", "started_at": "2026-09-21T15:13:14+07:00", "pickup_lat": 10.798628, "pickup_lng": 106.710062, "net_vnd": 68371, "duration_min": 27.8, "dropoff_lat": 10.872924, "dropoff_lng": 106.741008, "distance_km": 11.62},
+    {"trip_id": "t043", "started_at": "2026-09-22T13:14:42+07:00", "pickup_lat": 10.772047, "pickup_lng": 106.699592, "net_vnd": 30290, "duration_min": 13.5, "dropoff_lat": 10.796111, "dropoff_lng": 106.685118, "distance_km": 4.04},
+    {"trip_id": "t044", "started_at": "2026-09-22T13:44:42+07:00", "pickup_lat": 10.798816, "pickup_lng": 106.709654, "net_vnd": 42697, "duration_min": 13.2, "dropoff_lat": 10.820766, "dropoff_lng": 106.74522, "distance_km": 5.97},
+    {"trip_id": "t045", "started_at": "2026-09-22T14:11:57+07:00", "pickup_lat": 10.782705, "pickup_lng": 106.694144, "net_vnd": 18708, "duration_min": 6.0, "dropoff_lat": 10.780031, "dropoff_lng": 106.70475, "distance_km": 1.56},
+    {"trip_id": "t046", "started_at": "2026-09-22T14:23:09+07:00", "pickup_lat": 10.787312, "pickup_lng": 106.68783, "net_vnd": 40925, "duration_min": 17.1, "dropoff_lat": 10.789337, "dropoff_lng": 106.726374, "distance_km": 5.49},
+    {"trip_id": "t047", "started_at": "2026-09-22T14:45:39+07:00", "pickup_lat": 10.772282, "pickup_lng": 106.699925, "net_vnd": 22374, "duration_min": 7.4, "dropoff_lat": 10.758608, "dropoff_lng": 106.688967, "distance_km": 2.52},
+    {"trip_id": "t048", "started_at": "2026-09-22T15:01:10+07:00", "pickup_lat": 10.788225, "pickup_lng": 106.688038, "net_vnd": 21703, "duration_min": 8.1, "dropoff_lat": 10.772523, "dropoff_lng": 106.696324, "distance_km": 2.56},
+    {"trip_id": "t049", "started_at": "2026-09-23T12:45:41+07:00", "pickup_lat": 10.798018, "pickup_lng": 106.709768, "net_vnd": 60550, "duration_min": 24.9, "dropoff_lat": 10.780838, "dropoff_lng": 106.642351, "distance_km": 9.9},
+    {"trip_id": "t050", "started_at": "2026-09-23T13:16:00+07:00", "pickup_lat": 10.77095, "pickup_lng": 106.698675, "net_vnd": 25691, "duration_min": 8.5, "dropoff_lat": 10.768259, "dropoff_lng": 106.676641},
+    {"trip_id": "t051", "started_at": "2026-09-23T13:32:46+07:00", "pickup_lat": 10.782732, "pickup_lng": 106.69372, "net_vnd": 35216, "duration_min": 15.8, "dropoff_lat": 10.76102, "dropoff_lng": 106.67215, "distance_km": 4.39},
+    {"trip_id": "t052", "started_at": "2026-09-23T14:07:14+07:00", "pickup_lat": 10.772118, "pickup_lng": 106.698876, "net_vnd": 40378, "duration_min": 16.2, "dropoff_lat": 10.740187, "dropoff_lng": 106.677003, "distance_km": 5.57},
+    {"trip_id": "t053", "started_at": "2026-09-23T14:27:15+07:00", "pickup_lat": 10.78224, "pickup_lng": 106.69426, "net_vnd": 28789, "duration_min": 10.3, "dropoff_lat": 10.801334, "dropoff_lng": 106.702334, "distance_km": 2.99},
+    {"trip_id": "t054", "started_at": "2026-09-23T14:40:42+07:00", "pickup_lat": 10.788164, "pickup_lng": 106.688186, "net_vnd": 47678, "duration_min": 26.3, "dropoff_lat": 10.832616, "dropoff_lng": 106.701789, "distance_km": 6.72},
+    {"trip_id": "t055", "started_at": "2026-09-24T12:43:08+07:00", "pickup_lat": 10.782048, "pickup_lng": 106.693185, "net_vnd": 30884, "duration_min": 13.9, "dropoff_lat": 10.761956, "dropoff_lng": 106.715564, "distance_km": 4.31},
+    {"trip_id": "t056", "started_at": "2026-09-24T13:06:43+07:00", "pickup_lat": 10.7874, "pickup_lng": 106.688234, "net_vnd": 36734, "duration_min": 13.3, "dropoff_lat": 10.793746, "dropoff_lng": 106.714175, "distance_km": 3.8},
+    {"trip_id": "t057", "started_at": "2026-09-24T13:24:36+07:00", "pickup_lat": 10.771239, "pickup_lng": 106.698868, "net_vnd": 30378, "duration_min": 12.2, "dropoff_lat": 10.74347, "dropoff_lng": 106.696586, "distance_km": 4.03},
+    {"trip_id": "t058", "started_at": "2026-09-24T13:40:46+07:00", "pickup_lat": 10.787456, "pickup_lng": 106.687596, "net_vnd": 30033, "duration_min": 11.9, "dropoff_lat": 10.762903, "dropoff_lng": 106.696673, "distance_km": 3.78},
+    {"trip_id": "t059", "started_at": "2026-09-24T13:54:51+07:00", "pickup_lat": 10.782426, "pickup_lng": 106.693135, "net_vnd": 33091, "duration_min": 11.0, "dropoff_lat": 10.771992, "dropoff_lng": 106.671432, "distance_km": 3.44},
+    {"trip_id": "t060", "started_at": "2026-09-24T14:06:28+07:00", "pickup_lat": 10.771082, "pickup_lng": 106.699669, "net_vnd": 23748, "duration_min": 5.3, "dropoff_lat": 10.766619, "dropoff_lng": 106.712307},
+    {"trip_id": "t061", "started_at": "2026-09-25T12:40:39+07:00", "pickup_lat": 10.771354, "pickup_lng": 106.699319, "net_vnd": 44887, "duration_min": 26.3, "dropoff_lat": 10.741035, "dropoff_lng": 106.656837, "distance_km": 7.47},
+    {"trip_id": "t062", "started_at": "2026-09-25T13:31:36+07:00", "pickup_lat": 10.798295, "pickup_lng": 106.70984, "net_vnd": 30295, "duration_min": 10.5, "dropoff_lat": 10.772464, "dropoff_lng": 106.696511, "distance_km": 4.19},
+    {"trip_id": "t063", "started_at": "2026-09-25T13:47:13+07:00", "pickup_lat": 10.787362, "pickup_lng": 106.687718, "net_vnd": 25885, "duration_min": 6.6, "dropoff_lat": 10.801026, "dropoff_lng": 106.698109, "distance_km": 2.47},
+    {"trip_id": "t064", "started_at": "2026-09-25T13:57:44+07:00", "pickup_lat": 10.772255, "pickup_lng": 106.699638, "net_vnd": 30573, "duration_min": 10.3, "dropoff_lat": 10.752748, "dropoff_lng": 106.712857, "distance_km": 3.39},
+    {"trip_id": "t065", "started_at": "2026-09-25T14:43:34+07:00", "pickup_lat": 10.771073, "pickup_lng": 106.699788, "net_vnd": 26397, "duration_min": 9.7, "dropoff_lat": 10.794915, "dropoff_lng": 106.706287, "distance_km": 3.57},
+    {"trip_id": "t066", "started_at": "2026-09-25T14:59:05+07:00", "pickup_lat": 10.788166, "pickup_lng": 106.687907, "net_vnd": 31403, "duration_min": 10.4, "dropoff_lat": 10.783614, "dropoff_lng": 106.711377, "distance_km": 3.4},
+    {"trip_id": "t067", "started_at": "2026-09-26T13:09:52+07:00", "pickup_lat": 10.788346, "pickup_lng": 106.687597, "net_vnd": 36209, "duration_min": 16.4, "dropoff_lat": 10.772566, "dropoff_lng": 106.651215, "distance_km": 5.65},
+    {"trip_id": "t068", "started_at": "2026-09-26T13:36:11+07:00", "pickup_lat": 10.782696, "pickup_lng": 106.693612, "net_vnd": 24767, "duration_min": 8.4, "dropoff_lat": 10.794171, "dropoff_lng": 106.704235, "distance_km": 2.24},
+    {"trip_id": "t069", "started_at": "2026-09-26T13:48:29+07:00", "pickup_lat": 10.771692, "pickup_lng": 106.698914, "net_vnd": 51204, "duration_min": 23.8, "dropoff_lat": 10.770103, "dropoff_lng": 106.754029, "distance_km": 7.84},
+    {"trip_id": "t070", "started_at": "2026-09-26T14:15:34+07:00", "pickup_lat": 10.78844, "pickup_lng": 106.688455, "net_vnd": 30929, "duration_min": 8.7, "dropoff_lat": 10.795038, "dropoff_lng": 106.708335},
+    {"trip_id": "t071", "started_at": "2026-09-26T14:33:39+07:00", "pickup_lat": 10.782963, "pickup_lng": 106.69319, "net_vnd": 22185, "duration_min": 4.6, "dropoff_lat": 10.780784, "dropoff_lng": 106.705366, "distance_km": 1.76},
+    {"trip_id": "t072", "started_at": "2026-09-26T14:39:22+07:00", "pickup_lat": 10.771136, "pickup_lng": 106.698695, "net_vnd": 37619, "duration_min": 17.5, "dropoff_lat": 10.74451, "dropoff_lng": 106.67001, "distance_km": 5.61}
+  ],
+  "wait_spells": [
+    {"spell_id": "w001", "start": "2026-09-15T12:40:00+07:00", "end": "2026-09-15T12:46:39+07:00", "lat": 10.783118, "lng": 106.693148, "ended_by": "trip"},
+    {"spell_id": "w002", "start": "2026-09-15T12:56:44+07:00", "end": "2026-09-15T12:58:49+07:00", "lat": 10.770959, "lng": 106.699027, "ended_by": "trip"},
+    {"spell_id": "w003", "start": "2026-09-15T13:16:15+07:00", "end": "2026-09-15T13:29:29+07:00", "lat": 10.7992, "lng": 106.709904, "ended_by": "trip"},
+    {"spell_id": "w004", "start": "2026-09-15T13:51:54+07:00", "end": "2026-09-15T13:56:34+07:00", "lat": 10.787298, "lng": 106.688951, "ended_by": "trip"},
+    {"spell_id": "w005", "start": "2026-09-15T14:08:25+07:00", "end": "2026-09-15T14:08:37+07:00", "lat": 10.771173, "lng": 106.699273, "ended_by": "trip"},
+    {"spell_id": "w006", "start": "2026-09-15T14:15:21+07:00", "end": "2026-09-15T14:30:31+07:00", "lat": 10.799178, "lng": 106.709541, "ended_by": "trip"},
+    {"spell_id": "w007", "start": "2026-09-15T14:47:50+07:00", "end": "2026-09-15T15:17:22+07:00", "lat": 10.788377, "lng": 106.688946, "ended_by": "offline"},
+    {"spell_id": "w008", "start": "2026-09-16T12:40:00+07:00", "end": "2026-09-16T12:40:41+07:00", "lat": 10.771581, "lng": 106.698987, "ended_by": "trip"},
+    {"spell_id": "w009", "start": "2026-09-16T12:58:21+07:00", "end": "2026-09-16T13:18:21+07:00", "lat": 10.79849, "lng": 106.710575, "ended_by": "moved"},
+    {"spell_id": "w010", "start": "2026-09-16T13:18:21+07:00", "end": "2026-09-16T13:21:48+07:00", "lat": 10.787664, "lng": 106.688526, "ended_by": "trip"},
+    {"spell_id": "w011", "start": "2026-09-16T13:50:13+07:00", "end": "2026-09-16T13:52:04+07:00", "lat": 10.798913, "lng": 106.710142, "ended_by": "trip"},
+    {"spell_id": "w012", "start": "2026-09-16T14:03:08+07:00", "end": "2026-09-16T14:13:43+07:00", "lat": 10.77173, "lng": 106.699101, "ended_by": "trip"},
+    {"spell_id": "w013", "start": "2026-09-16T14:34:44+07:00", "end": "2026-09-16T14:36:55+07:00", "lat": 10.788062, "lng": 106.687574, "ended_by": "trip"},
+    {"spell_id": "w014", "start": "2026-09-16T14:44:06+07:00", "end": "2026-09-16T14:46:54+07:00", "lat": 10.78244, "lng": 106.693839, "ended_by": "trip"},
+    {"spell_id": "w015", "start": "2026-09-16T14:59:06+07:00", "end": "2026-09-16T15:25:47+07:00", "lat": 10.77187, "lng": 106.699038, "ended_by": "offline"},
+    {"spell_id": "w016", "start": "2026-09-17T12:40:00+07:00", "end": "2026-09-17T12:40:42+07:00", "lat": 10.772128, "lng": 106.698599, "ended_by": "trip"},
+    {"spell_id": "w017", "start": "2026-09-17T12:52:35+07:00", "end": "2026-09-17T12:53:38+07:00", "lat": 10.787797, "lng": 106.688727, "ended_by": "trip"},
+    {"spell_id": "w018", "start": "2026-09-17T12:58:45+07:00", "end": "2026-09-17T12:59:20+07:00", "lat": 10.781839, "lng": 106.693955, "ended_by": "trip"},
+    {"spell_id": "w019", "start": "2026-09-17T13:15:35+07:00", "end": "2026-09-17T13:18:41+07:00", "lat": 10.771716, "lng": 106.699202, "ended_by": "trip"},
+    {"spell_id": "w020", "start": "2026-09-17T13:26:06+07:00", "end": "2026-09-17T13:46:06+07:00", "lat": 10.79863, "lng": 106.709645, "ended_by": "moved"},
+    {"spell_id": "w021", "start": "2026-09-17T13:46:06+07:00", "end": "2026-09-17T13:47:03+07:00", "lat": 10.77145, "lng": 106.699818, "ended_by": "trip"},
+    {"spell_id": "w022", "start": "2026-09-17T14:03:17+07:00", "end": "2026-09-17T14:09:52+07:00", "lat": 10.788353, "lng": 106.688396, "ended_by": "trip"},
+    {"spell_id": "w023", "start": "2026-09-17T14:18:22+07:00", "end": "2026-09-17T14:56:52+07:00", "lat": 10.781731, "lng": 106.694282, "ended_by": "offline"},
+    {"spell_id": "w024", "start": "2026-09-18T12:40:00+07:00", "end": "2026-09-18T12:56:07+07:00", "lat": 10.787232, "lng": 106.688626, "ended_by": "trip"},
+    {"spell_id": "w025", "start": "2026-09-18T13:05:09+07:00", "end": "2026-09-18T13:19:54+07:00", "lat": 10.798463, "lng": 106.709667, "ended_by": "trip"},
+    {"spell_id": "w026", "start": "2026-09-18T13:36:24+07:00", "end": "2026-09-18T13:36:30+07:00", "lat": 10.771495, "lng": 106.699768, "ended_by": "trip"},
+    {"spell_id": "w027", "start": "2026-09-18T13:49:29+07:00", "end": "2026-09-18T14:09:29+07:00", "lat": 10.798112, "lng": 106.710515, "ended_by": "moved"},
+    {"spell_id": "w028", "start": "2026-09-18T14:09:29+07:00", "end": "2026-09-18T14:29:29+07:00", "lat": 10.782288, "lng": 106.69397, "ended_by": "moved"},
+    {"spell_id": "w029", "start": "2026-09-18T14:29:29+07:00", "end": "2026-09-18T14:49:29+07:00", "lat": 10.771693, "lng": 106.698789, "ended_by": "moved"},
+    {"spell_id": "w030", "start": "2026-09-18T14:49:29+07:00", "end": "2026-09-18T14:59:45+07:00", "lat": 10.782293, "lng": 106.693886, "ended_by": "trip"},
+    {"spell_id": "w031", "start": "2026-09-18T15:06:26+07:00", "end": "2026-09-18T15:08:49+07:00", "lat": 10.798591, "lng": 106.710138, "ended_by": "trip"},
+    {"spell_id": "w032", "start": "2026-09-18T15:36:15+07:00", "end": "2026-09-18T15:38:09+07:00", "lat": 10.787395, "lng": 106.688708, "ended_by": "trip"},
+    {"spell_id": "w033", "start": "2026-09-18T15:44:20+07:00", "end": "2026-09-18T16:34:03+07:00", "lat": 10.782802, "lng": 106.693435, "ended_by": "offline"},
+    {"spell_id": "w034", "start": "2026-09-19T12:40:00+07:00", "end": "2026-09-19T12:47:15+07:00", "lat": 10.788419, "lng": 106.68892, "ended_by": "trip"},
+    {"spell_id": "w035", "start": "2026-09-19T12:57:21+07:00", "end": "2026-09-19T12:57:35+07:00", "lat": 10.772224, "lng": 106.699038, "ended_by": "trip"},
+    {"spell_id": "w036", "start": "2026-09-19T13:11:42+07:00", "end": "2026-09-19T13:31:42+07:00", "lat": 10.781769, "lng": 106.69307, "ended_by": "moved"},
+    {"spell_id": "w037", "start": "2026-09-19T13:31:42+07:00", "end": "2026-09-19T13:51:42+07:00", "lat": 10.798853, "lng": 106.710654, "ended_by": "moved"},
+    {"spell_id": "w038", "start": "2026-09-19T13:51:42+07:00", "end": "2026-09-19T13:57:16+07:00", "lat": 10.771202, "lng": 106.698627, "ended_by": "trip"},
+    {"spell_id": "w039", "start": "2026-09-19T14:04:49+07:00", "end": "2026-09-19T14:23:00+07:00", "lat": 10.78736, "lng": 106.688182, "ended_by": "trip"},
+    {"spell_id": "w040", "start": "2026-09-19T14:41:14+07:00", "end": "2026-09-19T15:01:14+07:00", "lat": 10.798971, "lng": 106.710474, "ended_by": "moved"},
+    {"spell_id": "w041", "start": "2026-09-19T15:01:14+07:00", "end": "2026-09-19T15:14:17+07:00", "lat": 10.771727, "lng": 106.699641, "ended_by": "trip"},
+    {"spell_id": "w042", "start": "2026-09-19T15:30:00+07:00", "end": "2026-09-19T15:36:00+07:00", "lat": 10.782098, "lng": 106.693207, "ended_by": "trip"},
+    {"spell_id": "w043", "start": "2026-09-19T15:42:23+07:00", "end": "2026-09-19T16:33:45+07:00", "lat": 10.771909, "lng": 106.699556, "ended_by": "offline"},
+    {"spell_id": "w044", "start": "2026-09-20T12:40:00+07:00", "end": "2026-09-20T12:47:11+07:00", "lat": 10.771315, "lng": 106.699159, "ended_by": "trip"},
+    {"spell_id": "w045", "start": "2026-09-20T13:05:58+07:00", "end": "2026-09-20T13:12:06+07:00", "lat": 10.787471, "lng": 106.688515, "ended_by": "trip"},
+    {"spell_id": "w046", "start": "2026-09-20T13:23:42+07:00", "end": "2026-09-20T13:38:44+07:00", "lat": 10.798423, "lng": 106.7104, "ended_by": "trip"},
+    {"spell_id": "w047", "start": "2026-09-20T13:51:24+07:00", "end": "2026-09-20T13:57:19+07:00", "lat": 10.782053, "lng": 106.693411, "ended_by": "trip"},
+    {"spell_id": "w048", "start": "2026-09-20T14:03:52+07:00", "end": "2026-09-20T14:12:01+07:00", "lat": 10.771405, "lng": 106.699113, "ended_by": "trip"},
+    {"spell_id": "w049", "start": "2026-09-20T14:21:08+07:00", "end": "2026-09-20T14:32:07+07:00", "lat": 10.798144, "lng": 106.710686, "ended_by": "trip"},
+    {"spell_id": "w050", "start": "2026-09-20T14:50:44+07:00", "end": "2026-09-20T15:23:45+07:00", "lat": 10.78306, "lng": 106.693959, "ended_by": "offline"},
+    {"spell_id": "w051", "start": "2026-09-21T12:40:00+07:00", "end": "2026-09-21T12:40:53+07:00", "lat": 10.788205, "lng": 106.688258, "ended_by": "trip"},
+    {"spell_id": "w052", "start": "2026-09-21T12:50:45+07:00", "end": "2026-09-21T12:53:10+07:00", "lat": 10.771127, "lng": 106.698945, "ended_by": "trip"},
+    {"spell_id": "w053", "start": "2026-09-21T13:09:07+07:00", "end": "2026-09-21T13:29:07+07:00", "lat": 10.798218, "lng": 106.710689, "ended_by": "moved"},
+    {"spell_id": "w054", "start": "2026-09-21T13:29:07+07:00", "end": "2026-09-21T13:31:48+07:00", "lat": 10.771541, "lng": 106.699714, "ended_by": "trip"},
+    {"spell_id": "w055", "start": "2026-09-21T14:00:13+07:00", "end": "2026-09-21T14:12:05+07:00", "lat": 10.799237, "lng": 106.709511, "ended_by": "trip"},
+    {"spell_id": "w056", "start": "2026-09-21T14:38:12+07:00", "end": "2026-09-21T14:56:05+07:00", "lat": 10.78274, "lng": 106.694274, "ended_by": "trip"},
+    {"spell_id": "w057", "start": "2026-09-21T15:05:06+07:00", "end": "2026-09-21T15:13:14+07:00", "lat": 10.798628, "lng": 106.710062, "ended_by": "trip"},
+    {"spell_id": "w058", "start": "2026-09-21T15:41:01+07:00", "end": "2026-09-21T16:34:29+07:00", "lat": 10.787819, "lng": 106.687688, "ended_by": "offline"},
+    {"spell_id": "w059", "start": "2026-09-22T12:40:00+07:00", "end": "2026-09-22T13:00:00+07:00", "lat": 10.787263, "lng": 106.688076, "ended_by": "moved"},
+    {"spell_id": "w060", "start": "2026-09-22T13:00:00+07:00", "end": "2026-09-22T13:14:42+07:00", "lat": 10.772047, "lng": 106.699592, "ended_by": "trip"},
+    {"spell_id": "w061", "start": "2026-09-22T13:28:10+07:00", "end": "2026-09-22T13:44:42+07:00", "lat": 10.798816, "lng": 106.709654, "ended_by": "trip"},
+    {"spell_id": "w062", "start": "2026-09-22T13:57:54+07:00", "end": "2026-09-22T14:11:57+07:00", "lat": 10.782705, "lng": 106.694144, "ended_by": "trip"},
+    {"spell_id": "w063", "start": "2026-09-22T14:17:57+07:00", "end": "2026-09-22T14:23:09+07:00", "lat": 10.787312, "lng": 106.68783, "ended_by": "trip"},
+    {"spell_id": "w064", "start": "2026-09-22T14:40:12+07:00", "end": "2026-09-22T14:45:39+07:00", "lat": 10.772282, "lng": 106.699925, "ended_by": "trip"},
+    {"spell_id": "w065", "start": "2026-09-22T14:53:03+07:00", "end": "2026-09-22T15:01:10+07:00", "lat": 10.788225, "lng": 106.688038, "ended_by": "trip"},
+    {"spell_id": "w066", "start": "2026-09-22T15:09:19+07:00", "end": "2026-09-22T15:38:28+07:00", "lat": 10.783111, "lng": 106.693598, "ended_by": "offline"},
+    {"spell_id": "w067", "start": "2026-09-23T12:40:00+07:00", "end": "2026-09-23T12:45:41+07:00", "lat": 10.798018, "lng": 106.709768, "ended_by": "trip"},
+    {"spell_id": "w068", "start": "2026-09-23T13:10:35+07:00", "end": "2026-09-23T13:16:00+07:00", "lat": 10.77095, "lng": 106.698675, "ended_by": "trip"},
+    {"spell_id": "w069", "start": "2026-09-23T13:24:29+07:00", "end": "2026-09-23T13:32:46+07:00", "lat": 10.782732, "lng": 106.69372, "ended_by": "trip"},
+    {"spell_id": "w070", "start": "2026-09-23T13:48:37+07:00", "end": "2026-09-23T14:07:14+07:00", "lat": 10.772118, "lng": 106.698876, "ended_by": "trip"},
+    {"spell_id": "w071", "start": "2026-09-23T14:23:27+07:00", "end": "2026-09-23T14:27:15+07:00", "lat": 10.78224, "lng": 106.69426, "ended_by": "trip"},
+    {"spell_id": "w072", "start": "2026-09-23T14:37:32+07:00", "end": "2026-09-23T14:40:42+07:00", "lat": 10.788164, "lng": 106.688186, "ended_by": "trip"},
+    {"spell_id": "w073", "start": "2026-09-23T15:07:03+07:00", "end": "2026-09-23T15:39:57+07:00", "lat": 10.771528, "lng": 106.698889, "ended_by": "offline"},
+    {"spell_id": "w074", "start": "2026-09-24T12:40:00+07:00", "end": "2026-09-24T12:43:08+07:00", "lat": 10.782048, "lng": 106.693185, "ended_by": "trip"},
+    {"spell_id": "w075", "start": "2026-09-24T12:57:03+07:00", "end": "2026-09-24T13:06:43+07:00", "lat": 10.7874, "lng": 106.688234, "ended_by": "trip"},
+    {"spell_id": "w076", "start": "2026-09-24T13:20:02+07:00", "end": "2026-09-24T13:24:36+07:00", "lat": 10.771239, "lng": 106.698868, "ended_by": "trip"},
+    {"spell_id": "w077", "start": "2026-09-24T13:36:50+07:00", "end": "2026-09-24T13:40:46+07:00", "lat": 10.787456, "lng": 106.687596, "ended_by": "trip"},
+    {"spell_id": "w078", "start": "2026-09-24T13:52:40+07:00", "end": "2026-09-24T13:54:51+07:00", "lat": 10.782426, "lng": 106.693135, "ended_by": "trip"},
+    {"spell_id": "w079", "start": "2026-09-24T14:05:53+07:00", "end": "2026-09-24T14:06:28+07:00", "lat": 10.771082, "lng": 106.699669, "ended_by": "trip"},
+    {"spell_id": "w080", "start": "2026-09-24T14:11:44+07:00", "end": "2026-09-24T14:54:22+07:00", "lat": 10.798915, "lng": 106.71051, "ended_by": "offline"},
+    {"spell_id": "w081", "start": "2026-09-25T12:40:00+07:00", "end": "2026-09-25T12:40:39+07:00", "lat": 10.771354, "lng": 106.699319, "ended_by": "trip"},
+    {"spell_id": "w082", "start": "2026-09-25T13:06:55+07:00", "end": "2026-09-25T13:26:55+07:00", "lat": 10.78814, "lng": 106.688331, "ended_by": "moved"},
+    {"spell_id": "w083", "start": "2026-09-25T13:26:55+07:00", "end": "2026-09-25T13:31:36+07:00", "lat": 10.798295, "lng": 106.70984, "ended_by": "trip"},
+    {"spell_id": "w084", "start": "2026-09-25T13:42:03+07:00", "end": "2026-09-25T13:47:13+07:00", "lat": 10.787362, "lng": 106.687718, "ended_by": "trip"},
+    {"spell_id": "w085", "start": "2026-09-25T13:53:51+07:00", "end": "2026-09-25T13:57:44+07:00", "lat": 10.772255, "lng": 106.699638, "ended_by": "trip"},
+    {"spell_id": "w086", "start": "2026-09-25T14:08:05+07:00", "end": "2026-09-25T14:28:05+07:00", "lat": 10.798213, "lng": 106.710804, "ended_by": "moved"},
+    {"spell_id": "w087", "start": "2026-09-25T14:28:05+07:00", "end": "2026-09-25T14:43:34+07:00", "lat": 10.771073, "lng": 106.699788, "ended_by": "trip"},
+    {"spell_id": "w088", "start": "2026-09-25T14:53:15+07:00", "end": "2026-09-25T14:59:05+07:00", "lat": 10.788166, "lng": 106.687907, "ended_by": "trip"},
+    {"spell_id": "w089", "start": "2026-09-25T15:09:27+07:00", "end": "2026-09-25T16:01:17+07:00", "lat": 10.79848, "lng": 106.709568, "ended_by": "offline"},
+    {"spell_id": "w090", "start": "2026-09-26T12:40:00+07:00", "end": "2026-09-26T13:00:00+07:00", "lat": 10.798748, "lng": 106.710085, "ended_by": "moved"},
+    {"spell_id": "w091", "start": "2026-09-26T13:00:00+07:00", "end": "2026-09-26T13:09:52+07:00", "lat": 10.788346, "lng": 106.687597, "ended_by": "trip"},
+    {"spell_id": "w092", "start": "2026-09-26T13:26:18+07:00", "end": "2026-09-26T13:36:11+07:00", "lat": 10.782696, "lng": 106.693612, "ended_by": "trip"},
+    {"spell_id": "w093", "start": "2026-09-26T13:44:32+07:00", "end": "2026-09-26T13:48:29+07:00", "lat": 10.771692, "lng": 106.698914, "ended_by": "trip"},
+    {"spell_id": "w094", "start": "2026-09-26T14:12:16+07:00", "end": "2026-09-26T14:15:34+07:00", "lat": 10.78844, "lng": 106.688455, "ended_by": "trip"},
+    {"spell_id": "w095", "start": "2026-09-26T14:24:18+07:00", "end": "2026-09-26T14:33:39+07:00", "lat": 10.782963, "lng": 106.69319, "ended_by": "trip"},
+    {"spell_id": "w096", "start": "2026-09-26T14:38:16+07:00", "end": "2026-09-26T14:39:22+07:00", "lat": 10.771136, "lng": 106.698695, "ended_by": "trip"},
+    {"spell_id": "w097", "start": "2026-09-26T14:56:49+07:00", "end": "2026-09-26T15:41:45+07:00", "lat": 10.799194, "lng": 106.710698, "ended_by": "offline"}
+  ]
 }

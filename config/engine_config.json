@@ -71,14 +71,17 @@
     "note": "Đề xuất tạm. ratio = current_speed / free_flow_speed; edge quá cũ (observed_at) bị loại"
   },
   "max_trip_value": {
-    "trip_accept_ratio": 0.8,
     "max_wait_min": 20,
-    "note": "Đề xuất tạm. trip_accept_ratio: chỉ nên nhận cuốc có cước ròng >= tỷ lệ này x cước ròng bình quân của khu vực"
+    "note": "Đề xuất tạm. Ngưỡng nhận cuốc KHÔNG còn là hệ số tự đặt: cước ròng tối thiểu = mục_tiêu_đ/giờ × (thời gian chuyến + chờ)/60 + xăng, với mục tiêu do tài xế nhập (DriverProfile.target_vnd_per_hour)"
   },
   "maintain_position": {
     "wait_penalty_per_min": 1.5,
     "reposition_penalty_per_km": 2.0,
-    "note": "Đề xuất tạm. Điểm 0-100, cao hơn = tốt hơn: favorable_dropoff_pct - phạt chờ - phạt dịch chuyển"
+    "wait_thresholds_min": [
+      10,
+      20
+    ],
+    "note": "Đề xuất tạm. Điểm 0-100, cao hơn = tốt hơn: 100·P(chờ ≤ ngưỡng đầu) - phạt chờ kỳ vọng - phạt dịch chuyển. P(chờ ≤ t) từ survival (Kaplan–Meier) trên các đợt chờ thật của tài xế, đợt chờ kết thúc vì offline/đổi chỗ được coi là bị kiểm duyệt"
   },
   "rest_spot": {
     "max_candidates": 5,
@@ -166,11 +169,27 @@
     "daypart_window_h": 2.0,
     "shrinkage_k": 5.0,
     "interval_z": 1.2816,
-    "follow_up_max_min": 20,
-    "follow_up_max_km": 1.5,
-    "session_gap_max_min": 180,
     "max_age_days": 60,
-    "note": "Đề xuất tạm — chưa hiệu chỉnh. Nhật ký chuyến do chính tài xế cung cấp: gom vùng đón theo ô lưới zone_cell_m, lọc khung giờ ±daypart_window_h quanh giờ hiện tại, co (shrink) trung bình vùng về trung bình cá nhân với trọng số k chuyến; interval_z=1.2816 ứng với khoảng ~80%. session_gap_max_min: khoảng cách giữa hai chuyến lớn hơn mức này coi là nghỉ ca, không tính là thời gian chờ."
+    "min_spells_per_zone": 4,
+    "wait_horizon_min": 30,
+    "fit_min_distance_sd_km": 0.5,
+    "min_spells_total": 20,
+    "min_wait_events_per_zone": 2,
+    "note": "Đề xuất tạm — chưa hiệu chỉnh. Nhật ký chuyến + đợt chờ do chính tài xế cung cấp: gom vùng theo ô lưới zone_cell_m, lọc khung giờ ±daypart_window_h quanh giờ hiện tại, co (shrink) số liệu vùng về trung bình cá nhân với trọng số k mẫu; interval_z=1.2816 ứng với khoảng ~80% (P10–P90). wait_horizon_min: khung quan sát (phút) khi tính thời gian chờ kỳ vọng (restricted mean) — phải ≥ ngưỡng P(chờ ≤ t) lớn nhất; tài xế thường đổi chỗ sau khoảng thời gian này nên dữ liệu sau mốc đó rất thưa. min_spells_per_zone: số đợt chờ tối thiểu để một vùng có số liệu chờ. fit_min_distance_sd_km: độ phân tán cự ly tối thiểu để fit biểu cước a + b·km (nếu không đủ thì dùng biểu cước tài xế nhập hoặc báo thiếu). min_spells_total / min_wait_events_per_zone: số đợt chờ tối thiểu toàn nhật ký / số đợt kết thúc bằng có cuốc tối thiểu mỗi vùng (đợt bị kiểm duyệt không chứng minh được thời gian chờ)."
+  },
+  "what_if": {
+    "trip_km": [
+      2,
+      5,
+      10
+    ],
+    "wait_min": [
+      5,
+      10,
+      20
+    ],
+    "assumed_trip_speed_kmh": 22.0,
+    "note": "Bảng kịch bản cho Bậc 0 (chưa có nhật ký): cuốc X km × chờ Y phút → đ/giờ theo biểu cước tài xế nhập. assumed_trip_speed_kmh là GIẢ ĐỊNH đề xuất tạm (chưa có nhật ký để học tốc độ); khi có nhật ký, engine dùng tốc độ học từ nhật ký."
   },
   "counterfactual": {
     "idle_scan_max_min": 120,
@@ -185,5 +204,14 @@
     "max_position_points": 12,
     "note": "Phân tích 'điều gì làm khuyến nghị đổi': chạy lại engine (hàm thuần) với đầu vào đổi từng biến một."
   },
-  "final_note": "Đây là gợi ý dựa trên dữ liệu hiện có, không phải quyết định thay bạn — hãy tự kiểm tra trước khi hành động, đặc biệt với các mục còn đang thiếu dữ liệu."
+  "final_note": "Đây là gợi ý dựa trên dữ liệu hiện có, không phải quyết định thay bạn — hãy tự kiểm tra trước khi hành động, đặc biệt với các mục còn đang thiếu dữ liệu.",
+  "ml": {
+    "enabled": true,
+    "min_spells": 60,
+    "min_cycles": 60,
+    "holdout_fraction": 0.3,
+    "min_gain_nll": 0.005,
+    "conformal_alpha": 0.2,
+    "note": "Lớp ML (v5) chỉ học từ dữ liệu của tài xế và chỉ thay baseline khi thắng backtest theo thời gian. enabled=false tắt hoàn toàn. min_gain_nll: lợi log-likelihood tối thiểu trên tập kiểm tra (so với baseline và so với mô hình không ngữ cảnh). conformal_alpha=0.2 ứng với khoảng 80%. Đề xuất tạm, chưa hiệu chỉnh trên dữ liệu thật."
+  }
 }

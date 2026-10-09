@@ -57,9 +57,13 @@ def build_assumptions(
         f"Mức chịu mưa '{prefs.rain_tolerance_level}' = ngưỡng {float(th['prob_pct']):.0f}% xác suất hoặc {float(th['mm']):.1f}mm "
         "(tham số đề xuất tạm, chưa hiệu chỉnh thực nghiệm)."
     )
+    prof = input_data.driver_profile
+    own_fuel = prof.fuel_cost_vnd_per_km if prof is not None else None
+    fuel_txt = (f"{own_fuel:,.0f}đ/km (theo mức tiêu hao và giá xăng bạn nhập)" if own_fuel is not None
+                else f"{GEO_CFG['reposition_cost_vnd_per_km']:g}đ/km (giả định cấu hình — chưa có lít/100km và giá xăng của bạn)")
     out.append(
         f"Chi phí/thời gian dịch chuyển giữa các khu vực là ƯỚC TÍNH từ đường chim bay x{GEO_CFG['detour_factor']:g}, "
-        f"tốc độ {GEO_CFG['reposition_speed_kmh']:g} km/h, {GEO_CFG['reposition_cost_vnd_per_km']:g}đ/km — không phải routing."
+        f"tốc độ {GEO_CFG['reposition_speed_kmh']:g} km/h, xăng {fuel_txt} — không phải routing."
     )
     out.append(
         f"Khoảng cách tới điểm nghỉ chỉ lấy từ mẫu routing xuất phát trong {ROUTING_CFG['origin_tolerance_m']:g}m quanh bạn; "

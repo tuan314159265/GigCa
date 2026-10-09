@@ -20,12 +20,14 @@ from engine.src.personal_model import build_personal_model
 from engine.src.roadmap import build_data_roadmap
 from engine.src.tradeoff import build_tradeoff_matrix
 from engine.src.priority import build_priority
-from engine.src.readiness_gate import resolve_readiness
+from engine.src.ml.insights import build_ml_insights
+from engine.src.readiness_gate import data_tier, resolve_readiness
 from engine.src.scorers.maintain_position import score_maintain_position
 from engine.src.scorers.max_trip_value import score_max_trip_value
 from engine.src.scorers.rest_spot import score_rest_spot
 from engine.src.scorers.safety_comfort import score_safety_comfort
 from engine.src.timeutil import parse_local
+from engine.src.whatif import build_what_if
 from engine.src.types import (
     DriverContext,
     DriverPreferences,
@@ -99,22 +101,30 @@ def run_driver_engine(
 
     objectives: dict[ObjectiveKey, ObjectiveResult] = {}
 
-    # v3: the driver's own trip log fills the two earning lenses ONLY where no market-side data exists.
-    pm = build_personal_model(input_data.trip_log, now_local)
+    # v4: the two earning lenses are fed ONLY by the driver's own data (trip log, tariff, wait spells). The adapter has
+    # already removed platform-defined market fields, so there is no market source left to mix with.
+    pm = build_personal_model(
+        input_data.trip_log, now_local, profile=input_data.driver_profile, spells=input_data.wait_spells,
+    )
+    ml_info = None
+    if pm.usable:
+        pm, ml_info = build_ml_insights(input_data, pm, now_local)  # v5: ML refines the per-zone waits only if it wins the backtest
     areas_trip = areas_pos = input_data.areas
     pm_used: list[str] = []
 
     # 1. max_trip_value (Section 5.1)
     mode_trip = resolve_readiness("max_trip_value", input_data.data_status, input_data.objective_readiness)
-    if pm.usable and not any(a.trip_value for a in input_data.areas):
-        areas_trip, pm_used = pm.areas, pm_used + ["max_trip_value"]
+    if pm.usable and pm.has_trip_zones and not any(a.trip_value for a in input_data.areas):
+        areas_trip, pm_used = [a for a in pm.areas if a.trip_value], pm_used + ["max_trip_value"]
         mode_trip = "PARTIAL"
-    objectives["max_trip_value"] = score_max_trip_value(mode=mode_trip, areas=areas_trip, driver_ctx=ctx)
+    objectives["max_trip_value"] = score_max_trip_value(
+        mode=mode_trip, areas=areas_trip, driver_ctx=ctx, economics=pm.economics,
+    )
 
     # 2. maintain_position (Section 5.2)
     mode_pos = resolve_readiness("maintain_position", input_data.data_status, input_data.objective_readiness)
-    if pm.usable and not any(a.destination_distribution for a in input_data.areas):
-        areas_pos, pm_used = pm.areas, pm_used + ["maintain_position"]
+    if pm.usable and pm.has_wait_zones and not any(a.destination_distribution for a in input_data.areas):
+        areas_pos, pm_used = [a for a in pm.areas if a.destination_distribution], pm_used + ["maintain_position"]
         mode_pos = "PARTIAL"
     objectives["maintain_position"] = score_maintain_position(mode=mode_pos, areas=areas_pos, driver_ctx=ctx)
 
@@ -151,20 +161,36 @@ def run_driver_engine(
     if now_local is None:
         extra.append("Không đọc được generated_at nên không neo được thời điểm hiện tại; kiểm tra giờ mở cửa và cửa sổ mưa bị hạn chế.")
     pm_summary: dict | None = None
-    if input_data.trip_log:
+    if input_data.trip_log or input_data.wait_spells:
         pm_summary = {**pm.summary, "used_for": pm_used}
         if pm_used:
             extra.append(
-                f"Hướng {' & '.join('1' if k == 'max_trip_value' else '2' for k in pm_used)} dùng NHẬT KÝ CHUYẾN CỦA CHÍNH BẠN "
-                f"({pm.summary['trips_in_daypart']} chuyến trong khung giờ, {pm.summary['zones_built']} vùng) — "
-                "không phải dữ liệu thị trường; vùng ít chuyến bị kéo về mức trung bình cá nhân."
+                f"Hướng {' & '.join('1' if k == 'max_trip_value' else '2' for k in pm_used)} dùng DỮ LIỆU CỦA CHÍNH BẠN "
+                f"({pm.summary['trips_in_daypart']} chuyến, {pm.summary['wait_spells_in_daypart']} đợt chờ trong khung giờ; "
+                f"{pm.summary['zones_built']} vùng) — không phải dữ liệu thị trường; vùng ít mẫu bị kéo về mức trung bình cá nhân."
             )
+            extra.extend(pm.summary.get("notes", []))
         elif pm.summary.get("status") != "ok":
-            extra.append(f"Nhật ký chuyến chưa dùng được: {pm.summary.get('reason', 'không đủ dữ liệu')}")
+            extra.append(f"Dữ liệu cá nhân chưa dùng được: {pm.summary.get('reason', 'không đủ dữ liệu')}")
         else:
-            extra.append("Đã có dữ liệu cước/điểm đến ở cấp khu vực nên nhật ký chuyến cá nhân không được trộn vào để tránh so sánh hai nguồn khác bản chất.")
+            extra.append("Đã có dữ liệu ở cấp khu vực nên dữ liệu cá nhân không được trộn vào để tránh so sánh hai nguồn khác bản chất.")
+    if ml_info:
+        if ml_info["wait_model"]["used"]:
+            extra.append(
+                "Thời gian chờ theo vùng do MÔ HÌNH ML (hazard/survival học từ đợt chờ của chính bạn theo giờ, mưa, vị trí) ước tính vì nó "
+                "thắng baseline thống kê trên tập kiểm tra theo thời gian; đợt offline/đổi chỗ vẫn được coi là bị kiểm duyệt."
+            )
+        extra.extend(ml_info["notes"])
+        explore = (ml_info.get("bandit") or {}).get("explore") or []
+        if explore:
+            names = {a.area_id: (a.area_name or a.area_id) for a in pm.areas}
+            extra.append(
+                "Lịch sử của bạn chưa đủ để loại các vùng sau (ít dữ liệu nhưng còn cơ hội cao nhất đáng kể): "
+                + "; ".join(names.get(e, e) for e in explore) + " — cân nhắc thử vài lần."
+            )
     assumptions = build_assumptions(input_data, prefs, extra)
 
+    tier = data_tier(pm_summary, input_data.driver_profile)
     output = DriverRecommendationOutput(
         generated_at=input_data.generated_at or "",
         objectives=objectives,
@@ -175,7 +201,10 @@ def run_driver_engine(
         data_quality_warnings=warnings,
         personal_model=pm_summary,
         tradeoff_matrix=build_tradeoff_matrix(objectives, ctx, pm_summary),
-        data_roadmap=build_data_roadmap(input_data, objectives, pm_summary),
+        data_roadmap=build_data_roadmap(input_data, objectives, pm_summary, tier),
+        data_tier=tier,
+        what_if=build_what_if(pm.economics, pm.speed_kmh),
+        ml_insights=ml_info,
     )
     if explain:
         from engine.src.counterfactual import build_decision_boundaries  # local import: avoids a cycle

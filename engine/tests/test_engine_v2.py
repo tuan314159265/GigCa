@@ -22,8 +22,10 @@ from engine.src.mock_data import (
     create_mock_engine_input,
 )
 from engine.src.robustness import analyze_top1
+from engine.src.scorers.maintain_position import score_maintain_position
+from engine.src.scorers.max_trip_value import score_max_trip_value
 from engine.src.timeutil import is_open_at
-from engine.src.types import DriverContext, DriverPreferences, WeatherHour
+from engine.src.types import AreaSample, DriverContext, DriverEconomics, DriverPreferences, WeatherHour
 from engine.src.weather import analyze_weather
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -31,6 +33,8 @@ FULL_FIXTURE = ROOT / "data" / "fixtures" / "hcmc_full_simulated_snapshot.json"
 DEMO_SNAPSHOT = ROOT / "data" / "samples" / "engine_input" / "hcmc_demo_snapshot.json"
 
 HANG_XANH = (10.801, 106.711)
+HANG_XANH_ZONE = "zone_2003_19448"  # the log-derived zone around Hàng Xanh (areas now come from the driver's own log)
+ECON = DriverEconomics(12000, 4800, 528, "driver_input", "driver_input", 90000)
 
 
 def full_payload() -> dict:
@@ -130,23 +134,22 @@ class TestNoFabrication(unittest.TestCase):
                 self.assertNotIn("6500", blob)
 
     def test_trip_value_missing_field_excludes_area_without_default(self) -> None:
-        def mut(p):
-            del p["areas"][0]["trip_value"]["avg_duration_min"]
-        out = run_driver_engine(load_full(mut), ctx(), prefs())
-        res = out.objectives["max_trip_value"]
-        ids = [c.area_id for c in res.candidates]
-        self.assertNotIn("area_ben_thanh_q1", ids)
+        pt = {"latitude": 10.7725, "longitude": 106.698}
+        good = AreaSample("a_ok", "driver_log_zone", pt, "ok", trip_value={"avg_trip_distance_km": 4.0, "avg_speed_kmh": 20.0})
+        bad = AreaSample("a_bad", "driver_log_zone", pt, "bad", trip_value={"avg_trip_distance_km": 4.0})  # no speed
+        res = score_max_trip_value("PARTIAL", [good, bad], None, ECON)
+        self.assertEqual([c.area_id for c in res.candidates], ["a_ok"])
         reasons = {e["id"]: e["reason"] for e in res.excluded or []}
-        self.assertIn("avg_duration_min", reasons["area_ben_thanh_q1"])
-        self.assertTrue(ids)  # the other areas are still evaluated
+        self.assertIn("avg_speed_kmh", reasons["a_bad"])  # no default speed is invented
 
     def test_position_missing_wait_excludes_area_without_default(self) -> None:
-        def mut(p):
-            del p["areas"][0]["destination_distribution"]["avg_next_wait_min"]
-        out = run_driver_engine(load_full(mut), ctx(), prefs())
-        res = out.objectives["maintain_position"]
-        self.assertNotIn("area_ben_thanh_q1", [c.area_id for c in res.candidates])
-        self.assertTrue(any(e["id"] == "area_ben_thanh_q1" and "avg_next_wait_min" in e["reason"] for e in res.excluded or []))
+        pt = {"latitude": 10.7725, "longitude": 106.698}
+        full = {"p_wait_le_pct": {"10": 60.0}, "expected_wait_min": 8.0}
+        good = AreaSample("a_ok", "driver_log_zone", pt, "ok", destination_distribution=full)
+        bad = AreaSample("a_bad", "driver_log_zone", pt, "bad", destination_distribution={"p_wait_le_pct": {"10": 60.0}})
+        res = score_maintain_position("PARTIAL", [good, bad], None)
+        self.assertEqual([c.area_id for c in res.candidates], ["a_ok"])
+        self.assertTrue(any(e["id"] == "a_bad" and "expected_wait_min" in e["reason"] for e in res.excluded or []))
 
     def test_adapter_does_not_inject_mock_pois_or_zero_coordinates(self) -> None:
         inp = load_engine_input_from_file(DEMO_SNAPSHOT)
@@ -162,8 +165,8 @@ class TestDriverPositionAwareness(unittest.TestCase):
     def test_area_outside_reposition_radius_is_excluded_with_reason(self) -> None:
         out = run_driver_engine(load_full(), ctx(), prefs())
         res = out.objectives["max_trip_value"]
-        self.assertNotIn("area_hang_xanh_bt", [c.area_id for c in res.candidates])
-        reason = {e["id"]: e["reason"] for e in res.excluded or []}["area_hang_xanh_bt"]
+        self.assertNotIn(HANG_XANH_ZONE, [c.area_id for c in res.candidates])
+        reason = {e["id"]: e["reason"] for e in res.excluded or []}[HANG_XANH_ZONE]
         self.assertIn("ngoài bán kính", reason)
 
     def test_moving_the_driver_changes_the_result(self) -> None:
@@ -171,8 +174,8 @@ class TestDriverPositionAwareness(unittest.TestCase):
         here = run_driver_engine(inp, ctx(), prefs()).objectives["max_trip_value"]
         there = run_driver_engine(inp, ctx(lat=HANG_XANH[0], lng=HANG_XANH[1]), prefs()).objectives["max_trip_value"]
         cand = {c.area_id: c for c in there.candidates}
-        self.assertIn("area_hang_xanh_bt", cand)
-        self.assertEqual(cand["area_hang_xanh_bt"].reposition_km, 0.0)
+        self.assertIn(HANG_XANH_ZONE, cand)
+        self.assertEqual(cand[HANG_XANH_ZONE].reposition_km, 0.0)
         self.assertNotEqual([c.area_id for c in here.candidates], [c.area_id for c in there.candidates])
 
     def test_yield_is_net_of_reposition_cost_and_traceable(self) -> None:
@@ -182,8 +185,9 @@ class TestDriverPositionAwareness(unittest.TestCase):
             self.assertIn(f"{c.yield_vnd_per_hour:,.0f}đ/giờ", c.explanation or "")
             self.assertIn("KHÔNG phải routing", c.explanation or "")
             hours = (c.estimated_duration_min + (c.reposition_min or 0) + (c.wait_min or 0)) / 60
-            expected = (c.expected_net_value_vnd - (c.reposition_cost_vnd or 0)) / hours
-            self.assertAlmostEqual(c.yield_vnd_per_hour, expected, delta=expected * 0.01)
+            # income = fare before fuel - fuel of the PAID leg - fuel of the empty (repositioning) leg
+            expected = (c.net_after_fuel_vnd - (c.reposition_cost_vnd or 0)) / hours
+            self.assertAlmostEqual(c.yield_vnd_per_hour, expected, delta=expected * 0.03)  # trip minutes are displayed rounded to whole minutes
         ranks = [c.rank for c in res.candidates]
         self.assertEqual(ranks, sorted(ranks))
         yields = [c.yield_vnd_per_hour for c in res.candidates]

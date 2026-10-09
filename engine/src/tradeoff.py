@@ -83,10 +83,12 @@ def build_tradeoff_matrix(
             "income_vnd_per_hour": None if same is None else same.yield_vnd_per_hour,
             "income_basis": (
                 "năng suất của chính khu vực này theo Hướng 1" if same is not None
-                else "không quy đổi được ra tiền: Hướng 2 chỉ đo tỷ lệ trả khách thuận lợi và thời gian chờ"
+                else "không quy đổi được ra tiền: Hướng 2 chỉ đo thời gian chờ (survival) từ các đợt chờ của bạn"
             ),
             "position_score": pos_top.position_score,
-            "avg_next_wait_min": pos_top.avg_next_wait_min,
+            "p_wait_le_pct": pos_top.p_wait_le_pct,
+            "wait_threshold_min": pos_top.wait_threshold_min,
+            "expected_wait_min": pos_top.expected_wait_min,
             "main_cost": (f"dịch chuyển ước tính ~{pos_top.reposition_km:g}km" if pos_top.reposition_km else "không cần dịch chuyển"),
         })
     else:

@@ -126,15 +126,15 @@ flowchart TD
 ### 4.4. Hiện Thực 4 Bộ Lập Kế Hoạch Chiến Lược: [`scorers/`](src/scorers/)
 
 #### Hướng 1: Kế Hoạch Săn Cuốc Giá Trị Cao ([`max_trip_value.py`](src/scorers/max_trip_value.py))
-* **Khi `INSUFFICIENT`:** Báo trạng thái trung thực `insufficient_data`, giải thích rõ lý do chưa có dữ liệu giá cước/booking được cấp phép.
+* **Khi `INSUFFICIENT`:** Báo trạng thái trung thực `insufficient_data`, giải thích rõ chưa có biểu cước/nhật ký chuyến của tài xế (chỉ trả bảng what-if nếu đã nhập biểu cước).
 * **Khi `AVAILABLE` / `PARTIAL`:**
-  * Chọn khu vực có doanh thu ròng dự kiến cao nhất (`net_value_vnd`).
+  * Chọn vùng (học từ nhật ký của tài xế) có thu nhập ròng/giờ cao nhất, đã trừ xăng cả chặng chở khách và chạy rỗng.
   * Xây dựng `DirectionPlan`:
     * *Bước 1 (0–5 phút):* Di chuyển đến điểm chốt đón khách tiềm năng cao.
     * *Bước 2 (5–15 phút):* Bật app và thiết lập ưu tiên cuốc đường dài/sân bay.
     * *Bước 3 (15–20 phút):* Thiết lập giới hạn chờ tối đa 20 phút để tránh thời gian chờ rỗng.
     * *Bước 4 (Sau cuốc):* Bật tính năng đón khách chiều ngược về trung tâm để tối ưu hóa km di chuyển.
-  * Chỉ số dự phóng: `expected_net_value_vnd`, `gross_fare_vnd`, `estimated_duration_min`, `demand_index`.
+  * Chỉ số dự phóng: `expected_net_value_vnd`, `net_after_fuel_vnd`, `estimated_duration_min`, `yield_vnd_per_hour` (+ khoảng P10–P90), `min_accept_fare_vnd`.
   * Đánh đổi: Cuốc dài đưa xe ra xa trung tâm, cần chủ động tìm khách chiều về.
 
 #### Hướng 2: Kế Hoạch Bám Trụ Vùng Lõi & Vòng Quay Nhanh ([`maintain_position.py`](src/scorers/maintain_position.py))
@@ -146,7 +146,7 @@ flowchart TD
     * *Bước 2 (0–15 phút):* Nhận cuốc bán kính ngắn $< 3$km nội quận.
     * *Bước 3 (15–20 phút):* Xoay vòng cuốc kế tiếp ngay tại điểm vừa trả khách (chờ $\sim 3$–$5$ phút).
     * *Bước 4 (Sau chuỗi cuốc):* Tự động quay về trục lõi trong 5 phút nếu có cuốc chệch hướng.
-  * Chỉ số dự phóng: `position_score`, `favorable_dropoff_pct`, `avg_next_wait_min`, `deadhead_km = 0.0`.
+  * Chỉ số dự phóng: `position_score`, `p_wait_le_pct` (P(chờ ≤ 10/20 phút), survival), `expected_wait_min`, `median_wait_min`.
   * Đánh đổi: Cước từng chuyến thấp hơn, phải di chuyển trong mật độ xe đông.
 
 #### Hướng 3: Kế Hoạch Nghỉ Ngơi & Phục Hồi Thể Lực ([`rest_spot.py`](src/scorers/rest_spot.py))
@@ -263,3 +263,22 @@ python scripts/run_demo.py --idle 30 --rain low --horizon 120
 ```
 
 > **v2:** engine đã được nâng cấp (neo thời gian thật, nhận biết vị trí tài xế, loại thay vì bịa khi thiếu dữ liệu, kiểm tra độ vững, thứ tự xem xét 4 hướng). Xem [UPGRADE_V2.md](UPGRADE_V2.md).
+
+---
+
+## Lớp ML (v5): [`src/ml/`](src/ml/)
+
+Mọi mô hình chỉ học từ dữ liệu của CHÍNH tài xế (đợt chờ, chuyến, biểu cước) và đều bị **cổng backtest** kiểm soát: chỉ thay baseline thống kê khi thắng nó trên phần lịch sử *mới hơn* (chia theo thời gian), cùng thước đo. Báo cáo số liệu: [`docs/09_ML_REPORT.md`](../docs/09_ML_REPORT.md) (sinh bằng `python scripts/ml_report.py`, dữ liệu mô phỏng có sự thật nền).
+
+| Thành phần | File | Làm gì | Cổng / giới hạn |
+|---|---|---|---|
+| Thời gian chờ có ngữ cảnh | `wait_model.py` | Survival rời rạc (hazard) trên đợt chờ theo giờ, thứ, mưa, vị trí; offline/đổi chỗ là bị kiểm duyệt. Ghi đè `P(chờ ≤ t)` và chờ kỳ vọng theo vùng cho thời điểm hiện tại | Phải thắng Kaplan–Meier theo ô VÀ thắng mô hình không ngữ cảnh (đối chứng) trên tập kiểm tra; ≥ 60 đợt chờ |
+| Khoảng conformal | `cycle_model.py` | Hồi quy phân vị + CQR cho năng suất một chu kỳ (chờ + chuyến), khoảng 80% | Không hiển thị nếu độ phủ trên tập kiểm tra thấp hơn danh nghĩa quá 10 điểm %; ≥ 60 chu kỳ |
+| Bandit Thompson | `bandit.py` | `p_best` và cờ "nên thử" cho vùng ít dữ liệu nhưng còn cơ hội | Chỉ giải thích, không tự đổi khuyến nghị; lợi thế chỉ rõ khi lịch sử dài (xem báo cáo) |
+| Nhập liệu tiếng Việt | `intake.py` | Câu như "muốn 100k/giờ, mưa là nghỉ" → hồ sơ/tùy chọn; kiểm khoảng hợp lý; có thể cắm LLM nhưng mọi số phải xuất hiện trong câu | Luôn cần tài xế xác nhận |
+| Kiểm tra số trong giải thích | `explain_check.py` | LLM chỉ diễn đạt lại; số nào không truy được về output engine thì loại văn bản, dùng lời của engine | Cần nhưng chưa đủ: chứng minh không bịa số, không chứng minh dùng số đúng chỗ |
+| Nhập chuyến từ văn bản OCR | `earnings_import.py` | Văn bản (OCR/vision) của lịch sử chuyến → ứng viên `trip_log`; thiếu trường hoặc điểm đón không có trong bảng tọa độ thì trả về `needs_input`, không điền mặc định | Số tiền có thể là cước gộp nên luôn gắn `amount_to_confirm`; tài xế phải xác nhận trước khi dùng. OCR nằm ngoài engine |
+| Cộng đồng (Bậc 3, nguyên mẫu) | `ml/community.py` | Gộp ẩn danh theo ô với k-ẩn danh (ô < k tài xế bị loại), mỗi tài xế tính một lần; co Bayes thực nghiệm cho tài xế mới | CHƯA nối vào engine; k-ẩn danh không phải differential privacy |
+
+Kết quả nằm ở `DriverRecommendationOutput.ml_insights` (backtest, phần ML có được dùng không, khoảng conformal theo vùng, bandit). Cấu hình ở mục `ml` của `config/engine_config.json`. Fit được cache theo nội dung nhật ký vì `explain=True` gọi engine nhiều lần. Ảnh chụp màn hình thu nhập **chưa** dựng được nhật ký: thiếu tọa độ điểm đón, cần GPS từ app companion.
+
