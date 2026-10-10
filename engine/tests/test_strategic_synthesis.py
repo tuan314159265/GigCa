@@ -10,7 +10,7 @@ import unittest
 
 from engine.src.advisor import consult_driver_advisor
 from engine.src.engine import run_driver_engine
-from engine.src.mock_data import (
+from engine.tests.fixtures import (
     create_default_driver_context,
     create_default_driver_preferences,
     create_mock_engine_input,

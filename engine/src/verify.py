@@ -1,7 +1,9 @@
-"""Verification runner for Decision Engine.
+"""Verification runner for the Decision Engine — on REAL inputs only.
 
-Runs sample snapshot and variations, displaying results in an inspection table
-demonstrating responsiveness to input changes without hardcoded lookups.
+1. Tariff arithmetic: the published tariff in config reproduces hand-computed fares (no data needed).
+2. The real ETL snapshot (Open-Meteo / OSM / OSRM) with the driver's inputs: what the engine can and cannot say.
+3. Every real driver log imported with data/driver_log_import.py into data/raw/driver_logs/*.json (if any).
+No simulated or mock data is loaded here; unit-test inputs live under engine/tests/ and are used only by the tests.
 """
 
 from __future__ import annotations
@@ -23,19 +25,14 @@ if sys.stderr.encoding.lower() != "utf-8":
         pass
 
 
-from engine.src.adapter import load_engine_input_from_file
 from engine.src.advisor import consult_driver_advisor
 from engine.src.engine import run_driver_engine
-from engine.src.mock_data import (
-    create_default_driver_context,
-    create_default_driver_preferences,
-    create_mock_engine_input,
-)
-from engine.src.types import DriverRecommendationOutput
+from engine.src.personal_model import resolve_economics
+from engine.src.types import DriverContext, DriverPreferences, DriverRecommendationOutput
 
 ROOT = Path(__file__).resolve().parents[2]
 SNAPSHOT_PATH = ROOT / "data" / "samples" / "engine_input" / "hcmc_demo_snapshot.json"
-FULL_FIXTURE_PATH = ROOT / "data" / "fixtures" / "hcmc_full_simulated_snapshot.json"
+DRIVER_LOG_DIR = ROOT / "data" / "raw" / "driver_logs"
 
 
 def print_banner(title: str) -> None:
@@ -115,66 +112,76 @@ def print_recommendation_summary(output: DriverRecommendationOutput, title: str)
     print(f"\nLời nhắc cuối: \"{output.final_note}\"")
 
 
+def _tariff_selfcheck() -> bool:
+    """Hand-computed fares for the published tariff (12.500đ/2 km đầu, 4.300đ/km, 350đ/phút sau 2 km, 75%)."""
+    econ = resolve_economics(None, [])
+    if econ is None:
+        print("[LỖI] Cấu hình 'tariff' trống.")
+        return False
+    cases = [  # (km, moving minutes after the first k0 km, expected customer fare)
+        (1.5, 0.0, econ.fare_base_vnd),
+        (econ.fare_base_km, 0.0, econ.fare_base_vnd),
+        (5.0, 9.0, econ.fare_base_vnd + econ.fare_per_km_vnd * (5.0 - econ.fare_base_km) + econ.fare_per_min_vnd * 9.0),
+    ]
+    ok = True
+    for km, mins, expected in cases:
+        got = econ.gross_fare_vnd(km, mins)
+        mark = "✓" if abs(got - expected) < 1e-6 else "✗"
+        ok &= mark == "✓"
+        print(f"  {mark} {km:g} km, {mins:g} phút tính phí -> cước khách {got:,.0f}đ, tài xế nhận "
+              f"{got * econ.driver_share:,.0f}đ ({econ.driver_share * 100:.0f}%)")
+    return ok
+
+
 def run_verification() -> int:
-    """Run verification scenarios and print comparison table."""
+    """Run the checks on real inputs and print what the engine concludes."""
     print("================================================================================")
-    print("           GIGCA DRIVER DECISION ENGINE — VERIFICATION SUITE                    ")
+    print("           GIGCA DRIVER DECISION ENGINE — VERIFICATION (DỮ LIỆU THẬT)          ")
     print("================================================================================")
+    print_banner("1. Biểu cước công bố — kiểm tra số học")
+    if not _tariff_selfcheck():
+        return 1
 
-    ctx = create_default_driver_context(horizon_min=180, idle_min=25)
+    if not SNAPSHOT_PATH.exists():
+        print(f"[NOTE] Không thấy snapshot thật tại {SNAPSHOT_PATH}")
+        return 0
+    payload = json.loads(SNAPSHOT_PATH.read_text(encoding="utf-8"))
+    ctx = DriverContext(current_lat=10.7769, current_lng=106.7009, idle_duration_min=25, horizon_min=180)
+    prefs = DriverPreferences(rain_tolerance_level="medium")
+    from data.driver_log_import import attach_driver_log  # local imports: the engine itself does not depend on data/
+    from data.engine_bridge import load_for_engine
 
-    # 1. Baseline Run with Mock Data
-    mock_input = create_mock_engine_input()
-    prefs_med = create_default_driver_preferences(rain_tolerance="medium")
-    out_baseline = run_driver_engine(mock_input, ctx, prefs_med)
-    print_recommendation_summary(out_baseline, "Kịch bản 1: Baseline Mock Data (Rain Tolerance = MEDIUM)")
+    def _load(p: dict):
+        return load_for_engine(p, trip_log=p.get("trip_log"), wait_spells=p.get("wait_spells"),
+                               driver_profile=p.get("driver_profile"))
 
-    # 2. Responsiveness: Rain Tolerance Comparison
-    print_banner("Kịch bản 2: Kiểm tra phản ứng đầu vào — Mức chịu mưa LOW vs MEDIUM vs HIGH")
-    for level in ["low", "medium", "high"]:
-        p = create_default_driver_preferences(rain_tolerance=level)
-        out = run_driver_engine(mock_input, ctx, p)
-        safety_res = out.objectives["safety_comfort"]
-        flags = safety_res.rain_flags or []
-        exceeded_times = [f.window or f.valid_time for f in flags if f.exceeds_tolerance]
-        signal = safety_res.weather_action_signal
-        window = safety_res.safe_window_min
-        print(
-            f"Mức chịu mưa: {level.upper():<6} -> "
-            f"Số giờ vượt: {len(exceeded_times)}/{len(flags)} "
-            f"| Tín hiệu: {signal:<22} "
-            f"| Cửa sổ an toàn: ~{window}m "
-            f"({', '.join(exceeded_times) if exceeded_times else 'Khô ráo'})"
-        )
+    out = run_driver_engine(_load(payload), ctx, prefs)
+    print_recommendation_summary(out, "2. Snapshot ETL thật (Open-Meteo / OSM / OSRM), chưa có nhật ký tài xế")
+    if out.what_if:
+        print("  Bảng kịch bản (rút gọn):")
+        for r in out.what_if["rows"]:
+            print(f"    {r['trip_km']:g} km, chờ {r['wait_min']}' -> khách trả {r['customer_fare_vnd']:,}đ, "
+                  f"bạn nhận {r['net_before_fuel_vnd']:,}đ, ~{r['yield_vnd_per_hour']:,}đ/giờ sau xăng")
 
-    # 3. Snapshot Run from File (hcmc_demo_snapshot.json)
-    if SNAPSHOT_PATH.exists():
-        snapshot_input = load_engine_input_from_file(SNAPSHOT_PATH)
-        out_snapshot = run_driver_engine(snapshot_input, ctx, prefs_med)
-        print_recommendation_summary(out_snapshot, "Kịch bản 3: Snapshot thật data/samples/engine_input/hcmc_demo_snapshot.json")
-    else:
-        print(f"[NOTE] Snapshot file not found at {SNAPSHOT_PATH}")
-
-    # 4. Responsiveness to the driver's position and idle time (full simulated snapshot)
-    if FULL_FIXTURE_PATH.exists():
-        full_input = load_engine_input_from_file(FULL_FIXTURE_PATH)
-        print_banner("Kịch bản 4: Phản ứng với VỊ TRÍ và THỜI GIAN CHỜ của tài xế (fixture đầy đủ)")
-        for name, (lat, lng) in {"Bến Thành": (10.7725, 106.698), "Hàng Xanh": (10.801, 106.711)}.items():
-            c = create_default_driver_context(lat=lat, lng=lng, horizon_min=180, idle_min=25)
-            o = run_driver_engine(full_input, c, prefs_med).objectives["max_trip_value"]
-            names = " > ".join(f"{x.area_name.split(' - ')[0].replace('Khu vực ', '')} ({x.yield_vnd_per_hour:,.0f}đ/h)" for x in o.candidates)
-            print(f"Tài xế ở {name:<10}: {names}  | loại: {len(o.excluded or [])}")
-        for idle in (10, 50):
-            c = create_default_driver_context(horizon_min=180, idle_min=idle)
-            o = run_driver_engine(full_input, c, prefs_med)
-            order = " > ".join(r["objective"] for r in o.direction_priority or [] if r["rankable"])
-            print(f"Chờ {idle:>2} phút        : thứ tự xem xét = {order}")
-    else:
-        print(f"[NOTE] Full fixture not found at {FULL_FIXTURE_PATH}")
+    logs = sorted(DRIVER_LOG_DIR.glob("*.json")) if DRIVER_LOG_DIR.exists() else []
+    if not logs:
+        print("\n[NOTE] Chưa có nhật ký thật trong data/raw/driver_logs/ — xem data/driver_input/README.md để thu thập.")
+    for path in logs:
+        log = json.loads(path.read_text(encoding="utf-8"))
+        try:
+            p = attach_driver_log(payload, log)
+        except ValueError as exc:
+            print(f"[BỎ QUA] {path.name}: {exc}")
+            continue
+        o = run_driver_engine(_load(p), ctx, prefs, explain=True)
+        prov = log.get("provenance") or {}
+        print_recommendation_summary(o, f"3. Nhật ký thật {prov.get('driver_pseudonym', path.stem)} ({len(p['trip_log'])} chuyến)")
+        for item in o.data_roadmap or []:
+            if item.get("fastest_unlock"):
+                print(f"    ▸ [{item['objective']}] {item['fastest_unlock']}")
 
     print("\n✓ Hoàn thành kiểm tra Decision Engine.")
     return 0
-
 
 
 if __name__ == "__main__":

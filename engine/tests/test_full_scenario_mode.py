@@ -1,49 +1,41 @@
-"""Test Full Simulation Mode.
-
-Verifies that when full simulated data is provided for all feeds,
-the engine activates FULL mode across all 4 objectives with MEDIUM confidence.
-"""
+"""Full-scenario test: when every feed has (hand-set TEST) inputs, the market-independent lenses run in FULL mode with
+MEDIUM confidence; the two earning lenses run on the driver's own log and stay PARTIAL/LOW."""
 
 from __future__ import annotations
 
 import unittest
-from pathlib import Path
 
-from engine.src.adapter import load_engine_input_from_file
+from engine.src.adapter import load_engine_input_from_dict
 from engine.src.engine import run_driver_engine
-from engine.src.mock_data import (
+from engine.tests.fixtures import (
     create_default_driver_context,
     create_default_driver_preferences,
+    full_scenario_payload,
 )
 
-ROOT = Path(__file__).resolve().parents[2]
-FULL_SIM_PATH = ROOT / "data" / "fixtures" / "hcmc_full_simulated_snapshot.json"
 
-
-class TestFullSimulationMode(unittest.TestCase):
+class TestFullScenarioMode(unittest.TestCase):
     def test_all_objectives_available_with_medium_confidence(self) -> None:
-        self.assertTrue(FULL_SIM_PATH.exists(), f"Missing fixture at {FULL_SIM_PATH}")
-
-        engine_input = load_engine_input_from_file(FULL_SIM_PATH)
+        engine_input = load_engine_input_from_dict(full_scenario_payload())
         ctx = create_default_driver_context(idle_min=25, horizon_min=180)
         prefs = create_default_driver_preferences(rain_tolerance="medium")
 
         output = run_driver_engine(engine_input, ctx, prefs)
 
-        # 1. max_trip_value
+        # 1. max_trip_value — fed only by the driver's own log/tariff (no market data), so PARTIAL with LOW confidence
         trip_val = output.objectives["max_trip_value"]
-        self.assertEqual(trip_val.status, "available")
-        self.assertEqual(trip_val.confidence, "medium")
+        self.assertEqual(trip_val.status, "partial")
+        self.assertEqual(trip_val.confidence, "low")
         self.assertGreater(len(trip_val.candidates), 0)
         self.assertIsNotNone(trip_val.plan)
         self.assertEqual(trip_val.plan.plan_id, "max_trip_value")
         self.assertGreater(len(trip_val.plan.steps), 0)
         self.assertIsNotNone(trip_val.plan.trade_offs)
 
-        # 2. maintain_position
+        # 2. maintain_position — survival wait times from the driver's own wait spells, same honesty rule
         pos = output.objectives["maintain_position"]
-        self.assertEqual(pos.status, "available")
-        self.assertEqual(pos.confidence, "medium")
+        self.assertEqual(pos.status, "partial")
+        self.assertEqual(pos.confidence, "low")
         self.assertGreater(len(pos.candidates), 0)
         self.assertIsNotNone(pos.plan)
         self.assertEqual(pos.plan.plan_id, "maintain_position")

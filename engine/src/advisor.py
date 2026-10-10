@@ -130,6 +130,11 @@ def build_expert_reasoning(output: DriverRecommendationOutput, custom_query: str
         "action_steps": tactical_steps,
         "contingency_plan": backup_plan,
         "data_caveats": caveats,
+        # v3: structured, number-backed context for the UI/pitch (all optional, None when not computed)
+        "tradeoff_matrix": output.tradeoff_matrix,
+        "decision_boundaries": output.decision_boundaries,
+        "data_roadmap": output.data_roadmap,
+        "personal_model": output.personal_model,
         "advisor_mode": "deterministic_expert_system",
     }
 

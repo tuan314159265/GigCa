@@ -31,91 +31,71 @@ Tài liệu này chuẩn hóa và giải thích chi tiết toàn bộ **công th
 | **Điểm tiện ích (`poi_candidates`)** | Thật: OpenStreetMap / Overpass | `poi_id`, `name`, `category`, `subcategory`, `tags`, `opening_hours` | Hướng 3 |
 | **Xác minh thực địa (`verified_places`)** | Khảo sát thực địa (Hiện là Mock) | `verified` (bool), `parking_allowed` (bool) | Hướng 3 |
 | **Mẫu định tuyến (`routing_samples`)** | Thật: OSRM Routing Machine | `route_distance_m`, `route_duration_s`, `profile`, `origin_point`, `destination_id` | Hướng 3 |
-| **Cước & Chuyến đi (`trip_value`)** | Nền tảng hãng xe (Hiện là Mock) | `net_value_vnd`, `gross_fare_vnd`, `avg_duration_min`, `demand_index`, `long_trip_rate_pct`, `avg_trip_distance_km`, `hotspot_features` | Hướng 1 |
-| **Phân bố điểm đến (`destination_distribution`)** | Nền tảng hãng xe (Hiện là Mock) | `favorable_dropoff_pct`, `avg_next_wait_min` | Hướng 1, Hướng 2 |
+| **Biểu cước (`tariff`)** | Bảng giá công bố, ghi trong `config/engine_config.json` kèm `source` | `fare_base_vnd` 12.500 cho `fare_base_km` 2 km đầu, `fare_per_km_vnd` 4.300, `fare_per_min_vnd` 350 (phút di chuyển sau 2 km), `driver_share` 0,75 (giả định cố định; thực tế 0,5–0,75) | Hướng 1, what-if |
+| **Hồ sơ tài xế (`driver_profile`)** | Do CHÍNH tài xế nhập | `fare_base_vnd` (a), `fare_per_km_vnd` (b), `fare_base_km`, `fare_per_min_vnd`, `driver_share` (đều tùy chọn — thiếu thì dùng `tariff`, có nhãn), `fuel_l_per_100km`, `fuel_price_vnd_per_l` (→ c; thiếu thì dùng cấu hình, có nhãn), `target_vnd_per_hour` | Hướng 1 |
+| **Nhật ký chuyến (`trip_log`)** | Do CHÍNH tài xế THẬT ghi (thử nghiệm có đồng ý), nhập bằng `data/driver_log_import.py` | Bắt buộc: `trip_id`, `started_at`, `pickup_lat/lng`, `net_vnd` (sau phí sàn, trước xăng, không gồm thưởng/tip), `duration_min` > 0. Tùy chọn: `dropoff_lat/lng`, `distance_km`. Thiếu trường bắt buộc → loại và đếm | Hướng 1 |
+| **Đợt chờ (`wait_spells`)** | App companion / GPS / tài xế ghi giờ | Bắt buộc: `spell_id`, `start`, `end` (≥ start), `lat`, `lng`, `ended_by` (`trip`/`offline`/`moved`; hai loại sau là bị kiểm duyệt). Tùy chọn: `rain_mm` (chỉ cho ML) | Hướng 1, Hướng 2 |
 | **Giao thông thời gian thực (`traffic_edges`)** | Cổng giao thông / GPS xe (Hiện là Mock) | `edge_id`, `name`, `current_speed_kmh`, `free_flow_speed_kmh`, `timestamp` | Hướng 4 |
 
 ---
 
-## 3. Hướng 1: Săn Cuốc Cước Giá Trị Cao (`max_trip_value.py`)
+## 3. Hướng 1: Săn Cuốc Giá Trị Cao (`max_trip_value.py`)
+
+Engine KHÔNG đọc dữ liệu thị trường do sàn định nghĩa (cước gộp/ròng khu vực, `demand_index`, tỷ lệ cuốc xa, thời gian chờ khu vực…): không có API, không kiểm chứng được. Adapter xóa các trường này và báo số lượng đã xóa. Chỉ dùng dữ liệu tài xế tự kiểm chứng được.
 
 ### 3.1. Dữ Liệu Đầu Vào
-* **Trường bắt buộc (`REQUIRED`):**
-  * `trip_value.net_value_vnd`: Tiền cước ròng thực nhận của tài xế sau chiết khấu (VNĐ, yêu cầu $\ge 0$).
-  * `trip_value.avg_duration_min`: Thời gian trung bình để hoàn thành cuốc xe (phút, yêu cầu $> 0$).
-* **Trường tùy chọn bổ trợ:**
-  * `destination_distribution.avg_next_wait_min`: Thời gian chờ trung bình để nổ cuốc kế (phút).
-  * `trip_value.demand_index`: Chỉ số nhu cầu đặt xe (thang điểm chuẩn hóa, dùng cho Pareto).
-  * `trip_value.long_trip_rate_pct`: Tỷ lệ phần trăm cuốc đi xa ($> 8\text{ km}$).
-  * `trip_value.avg_trip_distance_km`: Cự ly di chuyển trung bình của cuốc xe (km).
-  * `representative_point`: Tọa độ tâm khu vực `(lat, lng)` để tính chi phí dịch chuyển.
+* **Biểu cước khách trả** (công bố, trong `tariff`; tài xế nhập thì ghi đè từng trường): $a$ = 12.500đ cho $k_0$ = 2 km đầu, $b$ = 4.300đ/km tiếp theo, $m$ = 350đ mỗi phút di chuyển sau $k_0$. **Tỷ lệ tài xế nhận** $s$ = 0,75 (giả định cố định của nhóm; thực tế 0,5–0,75 — engine báo thêm năng suất ở $s$ = 0,5). Biểu cước KHÔNG còn được fit từ nhật ký.
+* Xăng $c$ (đ/km) = lít/100km × giá xăng / 100; thiếu thì dùng `geo.reposition_cost_vnd_per_km` và ghi nhãn.
+* Theo vùng $z$ (ô lưới từ nhật ký THẬT, co Bayes về trung bình cá nhân): `avg_trip_distance_km` $\bar d_z$, `avg_speed_kmh` $v_z$, thời gian chờ kỳ vọng $w_z$ (survival; vùng chưa đủ đợt chờ dùng mức chờ trung bình chung, có ghi nhãn).
+* `representative_point` để ước tính dịch chuyển $r_z$ (đường chim bay × `detour_factor`, không phải routing).
 
-### 3.2. Mô Hình Toán Học & Công Thức Tính
+### 3.2. Công thức
+$$\text{Cước khách}(d, v) = a + b\,(d-k_0)^+ + m\,\frac{(d-k_0)^+}{v}\cdot 60 \qquad \text{Tiền nhận}(d, v) = s\cdot\text{Cước khách}(d, v)$$
+$$\text{Thu nhập/chuyến} = \text{Tiền nhận}(\bar d_z, v_z) - c\,\bar d_z - c\,r_z \qquad \text{Giờ/chuyến} = \frac{\bar d_z}{v_z} + \frac{r_z}{v_{rep}} + \frac{w_z}{60}$$
+$$\text{Yield (đ/giờ)} = \frac{\text{Thu nhập/chuyến}}{\text{Giờ/chuyến}}$$
+Số phút tính phí là phút **di chuyển** sau $k_0$, ước tính bằng quãng còn lại / tốc độ chuyến (tốc độ học từ nhật ký; ở bảng what-if là giả định cấu hình 22 km/h, có nhãn). Xăng được trừ cho cả chặng chở khách và chặng chạy rỗng. Số hạng chờ chỉ dùng khi MỌI vùng đều có giá trị chờ.
 
-#### A. Ước tính quãng đường & chi phí dịch chuyển (Repositioning)
-Từ vị trí tài xế $(lat_1, lng_1)$ đến tâm khu vực $(lat_2, lng_2)$, khoảng cách đường chim bay $d_{\text{straight}}$ tính bằng công thức Haversine:
-$$d_{\text{straight}} = 2 R \arcsin \left( \sqrt{\sin^2\left(\frac{\Delta \phi}{2}\right) + \cos(\phi_1)\cos(\phi_2)\sin^2\left(\frac{\Delta \lambda}{2}\right)} \right)$$
+**Ngưỡng nhận cuốc:** tiền nhận tối thiểu $= \text{mục tiêu đ/giờ} \times (t_{chuyến} + w)/60 + c\cdot d$; cước khách trả tương ứng $=$ tiền nhận tối thiểu $/ s$. Engine so với cước theo biểu cước cho cùng cự ly (đạt / chưa đạt) và nêu mỗi km thêm cần bao nhiêu so với biểu cước trả thêm $s\,(b + 60m/v)$.
 
-Ước tính cự ly chạy xe trên thực địa:
-$$\text{reposition\_km} = \frac{d_{\text{straight}}}{1000} \times \text{detour\_factor}$$
-*(Mặc định `detour_factor = 1.3`). Nếu $d_{\text{straight}} \le \text{at\_area\_radius\_m} = 500\text{m}$ thì $\text{reposition\_km} = 0$.)*
+**Đối chiếu tỷ lệ nhận (khi có ≥ 20 chuyến có cự ly thật):** $\hat s = \text{median}\big(\text{net\_vnd} / \text{Cước khách}(d, \text{phút thật})\big)$ với phút tính phí $=$ `duration_min` $\times (d-k_0)^+/d$. Lệch hơn `tariff.share_check_tolerance` (0,10) so với $s$ ⇒ cảnh báo (thưởng/tip lẫn trong net, loại xe khác, chương trình khác).
 
-Thời gian và chi phí dịch chuyển tương ứng:
-$$\text{reposition\_min} = \frac{\text{reposition\_km}}{\text{reposition\_speed\_kmh}} \times 60 \quad (\text{với } \text{speed} = 20.0\text{ km/h})$$
-$$\text{reposition\_cost\_vnd} = \text{reposition\_km} \times \text{reposition\_cost\_vnd\_per\_km} \quad (\text{với đơn giá } = 2,000\text{ đ/km})$$
+**Bảng what-if (Bậc 0, không cần nhật ký):** lưới cự ly × thời gian chờ → cước khách, tiền nhận, đ/giờ sau xăng, đ/giờ nếu $s$ = 0,5, tiền nhận/cước khách tối thiểu để đạt mục tiêu, và cự ly tối thiểu đạt mục tiêu cho từng mức chờ.
 
-#### B. Công thức Năng suất Thu nhập Ròng theo Giờ (Yield)
-$$\text{Yield (VNĐ/giờ)} = \frac{\text{Net Income}}{\text{Total Time (hours)}} = \frac{\text{net\_value\_vnd} - \text{reposition\_cost\_vnd}}{\dfrac{\text{avg\_duration\_min} + \text{reposition\_min} + \text{wait\_min}}{60}}$$
+### 3.3. Pareto & độ nhạy
+* Pareto trên $(\text{Yield}, \text{P10 của Yield})$ — lợi nhuận vs độ chắc ăn. P10–P90 chỉ lan truyền dao động mẫu của cự ly và thời gian chờ trung bình vùng.
+* `analyze_top1` dao động `reposition_speed_kmh`, chi phí xăng, `detour_factor` $\pm 20\%$.
 
-> [!IMPORTANT]
-> **Quy tắc công bằng về thời gian chờ (`use_wait`):**
-> Thành phần $\text{wait\_min}$ chỉ được cộng vào mẫu số nếu **100% các khu vực hợp lệ** đều có trường `avg_next_wait_min`. Nếu có dù chỉ 1 khu vực thiếu trường này, $\text{wait\_min}$ sẽ bị loại bỏ khỏi toàn bộ các ứng viên để bảo đảm tính so sánh công bằng.
-
-### 3.3. Tối Ưu Pareto & Phân Tích Độ Nhạy (Robustness)
-* **Kiểm định Pareto (`_pareto`):** Một khu vực $A$ là tối ưu Pareto trên không gian $(\text{Yield}, \text{demand\_index})$ nếu không tồn tại khu vực $B$ nào thỏa mãn:
-  $$\text{Yield}(B) \ge \text{Yield}(A) \quad \text{VÀ} \quad \text{Demand}(B) \ge \text{Demand}(A)$$
-  *(trong đó có ít nhất một bất đẳng thức thực sự lớn hơn).*
-* **Phân tích độ nhạy Top-1 (`analyze_top1`):** Dao động từng tham số (`reposition_speed_kmh`, `reposition_cost_vnd_per_km`, `detour_factor`) một góc $\pm 20\%$ để kiểm tra tỷ lệ giữ vững ngôi đầu (`top1_share`). Nếu `top1_share` $< 0.8$, hệ thống cảnh báo xếp hạng có thể thay đổi khi điều kiện giao thông thay đổi.
-
-### 3.4. Điều Kiện Loại Trừ (Exclusion Rules)
-Khu vực bị loại trừ ngay khỏi bảng xếp hạng nếu:
-1. Thiếu trường `net_value_vnd` hoặc `avg_duration_min`.
-2. Giá trị `net_value_vnd < 0` hoặc `avg_duration_min <= 0`.
-3. Không tính được tọa độ đại diện hợp lệ.
-4. Quãng đường dịch chuyển vượt bán kính tối đa: $\text{reposition\_km} > \text{max\_reposition\_km}$.
+### 3.4. Loại trừ
+Thiếu `avg_trip_distance_km`/`avg_speed_kmh`, giá trị $\le 0$, thiếu tọa độ đại diện, hoặc $r_z >$ `max_reposition_km`. Chưa có nhật ký thật thì cả hướng là `insufficient_data`, kèm bảng what-if theo biểu cước.
 
 ---
 
-## 4. Hướng 2: Bám Trụ Vùng Lõi & Vòng Quay Mau (`maintain_position.py`)
+## 4. Hướng 2: Giữ Vị Trí Thuận Lợi (`maintain_position.py`)
 
 ### 4.1. Dữ Liệu Đầu Vào
-* **Trường bắt buộc (`REQUIRED`):**
-  * `destination_distribution.favorable_dropoff_pct`: Tỷ lệ % các chuyến trả khách trong vùng lõi trung tâm ($0.0 \le x \le 100.0$).
-  * `destination_distribution.avg_next_wait_min`: Thời gian chờ bình quân để đón cuốc tiếp theo tại khu vực này (phút, $x \ge 0$).
-* **Trường tọa độ đại diện:** Để tính cự ly chạy rỗng $\text{reposition\_km}$ khi cần quay lại vùng lõi.
+Từ các đợt chờ của tài xế, theo vùng, bằng Kaplan–Meier (đợt kết thúc vì `offline`/`moved` là bị kiểm duyệt nên giờ nghỉ trưa không còn bị tính là chờ):
+* `p_wait_le_pct` — $100\cdot P(\text{chờ} \le t)$ với các ngưỡng `maintain_position.wait_thresholds_min` (mặc định 10 và 20 phút);
+* `expected_wait_min` — thời gian chờ kỳ vọng trong khung `wait_horizon_min`; `median_wait_min` (None nếu chưa đạt 50%).
 
-### 4.2. Mô Hình Toán Học & Công Thức Tính
+### 4.2. Công thức
+$$\text{position\_score} = \operatorname{clamp}_{[0,100]}\big(100\,P(\text{chờ}\le t_0) - \alpha\,w_z - \beta\,r_z\big)$$
+$\alpha = 1.5$ điểm/phút, $\beta = 2.0$ điểm/km (tham số tạm, chưa hiệu chỉnh). Thay cho `favorable_dropoff_pct` cũ vốn trộn cầu với nơi tài xế chọn đi.
 
-#### Công thức Điểm Giữ Vị Trí (Position Score)
-Điểm số phản ánh mức độ thuận lợi của khu vực để duy trì chuỗi chuyến đi liên tục, tính theo thang điểm chuẩn từ $0$ đến $100$:
+### 4.3. Độ nhạy
+Biến thiên $\alpha, \beta$ $\pm 20\%$; `margin_pct` $< 5\%$ ⇒ cạnh tranh sít sao.
 
-$$\text{position\_score} = \operatorname{clamp}_{[0, 100]} \Big( \text{favorable\_dropoff\_pct} - (\alpha \times \text{avg\_next\_wait\_min}) - (\beta \times \text{reposition\_km}) \Big)$$
+### 4.4. Loại trừ
+Thiếu `p_wait_le_pct[t0]` hoặc `expected_wait_min`, giá trị ngoài miền, hoặc vượt `max_reposition_km`.
 
-Trong đó:
-* $\alpha = \text{wait\_penalty\_per\_min} = 1.5$ điểm phạt cho mỗi phút phải đứng chờ cuốc mới.
-* $\beta = \text{reposition\_penalty\_per\_km} = 2.0$ điểm phạt cho mỗi kilomet chạy rỗng dịch chuyển đến khu vực.
-* $\operatorname{clamp}_{[0, 100]}(s) = \max(0.0, \min(100.0, s))$.
+### 4.5. Thang sẵn sàng dữ liệu
+Bậc 0: chưa có nhật ký — bảng what-if + ngưỡng hòa vốn từ biểu cước công bố (hoặc tài xế nhập). Bậc 1: $\ge 20$ chuyến thật — học cự ly/tốc độ theo vùng, xếp hạng vùng (độ tin cậy thấp), đối chiếu tỷ lệ nhận. Bậc 2: $\ge 20$ đợt chờ — survival, Hướng 2. Bậc 3 (cộng đồng, k-ẩn danh): chưa có trong engine.
 
-### 4.3. Phân Tích Độ Nhạy (Robustness)
-Hệ thống kiểm tra tính ổn định của khu vực dẫn đầu bằng cách biến thiên các hệ số phạt $\alpha$ và $\beta$ thêm $\pm 20\%$:
-* Đo lường khoảng cách điểm số với vị trí thứ 2 (`margin_pct`):
-  $$\text{margin\_pct} = \frac{\text{score}_1 - \text{score}_2}{\text{score}_1} \times 100\%$$
-* Nếu $\text{margin\_pct} < 5.0\%$, đánh dấu là cạnh tranh sít sao (`contested = True`).
+---
 
-### 4.4. Điều Kiện Loại Trừ (Exclusion Rules)
-1. Thiếu trường `favorable_dropoff_pct` hoặc `avg_next_wait_min`.
-2. Giá trị ngoài miền hợp lệ: $\text{favorable\_dropoff\_pct} \notin [0, 100]$ hoặc $\text{avg\_next\_wait\_min} < 0$.
-3. Cự ly dịch chuyển vượt quá ngưỡng của tài xế: $\text{reposition\_km} > \text{max\_reposition\_km}$.
+### 4.6. Lớp ML tùy chọn (v5)
+Khi đủ dữ liệu và thắng cổng backtest, `P(chờ ≤ t)` và chờ kỳ vọng của Hướng 1/2 do mô hình hazard rời rạc tính cho giờ/mưa/vị trí hiện tại:
+$$h_k = P(\text{có cuốc trong ô } k \mid \text{còn chờ}, x), \quad S(t_k)=\prod_{j<k}(1-h_j), \quad P(\text{chờ}\le t)=1-S(t)$$
+Đợt chờ kết thúc vì `offline`/`moved` chỉ đóng góp các ô đã sống sót (kiểm duyệt). Mô hình chỉ học trên nhật ký THẬT; không có dữ liệu huấn luyện mô phỏng. Chi tiết và cổng: `engine/README.md` (mục "Lớp ML").
 
 ---
 
@@ -253,10 +233,15 @@ Mọi hằng số toán học đều được tham số hóa tại [`config/engi
 |---|:---:|:---:|---|
 | **`geo.detour_factor`** | `1.3` | Hệ số | Hệ số quy đổi cự ly đường chim bay Haversine sang cự ly thực tế trên đường bộ |
 | **`geo.reposition_speed_kmh`** | `20.0` | km/h | Vận tốc giả định của xe máy khi chạy rỗng xuyên khu vực |
-| **`geo.reposition_cost_vnd_per_km`** | `2000` | VNĐ/km | Chi phí xăng cộ và hao mòn xe máy ước tính trên mỗi kilomet chạy rỗng |
+| **`geo.reposition_cost_vnd_per_km`** | `2000` | VNĐ/km | Chi phí xăng dự phòng khi tài xế chưa nhập lít/100km và giá xăng (có nhãn) |
+| **`tariff.fare_base_vnd` / `fare_base_km`** | `12500` / `2` | VNĐ / km | Giá mở cửa trọn gói cho 2 km đầu (bảng giá công bố) |
+| **`tariff.fare_per_km_vnd`** | `4300` | VNĐ/km | Đơn giá mỗi km tiếp theo |
+| **`tariff.fare_per_min_vnd`** | `350` | VNĐ/phút | Phụ phí mỗi phút di chuyển sau 2 km đầu |
+| **`tariff.driver_share`** | `0.75` | Tỷ lệ | Phần cước tài xế nhận (giả định cố định; `driver_share_range` = [0.5, 0.75] dùng cho độ nhạy) |
+| **`tariff.share_check_tolerance`** | `0.10` | Tỷ lệ | Lệch tối đa giữa tỷ lệ nhận quan sát từ nhật ký và `driver_share` trước khi cảnh báo |
 | **`geo.at_area_radius_m`** | `500` | mét | Bán kính xem như tài xế đã ở ngay trong khu vực (cự ly chạy rỗng coi như $= 0$) |
 | **`routing.origin_tolerance_m`** | `800` | mét | Khoảng cách tối đa từ tài xế đến điểm xuất phát của mẫu routing OSRM |
-| **`max_trip_value.trip_accept_ratio`** | `0.8` | Hệ số | Ngưỡng cước ròng tối thiểu khuyên tài xế nhận ($80\%$ mức cước bình quân vùng) |
+| **`what_if.assumed_trip_speed_kmh`** | `22.0` | km/h | Giả định tốc độ cuốc cho bảng what-if Bậc 0 (chưa có nhật ký để học) |
 | **`max_trip_value.max_wait_min`** | `20` | phút | Giới hạn thời gian đứng chờ cuốc đi xa tối đa trước khi đổi chiến thuật |
 | **`maintain_position.wait_penalty_per_min`** | `1.5` | điểm/phút | Điểm trừ trong Position Score cho mỗi phút đứng chờ cuốc kế |
 | **`maintain_position.reposition_penalty_per_km`** | `2.0` | điểm/km | Điểm trừ trong Position Score cho mỗi kilomet chạy rỗng quay lại vùng lõi |
