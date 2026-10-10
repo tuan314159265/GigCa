@@ -13,12 +13,9 @@ This is a statement about what the driver's OWN history can and cannot tell, not
 from __future__ import annotations
 
 import math
-import random
 from typing import Any
 
 import numpy as np
-
-from engine.src.ml.simulate import ZONES, cycle_yield
 
 
 def posterior_table(
@@ -53,54 +50,3 @@ def posterior_table(
             "explore": bool(n <= explore_max_n and winners[i] >= explore_p_best and post[a][0] < best_mean),
         }
     return out
-
-
-# --------------------------------------------------------------------------- simulation against a known truth
-def simulate_policies(
-    horizon: int = 300, seeds: int = 30, hour: int = 18, rain_mm: float = 0.0,
-    epsilon: float = 0.1, prior_k: float = 5.0, truth_draws: int = 20000,
-) -> dict[str, Any]:
-    """Cumulative regret (VND/hour lost vs always picking the truly best zone) of greedy, epsilon-greedy and Thompson.
-
-    Rewards come from the ground-truth cycle sampler in `simulate.py`; the policies see only what they have pulled."""
-    names = sorted(ZONES)
-    truth_rng = random.Random(1234)
-    mu = {z: sum(cycle_yield(truth_rng, z, hour, rain_mm) for _ in range(truth_draws)) / truth_draws for z in names}
-    best = max(mu.values())
-    policies = ("greedy", "epsilon_greedy", "thompson")
-    regret = {p: np.zeros(horizon) for p in policies}
-    best_pick = {p: 0.0 for p in policies}
-    for sd in range(seeds):
-        for pol in policies:
-            rng = random.Random(10_000 + sd)
-            hist: dict[str, list[float]] = {z: [] for z in names}
-            cum = 0.0
-            for t in range(horizon):
-                untried = [z for z in names if not hist[z]]
-                if untried:
-                    arm = untried[0]  # every policy starts with one pull per zone
-                elif pol == "greedy":
-                    arm = max(names, key=lambda z: sum(hist[z]) / len(hist[z]))
-                elif pol == "epsilon_greedy":
-                    arm = rng.choice(names) if rng.random() < epsilon else max(names, key=lambda z: sum(hist[z]) / len(hist[z]))
-                else:
-                    allr = [x for z in names for x in hist[z]]
-                    mu0 = sum(allr) / len(allr)
-                    var = (sum((x - mu0) ** 2 for x in allr) / max(1, len(allr) - 1)) or 1.0
-                    draws = {}
-                    for z in names:
-                        n = len(hist[z])
-                        m = (prior_k * mu0 + sum(hist[z])) / (prior_k + n)
-                        draws[z] = rng.gauss(m, math.sqrt(var / (prior_k + n)))
-                    arm = max(names, key=lambda z: draws[z])
-                hist[arm].append(cycle_yield(rng, arm, hour, rain_mm))
-                cum += best - mu[arm]
-                regret[pol][t] += cum / seeds
-                if t >= horizon - 50 and mu[arm] == best:
-                    best_pick[pol] += 1.0 / (50 * seeds)
-    return {
-        "horizon": horizon, "seeds": seeds, "context": {"hour": hour, "rain_mm": rain_mm},
-        "true_mean_yield_vnd_per_hour": {z: int(round(v)) for z, v in mu.items()}, "best_zone": max(mu, key=mu.get),
-        "cumulative_regret_vnd_per_hour": {p: int(round(float(regret[p][-1]))) for p in policies},
-        "best_zone_pick_rate_last_50": {p: round(best_pick[p], 3) for p in policies},
-    }

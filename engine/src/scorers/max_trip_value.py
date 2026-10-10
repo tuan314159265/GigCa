@@ -2,22 +2,26 @@
 
 Ranks areas by estimated NET INCOME PER HOUR, with every cost counted (fuel of the paid leg AND of the empty leg):
 
-    income per trip = a + (b − c)·d̄_z − c·r_z        a, b: tariff (before fuel)   c: fuel VND/km
+    net per trip    = s·[a + b·(d̄_z − k0) + m·(d̄_z − k0)/v_z·60]     tariff: a opening fare for the first k0 km, b per km,
+                                                                    m per moving minute after k0; s = driver share
+    income per trip = net − c·d̄_z − c·r_z                            c: fuel VND/km
     hours per trip  = d̄_z / v_z + r_z / v_rep + w_z / 60
     yield           = income per trip / hours per trip
 
 Rules kept from the spec:
 - every input number comes from the DRIVER'S OWN data (trip log, tariff, wait spells): a missing required field EXCLUDES
   the area with a stated reason (no default distance, no default speed, no invented per-km rate);
-- the tariff (a, b) and fuel cost (c) arrive in `economics`; without a tariff the lens is insufficient — it never
-  falls back to a "market average fare";
+- the tariff (published in config or typed by the driver), the share and fuel cost arrive in `economics`; the zone
+  numbers (distance, speed, wait) come only from the driver's log — never a "market average fare" or a default distance;
 - repositioning from the driver's position is an explicit ESTIMATE (straight-line x detour), labelled as such;
 - the Pareto check trades yield against its P10 (profit vs. how sure we are), not against a platform-defined index.
 """
 
 from __future__ import annotations
 
-from engine.src.config import ROBUSTNESS_CFG, TRIP_CFG, GEO_CFG
+from dataclasses import replace
+
+from engine.src.config import GEO_CFG, ROBUSTNESS_CFG, TARIFF_CFG, TRIP_CFG
 from engine.src.robustness import analyze_top1, describe
 from engine.src.scorers._common import geo_base_params, missing_fields, num, reposition_for, straight_distance_to_area
 from engine.src.types import (
@@ -66,11 +70,12 @@ def score_max_trip_value(
     economics: DriverEconomics | None = None,
 ) -> ObjectiveResult:
     if mode == "INSUFFICIENT":
-        return _insufficient("Thiếu dữ liệu của chính tài xế: nhật ký chuyến (có cự ly) và biểu cước a + b·km.")
-    if economics is None:
         return _insufficient(
-            "Chưa có biểu cước a + b·km: cần nhập biểu cước (giá mở cửa, đơn giá/km) hoặc cung cấp ≥ 20 chuyến có cự ly để engine tự fit."
+            "Chưa có nhật ký chuyến (có cự ly) của chính tài xế để biết cự ly/tốc độ theo vùng — xem bảng kịch bản what-if "
+            "theo biểu cước để có mức cước tối thiểu nên nhận."
         )
+    if economics is None:
+        return _insufficient("Chưa có biểu cước: cấu hình 'tariff' trống và tài xế chưa nhập giá mở cửa/đơn giá km.")
     E = economics
     base_params = {**geo_base_params(), "cost_vnd_per_km": float(E.fuel_cost_vnd_per_km)}
 
@@ -127,7 +132,7 @@ def score_max_trip_value(
         c = p["cost_vnd_per_km"]
         d = r["km"] if km is None else km
         rep = reposition_for(r["straight"], p) if r["straight"] is not None else None
-        income = E.fare_base_vnd + (E.fare_per_km_vnd - c) * d - (rep.cost_vnd if rep else 0.0)
+        income = E.net_fare_vnd(d, r["speed"]) - c * d - (rep.cost_vnd if rep else 0.0)
         w = (r["wait"] if wait is None else wait) if use_wait else 0.0
         minutes = d / r["speed"] * 60.0 + (rep.minutes if rep else 0.0) + w
         return income / (minutes / 60.0)
@@ -156,13 +161,14 @@ def score_max_trip_value(
     candidates: list[TripValueCandidate] = []
     for rank, r in enumerate(rows, 1):
         rep = r["rep"]
-        net = E.fare_base_vnd + E.fare_per_km_vnd * r["km"]
+        net = E.net_fare_vnd(r["km"], r["speed"])
+        gross = net / E.driver_share if E.driver_share > 0 else None
         net_after_fuel = net - E.fuel_cost_vnd_per_km * r["km"]
         trip_min = r["km"] / r["speed"] * 60.0
-        r["net"], r["net_after_fuel"], r["trip_min"] = net, net_after_fuel, trip_min
+        r["net"], r["gross"], r["net_after_fuel"], r["trip_min"] = net, gross, net_after_fuel, trip_min
         parts = [
-            f"{r['name']}: cuốc TB ~{r['km']:.1f}km (~{trip_min:.0f} phút), cước ròng ~{net:,.0f}đ/chuyến trước xăng "
-            f"(~{net_after_fuel:,.0f}đ sau xăng chặng chở khách)",
+            f"{r['name']}: cuốc TB ~{r['km']:.1f}km (~{trip_min:.0f} phút), cước khách trả theo biểu cước ~{gross:,.0f}đ, "
+            f"bạn nhận ~{net:,.0f}đ ({E.driver_share * 100:.0f}%) trước xăng (~{net_after_fuel:,.0f}đ sau xăng chặng chở khách)",
         ]
         if rep is not None:
             parts.append(
@@ -211,11 +217,12 @@ def score_max_trip_value(
     top = candidates[0]
     tr = rows[0]
     wait_h = (tr["wait"] / 60.0) if use_wait else 0.0
-    accept_min = None
+    accept_min = accept_gross = None
     if E.target_vnd_per_hour is not None:
-        # break-even fare (before fuel) for a trip as long as this zone's average: hits the driver's own hourly goal
+        # break-even NET (what the driver receives, before fuel) for a trip as long as this zone's average: hits the goal
         accept_min = round(E.target_vnd_per_hour * (tr["km"] / tr["speed"] + wait_h) + E.fuel_cost_vnd_per_km * tr["km"])
-    facts = [f"cước ròng ~{tr['net']:,.0f}đ/chuyến trước xăng", f"~{tr['trip_min']:.0f} phút/chuyến", f"cự ly TB {tr['km']:.1f}km"]
+        accept_gross = round(accept_min / E.driver_share) if E.driver_share > 0 else None
+    facts = [f"bạn nhận ~{tr['net']:,.0f}đ/chuyến trước xăng", f"~{tr['trip_min']:.0f} phút/chuyến", f"cự ly TB {tr['km']:.1f}km"]
     summary = (
         f"Ưu tiên {top.area_name}: năng suất ước tính ~{top.yield_vnd_per_hour:,.0f}đ/giờ "
         f"({'; '.join(facts)})."
@@ -238,9 +245,11 @@ def score_max_trip_value(
             f"Tối đa {TRIP_CFG['max_wait_min']} phút",
             "Chỉ nhận cuốc đạt ngưỡng",
             (
-                f"Mức hòa vốn với mục tiêu {E.target_vnd_per_hour:,.0f}đ/giờ của bạn: cuốc dài ~{tr['km']:.1f}km cần cước ròng "
-                f"(trước xăng) từ ~{accept_min:,.0f}đ; mỗi km dài hơn/ngắn hơn thì cộng/trừ ~"
-                f"{E.target_vnd_per_hour / tr['speed'] + E.fuel_cost_vnd_per_km:,.0f}đ. "
+                f"Mức hòa vốn với mục tiêu {E.target_vnd_per_hour:,.0f}đ/giờ của bạn: cuốc dài ~{tr['km']:.1f}km cần tiền thực nhận "
+                f"(trước xăng) từ ~{accept_min:,.0f}đ, tức cước khách trả từ ~{accept_gross:,.0f}đ (với {E.driver_share * 100:.0f}% về tài xế); "
+                f"biểu cước cho cuốc này ~{tr['gross']:,.0f}đ ({'đạt' if tr['net'] >= accept_min else 'CHƯA đạt'} mục tiêu). "
+                f"Mỗi km dài hơn/ngắn hơn cần thêm/bớt ~{E.target_vnd_per_hour / tr['speed'] + E.fuel_cost_vnd_per_km:,.0f}đ tiền nhận, "
+                f"còn biểu cước trả thêm ~{E.net_per_extra_km(tr['speed']):,.0f}đ/km cho bạn (gồm phụ phí theo phút). "
                 f"Giới hạn chờ {TRIP_CFG['max_wait_min']} phút (tham số cấu hình)."
                 if accept_min is not None else
                 "Bạn chưa đặt mục tiêu thu nhập/giờ nên engine chưa đưa ra ngưỡng nhận cuốc — nhập mục tiêu để có mức hòa vốn "
@@ -260,6 +269,17 @@ def score_max_trip_value(
         "Chi phí dịch chuyển là ước tính từ đường chim bay; cước thực tế phụ thuộc thời điểm và cầu.",
         "Engine không dự báo xác suất có cuốc — kết quả dựa trên cuốc và đợt chờ ĐÃ XẢY RA của chính bạn.",
     ]
+    lo_share = float(TARIFF_CFG["driver_share_range"][0])
+    if E.share_source != "driver_input" and lo_share < E.driver_share:
+        low_E = replace(E, driver_share=lo_share)
+        rr = rows[0]
+        rep0 = rr["rep"]
+        inc_low = low_E.net_fare_vnd(rr["km"], rr["speed"]) - E.fuel_cost_vnd_per_km * rr["km"] - (rep0.cost_vnd if rep0 else 0.0)
+        mins0 = rr["km"] / rr["speed"] * 60.0 + (rep0.minutes if rep0 else 0.0) + (rr["wait"] if use_wait else 0.0)
+        trade.append(
+            f"Tỷ lệ nhận {E.driver_share * 100:.0f}% là giả định cố định; nếu thực tế chỉ {lo_share * 100:.0f}% thì năng suất "
+            f"{top.area_name} còn ~{inc_low / (mins0 / 60.0):,.0f}đ/giờ."
+        )
     if E.fuel_source == "config_default":
         trade.append(
             f"Xăng tính theo cấu hình {E.fuel_cost_vnd_per_km:g}đ/km vì bạn chưa nhập lít/100km và giá xăng — nhập để năng suất sát xe của bạn."
@@ -298,6 +318,9 @@ def score_max_trip_value(
             "net_after_fuel_vnd": round(tr["net_after_fuel"]),
             "avg_trip_distance_km": round(tr["km"], 2),
             "min_accept_fare_vnd": accept_min,
+            "min_accept_customer_fare_vnd": accept_gross,
+            "customer_fare_vnd": None if tr["gross"] is None else round(tr["gross"]),
+            "driver_share": E.driver_share,
             "yield_vnd_per_hour": top.yield_vnd_per_hour,
             "reposition_km_estimated": top.reposition_km,
             "wait_min_used": top.wait_min,
@@ -313,10 +336,13 @@ def score_max_trip_value(
         trade_offs=" ".join(trade),
         contingency_fallback=fallback,
     )
-    tariff_txt = "fit từ nhật ký của bạn" if E.tariff_source == "fitted_from_log" else "do bạn nhập"
-    caveat = f"Biểu cước {tariff_txt}; chi phí/thời gian dịch chuyển là ước tính từ đường chim bay; dữ liệu có thể là mô phỏng."
+    tariff_txt = {"published_tariff": "công bố (cấu hình)", "driver_input": "do bạn nhập",
+                  "mixed": "công bố + phần bạn nhập"}.get(E.tariff_source, E.tariff_source)
+    share_txt = (f"tỷ lệ nhận {E.driver_share * 100:.0f}% "
+                 + ("do bạn nhập" if E.share_source == "driver_input" else "là giả định cố định (thực tế 50–75% tùy sàn)"))
+    caveat = f"Biểu cước {tariff_txt}, {share_txt}; chi phí/thời gian dịch chuyển là ước tính từ đường chim bay."
     if top.data_source == "driver_trip_log":
-        caveat = (f"Cự ly, tốc độ lấy từ nhật ký chuyến của chính bạn (không phải thị trường); biểu cước {tariff_txt}; "
+        caveat = (f"Cự ly, tốc độ lấy từ nhật ký chuyến của chính bạn (không phải thị trường); biểu cước {tariff_txt}, {share_txt}; "
                   "chi phí/thời gian dịch chuyển là ước tính từ đường chim bay.")
     if rb_text:
         caveat += " " + rb_text

@@ -16,7 +16,7 @@ from datetime import datetime
 
 from engine.src.config import TIME_CFG, WEATHER_CFG
 from engine.src.geo import haversine_m, valid_point
-from engine.src.personal_model import build_personal_model
+from engine.src.personal_model import build_personal_model, describe_tariff
 from engine.src.roadmap import build_data_roadmap
 from engine.src.tradeoff import build_tradeoff_matrix
 from engine.src.priority import build_priority
@@ -158,6 +158,8 @@ def run_driver_engine(
     )
 
     extra = list(weather_notes)
+    if pm.economics is not None:
+        extra.append(describe_tariff(pm.economics))
     if now_local is None:
         extra.append("Không đọc được generated_at nên không neo được thời điểm hiện tại; kiểm tra giờ mở cửa và cửa sổ mưa bị hạn chế.")
     pm_summary: dict | None = None
@@ -190,7 +192,7 @@ def run_driver_engine(
             )
     assumptions = build_assumptions(input_data, prefs, extra)
 
-    tier = data_tier(pm_summary, input_data.driver_profile)
+    tier = data_tier(pm_summary, pm.economics is not None)
     output = DriverRecommendationOutput(
         generated_at=input_data.generated_at or "",
         objectives=objectives,

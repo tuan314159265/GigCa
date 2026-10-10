@@ -1,0 +1,279 @@
+{
+  "_test_only": "ĐẦU VÀO KIỂM THỬ (unit test) — KHÔNG PHẢI DỮ LIỆU. Các giá trị thời tiết/POI/routing/giao thông ở đây được đặt tay để kiểm tra từng nhánh logic của engine (ví dụ POI đã/chưa xác minh, đoạn đường thông thoáng/ùn tắc, giờ mưa). Không nạp vào database, không dùng cho demo/báo cáo kết quả.",
+  "schema_version": "test_fixture",
+  "snapshot_id": "unit_test_scenario",
+  "generated_at": "2026-09-27T14:00:00+07:00",
+  "data_status": [
+    {
+      "dataset": "weather",
+      "status": "available",
+      "reason": "Dự báo thời tiết chi tiết theo giờ (Open-Meteo mô phỏng)"
+    },
+    {
+      "dataset": "poi",
+      "status": "available",
+      "reason": "Dữ liệu địa điểm dừng nghỉ OSM đã kiểm tra danh mục"
+    },
+    {
+      "dataset": "routing",
+      "status": "available",
+      "reason": "Đồ thị định tuyến xe máy đã kiểm chứng cự ly và thời gian"
+    },
+    {
+      "dataset": "traffic",
+      "status": "available",
+      "reason": "Dữ liệu tốc độ lưu thông thời gian thực từ cảm biến đường phố"
+    },
+    {
+      "dataset": "road_incidents",
+      "status": "available",
+      "reason": "Không ghi nhận điểm đóng đường hoặc sự cố ngập úng"
+    },
+    {
+      "dataset": "verified_waiting_places",
+      "status": "available",
+      "reason": "Điểm dừng nghỉ đã xác minh thực địa quyền đỗ xe máy và giờ mở cửa"
+    },
+    {
+      "dataset": "vehicle_density",
+      "status": "missing",
+      "reason": "Không có feed mật độ xe được cấp phép."
+    },
+    {
+      "dataset": "booking_and_destinations",
+      "status": "not_integrated",
+      "reason": "Không có nguồn booking/điểm đến thị trường kiểm chứng được; thời gian chờ học từ các đợt chờ của chính tài xế (mô phỏng)."
+    },
+    {
+      "dataset": "trip_value",
+      "status": "not_integrated",
+      "reason": "Không có nguồn cước thị trường kiểm chứng được; thu nhập theo vùng học từ nhật ký chuyến và biểu cước của chính tài xế (mô phỏng)."
+    }
+  ],
+  "objective_readiness": [
+    {
+      "objective": "max_trip_value",
+      "status": "insufficient_data",
+      "blocking_datasets": [
+        "trip_value"
+      ],
+      "reason": "Không có dữ liệu thị trường; hướng này chỉ chạy được từ dữ liệu của chính tài xế (biểu cước, nhật ký chuyến, đợt chờ)."
+    },
+    {
+      "objective": "maintain_position",
+      "status": "insufficient_data",
+      "blocking_datasets": [
+        "booking_and_destinations"
+      ],
+      "reason": "Không có dữ liệu thị trường; hướng này chỉ chạy được từ dữ liệu của chính tài xế (biểu cước, nhật ký chuyến, đợt chờ)."
+    },
+    {
+      "objective": "rest_spot",
+      "status": "available",
+      "blocking_datasets": [],
+      "reason": "Đã xác minh thực địa quyền dừng đỗ xe máy và tiện ích điểm nghỉ."
+    },
+    {
+      "objective": "safety_comfort",
+      "status": "available",
+      "blocking_datasets": [],
+      "reason": "Đầy đủ forecast mưa và tốc độ lưu thông giao thông thực tế."
+    }
+  ],
+  "areas": [
+    {
+      "area_id": "area_ben_thanh_q1",
+      "area_name": "Khu vực Bến Thành - Phố Đi Bộ",
+      "spatial_scope": "polygon",
+      "representative_point": {
+        "latitude": 10.7725,
+        "longitude": 106.698
+      },
+      "poi_counts_by_category": {
+        "amenity": 820,
+        "shop": 210,
+        "public_transport": 95
+      },
+      "routing_samples": [
+        {
+          "destination_id": "poi_highlands_01",
+          "profile": "motorcycle_verified",
+          "route_distance_m": 510.0,
+          "route_duration_s": 70.0
+        },
+        {
+          "destination_id": "poi_trung_nguyen_02",
+          "profile": "motorcycle_verified",
+          "route_distance_m": 620.0,
+          "route_duration_s": 85.0
+        },
+        {
+          "destination_id": "poi_petrolimex_03",
+          "profile": "motorcycle_verified",
+          "route_distance_m": 850.0,
+          "route_duration_s": 115.0
+        },
+        {
+          "destination_id": "poi_parking_23_9_04",
+          "profile": "motorcycle_verified",
+          "route_distance_m": 420.0,
+          "route_duration_s": 60.0
+        }
+      ]
+    },
+    {
+      "area_id": "area_tan_dinh_q1",
+      "area_name": "Khu vực Chợ Tân Định - Hai Bà Trưng",
+      "spatial_scope": "polygon",
+      "representative_point": {
+        "latitude": 10.789,
+        "longitude": 106.691
+      },
+      "poi_counts_by_category": {
+        "amenity": 640,
+        "shop": 180,
+        "public_transport": 70
+      },
+      "routing_samples": []
+    },
+    {
+      "area_id": "area_vo_thi_sau_q3",
+      "area_name": "Khu vực Hồ Con Rùa - Võ Thị Sáu",
+      "spatial_scope": "polygon",
+      "representative_point": {
+        "latitude": 10.783,
+        "longitude": 106.696
+      },
+      "poi_counts_by_category": {
+        "amenity": 512,
+        "shop": 140,
+        "public_transport": 65
+      },
+      "routing_samples": []
+    },
+    {
+      "area_id": "area_hang_xanh_bt",
+      "area_name": "Khu vực Ngã Tư Hàng Xanh (Vùng ven)",
+      "spatial_scope": "polygon",
+      "representative_point": {
+        "latitude": 10.801,
+        "longitude": 106.711
+      },
+      "poi_counts_by_category": {
+        "amenity": 380,
+        "shop": 110,
+        "public_transport": 50
+      },
+      "routing_samples": []
+    }
+  ],
+  "pois": [
+    {
+      "poi_id": "poi_highlands_01",
+      "name": "Highlands Coffee Nhà Thờ Đức Bà (Có bãi đỗ xe máy riêng)",
+      "latitude": 10.7798,
+      "longitude": 106.699,
+      "category": "cafe",
+      "subcategory": "coffee_shop",
+      "verified": true,
+      "parking_allowed": true,
+      "opening_hours": "07:00 - 23:00",
+      "tags": {
+        "amenity": "cafe",
+        "brand": "Highlands Coffee",
+        "parking": "motorcycle_free"
+      }
+    },
+    {
+      "poi_id": "poi_trung_nguyen_02",
+      "name": "Cà phê Trung Nguyên Legend Lê Duẩn (Có chỗ nghỉ & sạc điện thoại)",
+      "latitude": 10.7785,
+      "longitude": 106.698,
+      "category": "cafe",
+      "subcategory": "coffee_shop",
+      "verified": true,
+      "parking_allowed": true,
+      "opening_hours": "06:30 - 22:30",
+      "tags": {
+        "amenity": "cafe",
+        "brand": "Trung Nguyên",
+        "parking": "motorcycle"
+      }
+    },
+    {
+      "poi_id": "poi_parking_23_9_04",
+      "name": "Bãi giữ xe Công viên 23/9 (Có mái che mưa & bảo vệ)",
+      "latitude": 10.7695,
+      "longitude": 106.6935,
+      "category": "parking",
+      "subcategory": "motorcycle_parking",
+      "verified": true,
+      "parking_allowed": true,
+      "opening_hours": "05:00 - 23:30",
+      "tags": {
+        "amenity": "parking",
+        "shelter": "yes"
+      }
+    },
+    {
+      "poi_id": "poi_petrolimex_03",
+      "name": "Cây xăng Petrolimex Số 1 Nguyễn Thị Minh Khai (Có bơm lốp & WC miễn phí)",
+      "latitude": 10.781,
+      "longitude": 106.702,
+      "category": "gas_station",
+      "subcategory": "fuel",
+      "verified": true,
+      "parking_allowed": true,
+      "opening_hours": "24/7",
+      "tags": {
+        "amenity": "fuel",
+        "toilets": "free"
+      }
+    }
+  ],
+  "traffic": [
+    {
+      "edge_id": "edge_le_duan_01",
+      "current_speed_kmh": 32.5,
+      "free_flow_speed_kmh": 35.0,
+      "congestion_level": "thong_thoang",
+      "observed_at": "2026-09-27T14:00:00+07:00"
+    },
+    {
+      "edge_id": "edge_dong_khoi_02",
+      "current_speed_kmh": 28.0,
+      "free_flow_speed_kmh": 30.0,
+      "congestion_level": "thong_thoang",
+      "observed_at": "2026-09-27T14:00:00+07:00"
+    }
+  ],
+  "weather": {
+    "hourly": [
+      {
+        "valid_time": "2026-09-27T14:00",
+        "precipitation_mm": 0.0,
+        "precipitation_probability_pct": 20.0
+      },
+      {
+        "valid_time": "2026-09-27T15:00",
+        "precipitation_mm": 0.3,
+        "precipitation_probability_pct": 45.0
+      },
+      {
+        "valid_time": "2026-09-27T16:00",
+        "precipitation_mm": 2.5,
+        "precipitation_probability_pct": 80.0
+      },
+      {
+        "valid_time": "2026-09-27T17:00",
+        "precipitation_mm": 3.8,
+        "precipitation_probability_pct": 95.0
+      },
+      {
+        "valid_time": "2026-09-27T18:00",
+        "precipitation_mm": 1.2,
+        "precipitation_probability_pct": 65.0
+      }
+    ]
+  }
+}

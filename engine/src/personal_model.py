@@ -5,14 +5,20 @@ bonus, surge and vehicle type, scales like demand_index belong to the platform).
 see every day: the per-km tariff, their own trips and how long they stood waiting. So the model is built only from:
 
 - the driver's trip log (pickup, net income before fuel, duration, optional distance);
-- the driver's profile (tariff a + b·km, vehicle fuel use, fuel price, income goal) — typed in by the driver;
+- the tariff: the PUBLISHED price list in config (`tariff`), overridable field by field by the driver's profile, and the
+  driver's share of it (fixed in config, e.g. 75%, overridable by the driver) — plus vehicle fuel use, fuel price, goal;
 - the driver's wait spells (stretches of standing still, with how each one ended).
 
-Money model (per pickup zone z):
+Money model (per pickup zone z, k0 = km included in the opening fare, s = driver share):
 
-    net fare per trip   = a + b·d̄_z                  (before fuel; a, b fitted from the log or typed in)
-    income per trip     = a + (b − c)·d̄_z − c·r_z      (c = fuel VND/km, r_z = repositioning km, scorer-side)
+    customer fare       = a + b·(d̄_z − k0) + m·(d̄_z − k0)/v_z·60     (per-minute charge on moving minutes after k0)
+    net per trip        = s · customer fare                           (before fuel)
+    income per trip     = net − c·d̄_z − c·r_z                          (c = fuel VND/km, r_z = repositioning km, scorer-side)
     time per trip (h)   = d̄_z / v_z + r_z / v_rep + w_z / 60
+
+The tariff is NOT fitted from the log any more (it is public). The log is used to CHECK it: the median of
+net_vnd / customer-fare-by-tariff over trips with a distance and a duration is the driver's observed share, reported next
+to the configured share; a gap larger than `tariff.share_check_tolerance` is flagged (bonus, surge, other vehicle type…).
 
 Honesty rules (same spirit as the rest of the engine):
 - nothing is invented: a zone needs `min_trips_per_zone` real trips (with a distance) / `min_spells_per_zone` spells,
@@ -32,7 +38,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from typing import Any
 
-from engine.src.config import GEO_CFG, PERSONAL_CFG, POSITION_CFG, TIME_CFG
+from engine.src.config import GEO_CFG, PERSONAL_CFG, POSITION_CFG, TARIFF_CFG, TIME_CFG
 from engine.src.geo import haversine_m
 from engine.src.timeutil import parse_local
 from engine.src.types import AreaSample, DriverEconomics, DriverProfile, TripRecord, WaitSpell
@@ -87,37 +93,6 @@ def _cell_key(lat: float, lng: float, lat_ref: float, cell_m: float) -> tuple[in
     dlat = cell_m / _M_PER_DEG_LAT
     dlng = cell_m / (_M_PER_DEG_LAT * max(math.cos(math.radians(lat_ref)), 1e-6))
     return math.floor(lat / dlat), math.floor(lng / dlng)
-
-
-def fit_tariff(points: list[tuple[float, float]]) -> dict[str, Any] | None:
-    """Least squares net = a + b·km on (km, net_vnd) points. Needs a positive slope.
-
-    If the free intercept comes out negative (impossible for a fare) the model is refitted through the origin (a = 0)
-    and says so. Returns None when the data cannot support a fit."""
-    n = len(points)
-    if n < 3:
-        return None
-    xs, ys = [p[0] for p in points], [p[1] for p in points]
-    mx, my = _mean(xs), _mean(ys)
-    sxx = sum((x - mx) ** 2 for x in xs)
-    if sxx <= 0:
-        return None
-    b = sum((x - mx) * (y - my) for x, y in points) / sxx
-    a = my - b * mx
-    method = "ols"
-    if a < 0:
-        sx2 = sum(x * x for x in xs)
-        b, a, method = sum(x * y for x, y in points) / sx2, 0.0, "origin"
-    if b <= 0:
-        return None
-    resid = [y - (a + b * x) for x, y in points]
-    ss_res = sum(r * r for r in resid)
-    ss_tot = sum((y - my) ** 2 for y in ys)
-    return {
-        "a": a, "b": b, "n": n, "method": method,
-        "r2": None if ss_tot <= 0 else max(0.0, 1.0 - ss_res / ss_tot),
-        "rmse_vnd": math.sqrt(ss_res / n),
-    }
 
 
 # --------------------------------------------------------------------------- survival (Kaplan–Meier)
@@ -199,35 +174,34 @@ def _trip_km(t: TripRecord, detour: float) -> tuple[float | None, bool]:
 
 
 def resolve_economics(
-    km_net: list[tuple[float, float]],
     profile: DriverProfile | None,
-    cfg: dict[str, Any],
     notes: list[str],
-) -> tuple[DriverEconomics | None, dict[str, Any] | None]:
-    """Pick the tariff (fitted from the log when it can support one, else the driver's own typed tariff) and the fuel
-    cost (driver inputs, else the config fallback — labelled). Returns (economics or None, fit details or None)."""
-    fit = None
-    if len(km_net) >= int(cfg["min_trips_total"]) and _sd([p[0] for p in km_net]) >= float(cfg["fit_min_distance_sd_km"]):
-        fit = fit_tariff(km_net)
-        if fit is None:
-            notes.append("Không fit được biểu cước a + b·km từ nhật ký (độ dốc không dương hoặc dữ liệu quá ít biến thiên).")
-    elif km_net:
-        notes.append(
-            f"Chưa fit biểu cước từ nhật ký: cần ≥ {int(cfg['min_trips_total'])} chuyến có cự ly và độ lệch chuẩn cự ly "
-            f"≥ {float(cfg['fit_min_distance_sd_km']):g}km (hiện {len(km_net)} chuyến)."
-        )
-    typed = profile is not None and profile.fare_base_vnd is not None and profile.fare_per_km_vnd is not None
-    if fit is not None:
-        a, b, source = fit["a"], fit["b"], "fitted_from_log"
-        if typed and profile.fare_per_km_vnd and abs(b - profile.fare_per_km_vnd) / profile.fare_per_km_vnd > 0.2:
-            notes.append(
-                f"Đơn giá/km fit từ nhật ký (~{b:,.0f}đ) lệch hơn 20% so với biểu cước bạn nhập ({profile.fare_per_km_vnd:,.0f}đ) — "
-                "engine dùng số fit từ nhật ký; hãy kiểm tra lại biểu cước đã nhập hoặc cách ghi cước."
-            )
-    elif typed:
-        a, b, source = float(profile.fare_base_vnd), float(profile.fare_per_km_vnd), "driver_input"
-    else:
-        return None, None
+    tariff_cfg: dict[str, Any] | None = None,
+) -> DriverEconomics | None:
+    """Tariff = the driver's own values where given, the published tariff in config otherwise (labelled per field).
+    Fuel = the driver's vehicle inputs, else the config fallback (labelled). Returns None only when neither the profile
+    nor the config gives an opening fare and a per-km price."""
+    tc = tariff_cfg or TARIFF_CFG
+
+    def pick(name: str) -> tuple[float | None, bool]:
+        own = getattr(profile, name, None) if profile is not None else None
+        if own is not None:
+            return float(own), True
+        cfg_v = tc.get(name)
+        return (None if cfg_v is None else float(cfg_v)), False
+
+    a, own_a = pick("fare_base_vnd")
+    b, own_b = pick("fare_per_km_vnd")
+    k0, own_k0 = pick("fare_base_km")
+    m, own_m = pick("fare_per_min_vnd")
+    share, own_share = pick("driver_share")
+    if a is None or b is None or share is None:
+        return None
+    owned = [own_a, own_b, own_k0, own_m]
+    source = "driver_input" if all(owned) else ("published_tariff" if not any(owned) else "mixed")
+    if source == "mixed":
+        mine = [n for n, o in zip(("giá mở cửa", "đơn giá/km", "số km gói", "phụ phí/phút"), owned) if o]
+        notes.append(f"Biểu cước trộn: {', '.join(mine)} do bạn nhập, phần còn lại theo biểu cước công bố trong cấu hình.")
     c = profile.fuel_cost_vnd_per_km if profile is not None else None
     fuel_source = "driver_input"
     if c is None:
@@ -236,7 +210,75 @@ def resolve_economics(
             f"Chưa có mức tiêu hao xăng (lít/100km) và giá xăng của bạn nên dùng {c:g}đ/km theo cấu hình (giả định đề xuất tạm)."
         )
     target = profile.target_vnd_per_hour if profile is not None else None
-    return DriverEconomics(a, b, float(c), source, fuel_source, target), fit
+    ref = str(tc.get("source") or "").strip() or None
+    return DriverEconomics(
+        fare_base_vnd=a, fare_per_km_vnd=b, fuel_cost_vnd_per_km=float(c), tariff_source=source, fuel_source=fuel_source,
+        target_vnd_per_hour=target, fare_base_km=k0 or 0.0, fare_per_min_vnd=m or 0.0, driver_share=share,
+        share_source="driver_input" if own_share else "config", tariff_reference=None if source == "driver_input" else ref,
+    )
+
+
+def tariff_dict(econ: DriverEconomics) -> dict[str, Any]:
+    return {
+        "source": econ.tariff_source,
+        "reference": econ.tariff_reference,
+        "fare_base_vnd": round(econ.fare_base_vnd),
+        "fare_base_km": econ.fare_base_km,
+        "fare_per_km_vnd": round(econ.fare_per_km_vnd),
+        "fare_per_min_vnd": round(econ.fare_per_min_vnd),
+        "driver_share": econ.driver_share,
+        "share_source": econ.share_source,
+        "driver_share_range": [float(x) for x in TARIFF_CFG["driver_share_range"]],
+    }
+
+
+def describe_tariff(econ: DriverEconomics) -> str:
+    """One traceable sentence: which tariff, which share, where from."""
+    src = {"published_tariff": "biểu cước công bố (cấu hình)", "driver_input": "biểu cước do bạn nhập",
+           "mixed": "biểu cước công bố + phần bạn nhập"}.get(econ.tariff_source, econ.tariff_source)
+    parts = [f"{econ.fare_base_km:g} km đầu {econ.fare_base_vnd:,.0f}đ" if econ.fare_base_km > 0 else f"mở cửa {econ.fare_base_vnd:,.0f}đ",
+             f"mỗi km tiếp theo {econ.fare_per_km_vnd:,.0f}đ"]
+    if econ.fare_per_min_vnd > 0:
+        parts.append(f"+{econ.fare_per_min_vnd:,.0f}đ/phút di chuyển sau {econ.fare_base_km:g} km đầu")
+    share_txt = (f"tài xế nhận {econ.driver_share * 100:.0f}% "
+                 + ("(bạn nhập)" if econ.share_source == "driver_input" else "(giả định cố định trong cấu hình)"))
+    lo, hi = (float(x) for x in TARIFF_CFG["driver_share_range"])
+    out = f"Cước khách trả theo {src}: {', '.join(parts)}; {share_txt}"
+    if econ.share_source != "driver_input":
+        out += f" — thực tế {lo * 100:.0f}–{hi * 100:.0f}% tùy sàn/chương trình"
+    if econ.tariff_reference:
+        out += f". Nguồn biểu cước: {econ.tariff_reference}"
+    return out + "."
+
+
+def share_check(rows: list[tuple[float, float, float]], econ: DriverEconomics, notes: list[str]) -> dict[str, Any] | None:
+    """Observed share from the log: median of net_vnd / tariff-fare over (km, duration_min, net_vnd) rows.
+
+    The per-minute charge uses the trip's own moving minutes after k0, approximated as duration × (km − k0)/km
+    (constant speed within the trip). Needs ≥ min_trips_total rows; otherwise None (nothing is claimed)."""
+    need = int(PERSONAL_CFG["min_trips_total"])
+    ratios: list[float] = []
+    for km, dur, net in rows:
+        mins_after = dur * max(0.0, km - econ.fare_base_km) / km if km > 0 else 0.0
+        gross = econ.gross_fare_vnd(km, mins_after)
+        if gross > 0:
+            ratios.append(net / gross)
+    if len(ratios) < need:
+        return None
+    ratios.sort()
+    mid = len(ratios) // 2
+    med = ratios[mid] if len(ratios) % 2 else (ratios[mid - 1] + ratios[mid]) / 2.0
+    tol = float(TARIFF_CFG["share_check_tolerance"])
+    gap = med - econ.driver_share
+    flagged = abs(gap) > tol
+    if flagged:
+        notes.append(
+            f"Tỷ lệ thực nhận quan sát từ {len(ratios)} chuyến của bạn (trung vị tiền nhận/cước theo biểu cước) là "
+            f"{med * 100:.0f}%, lệch {gap * 100:+.0f} điểm so với {econ.driver_share * 100:.0f}% đang dùng — kiểm tra lại "
+            "biểu cước/loại xe, hoặc net_vnd có lẫn thưởng/tip/phụ phí không."
+        )
+    return {"n": len(ratios), "median_observed_share": round(med, 3), "share_used": econ.driver_share,
+            "gap": round(gap, 3), "tolerance": tol, "flagged": flagged}
 
 
 def build_personal_model(
@@ -249,8 +291,8 @@ def build_personal_model(
     cfg = cfg or PERSONAL_CFG
     spells = spells or []
     if not trips and not spells:
-        # Tier 0: nothing logged. The driver's typed tariff may still support a what-if table (see whatif.py).
-        econ, _ = resolve_economics([], profile, cfg, [])
+        # Tier 0: nothing logged. The (published or typed) tariff still supports a what-if table (see whatif.py).
+        econ = resolve_economics(profile, [])
         return PersonalModelResult([], {"status": "no_log", "source": SOURCE}, econ)
 
     offset = int(TIME_CFG["local_utc_offset_minutes"])
@@ -351,17 +393,17 @@ def build_personal_model(
     elif len(rows) < len(in_part):
         notes.append(
             f"{len(in_part) - len(rows)}/{len(in_part)} chuyến không có cự ly (không có distance_km và không có điểm trả) "
-            "nên không dùng để học cự ly/tốc độ/biểu cước."
+            "nên không dùng để học cự ly/tốc độ."
         )
     if km_est:
         notes.append(
             f"{km_est}/{len(rows)} chuyến dùng cự ly ƯỚC TÍNH từ tọa độ đón–trả (đường chim bay x{detour:g}), không phải cự ly thật."
         )
 
-    # The tariff is fitted on REPORTED distances when there are enough of them: a distance estimated from two coordinates
-    # carries error in the regressor and would drag the slope down.
-    fit_rows = reported_rows if len(reported_rows) >= min_total else rows
-    econ, fit = resolve_economics([(km, t.net_vnd) for _, t, km in fit_rows] if trip_ok else [], profile, cfg, notes)
+    # The tariff is public (config) or typed by the driver — never fitted. The log only CHECKS the driver's share, and only
+    # on REPORTED distances: a distance estimated from two coordinates would bias the ratio.
+    econ = resolve_economics(profile, notes)
+    check = share_check([(km, t.duration_min, t.net_vnd) for _, t, km in reported_rows], econ, notes) if econ else None
 
     # ---- wait side: global Kaplan–Meier ----
     min_sp_total = int(cfg["min_spells_total"])
@@ -377,7 +419,7 @@ def build_personal_model(
 
     lens_trip = trip_ok and econ is not None and len(rows) >= min_zone
     if not lens_trip and trip_ok and econ is None:
-        notes.append("Chưa có biểu cước a + b·km (nhật ký chưa đủ để fit và bạn chưa nhập biểu cước) nên chưa xếp hạng vùng theo thu nhập.")
+        notes.append("Chưa có biểu cước (cấu hình 'tariff' trống và bạn chưa nhập) nên chưa xếp hạng vùng theo thu nhập.")
     if not lens_trip and g_wait is None:
         extra = {kk: v for kk, v in summary_base.items() if kk != "source"}
         return _insufficient(
@@ -466,7 +508,7 @@ def build_personal_model(
     g_expected_wait = None if g_wait is None else g_wait["expected_wait_min"]
     baseline = None
     if econ is not None and p_km is not None and p_speed is not None and g_expected_wait is not None:
-        net_after_fuel = econ.fare_base_vnd + (econ.fare_per_km_vnd - econ.fuel_cost_vnd_per_km) * p_km
+        net_after_fuel = econ.net_fare_vnd(p_km, p_speed) - econ.fuel_cost_vnd_per_km * p_km
         baseline = round(net_after_fuel / (p_km / p_speed + g_expected_wait / 60.0))
     summary = {
         **summary_base,
@@ -475,15 +517,7 @@ def build_personal_model(
         "zones_with_trip_stats": sum(1 for a in areas if a.trip_value),
         "zones_with_wait_stats": sum(1 for a in areas if a.destination_distribution),
         "zones_skipped_thin": skipped_thin,
-        "tariff": None if econ is None else {
-            "source": econ.tariff_source,
-            "fare_base_vnd": round(econ.fare_base_vnd),
-            "fare_per_km_vnd": round(econ.fare_per_km_vnd),
-            "fit": None if fit is None else {
-                "method": fit["method"], "n": fit["n"],
-                "r2": None if fit["r2"] is None else round(fit["r2"], 3), "rmse_vnd": round(fit["rmse_vnd"]),
-            },
-        },
+        "tariff": None if econ is None else {**tariff_dict(econ), "share_check": check},
         "fuel_cost_vnd_per_km": None if econ is None else round(econ.fuel_cost_vnd_per_km),
         "fuel_source": None if econ is None else econ.fuel_source,
         "trip_km_estimated_from_coordinates": km_est,

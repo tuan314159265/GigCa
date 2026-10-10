@@ -31,9 +31,10 @@ Tài liệu này chuẩn hóa và giải thích chi tiết toàn bộ **công th
 | **Điểm tiện ích (`poi_candidates`)** | Thật: OpenStreetMap / Overpass | `poi_id`, `name`, `category`, `subcategory`, `tags`, `opening_hours` | Hướng 3 |
 | **Xác minh thực địa (`verified_places`)** | Khảo sát thực địa (Hiện là Mock) | `verified` (bool), `parking_allowed` (bool) | Hướng 3 |
 | **Mẫu định tuyến (`routing_samples`)** | Thật: OSRM Routing Machine | `route_distance_m`, `route_duration_s`, `profile`, `origin_point`, `destination_id` | Hướng 3 |
-| **Hồ sơ tài xế (`driver_profile`)** | Do CHÍNH tài xế nhập | `fare_base_vnd` (a), `fare_per_km_vnd` (b), `fuel_l_per_100km`, `fuel_price_vnd_per_l`, `target_vnd_per_hour` | Hướng 1 |
-| **Nhật ký chuyến (`trip_log`)** | Do CHÍNH tài xế ghi | `started_at`, `pickup_lat/lng`, `net_vnd` (trước xăng, không gồm thưởng/tip), `duration_min`, `distance_km` (tùy chọn) | Hướng 1 |
-| **Đợt chờ (`wait_spells`)** | App companion / GPS của tài xế | `start`, `end`, `lat`, `lng`, `ended_by` (`trip`/`offline`/`moved`; hai loại sau là bị kiểm duyệt) | Hướng 1, Hướng 2 |
+| **Biểu cước (`tariff`)** | Bảng giá công bố, ghi trong `config/engine_config.json` kèm `source` | `fare_base_vnd` 12.500 cho `fare_base_km` 2 km đầu, `fare_per_km_vnd` 4.300, `fare_per_min_vnd` 350 (phút di chuyển sau 2 km), `driver_share` 0,75 (giả định cố định; thực tế 0,5–0,75) | Hướng 1, what-if |
+| **Hồ sơ tài xế (`driver_profile`)** | Do CHÍNH tài xế nhập | `fare_base_vnd` (a), `fare_per_km_vnd` (b), `fare_base_km`, `fare_per_min_vnd`, `driver_share` (đều tùy chọn — thiếu thì dùng `tariff`, có nhãn), `fuel_l_per_100km`, `fuel_price_vnd_per_l` (→ c; thiếu thì dùng cấu hình, có nhãn), `target_vnd_per_hour` | Hướng 1 |
+| **Nhật ký chuyến (`trip_log`)** | Do CHÍNH tài xế THẬT ghi (thử nghiệm có đồng ý), nhập bằng `data/driver_log_import.py` | Bắt buộc: `trip_id`, `started_at`, `pickup_lat/lng`, `net_vnd` (sau phí sàn, trước xăng, không gồm thưởng/tip), `duration_min` > 0. Tùy chọn: `dropoff_lat/lng`, `distance_km`. Thiếu trường bắt buộc → loại và đếm | Hướng 1 |
+| **Đợt chờ (`wait_spells`)** | App companion / GPS / tài xế ghi giờ | Bắt buộc: `spell_id`, `start`, `end` (≥ start), `lat`, `lng`, `ended_by` (`trip`/`offline`/`moved`; hai loại sau là bị kiểm duyệt). Tùy chọn: `rain_mm` (chỉ cho ML) | Hướng 1, Hướng 2 |
 | **Giao thông thời gian thực (`traffic_edges`)** | Cổng giao thông / GPS xe (Hiện là Mock) | `edge_id`, `name`, `current_speed_kmh`, `free_flow_speed_kmh`, `timestamp` | Hướng 4 |
 
 ---
@@ -43,23 +44,29 @@ Tài liệu này chuẩn hóa và giải thích chi tiết toàn bộ **công th
 Engine KHÔNG đọc dữ liệu thị trường do sàn định nghĩa (cước gộp/ròng khu vực, `demand_index`, tỷ lệ cuốc xa, thời gian chờ khu vực…): không có API, không kiểm chứng được. Adapter xóa các trường này và báo số lượng đã xóa. Chỉ dùng dữ liệu tài xế tự kiểm chứng được.
 
 ### 3.1. Dữ Liệu Đầu Vào
-* Biểu cước $a + b\cdot km$ (fit từ nhật ký khi có $\ge$ `min_trips_total` chuyến có cự ly và đủ phân tán, nếu không dùng biểu cước tài xế nhập) và xăng $c$ (đ/km, từ lít/100km × giá xăng; thiếu thì dùng cấu hình và ghi nhãn).
-* Theo vùng $z$ (ô lưới từ nhật ký, co Bayes về trung bình cá nhân): `avg_trip_distance_km` $\bar d_z$, `avg_speed_kmh` $v_z$, thời gian chờ kỳ vọng $w_z$ (survival; vùng chưa đủ đợt chờ dùng mức chờ trung bình chung, có ghi nhãn).
+* **Biểu cước khách trả** (công bố, trong `tariff`; tài xế nhập thì ghi đè từng trường): $a$ = 12.500đ cho $k_0$ = 2 km đầu, $b$ = 4.300đ/km tiếp theo, $m$ = 350đ mỗi phút di chuyển sau $k_0$. **Tỷ lệ tài xế nhận** $s$ = 0,75 (giả định cố định của nhóm; thực tế 0,5–0,75 — engine báo thêm năng suất ở $s$ = 0,5). Biểu cước KHÔNG còn được fit từ nhật ký.
+* Xăng $c$ (đ/km) = lít/100km × giá xăng / 100; thiếu thì dùng `geo.reposition_cost_vnd_per_km` và ghi nhãn.
+* Theo vùng $z$ (ô lưới từ nhật ký THẬT, co Bayes về trung bình cá nhân): `avg_trip_distance_km` $\bar d_z$, `avg_speed_kmh` $v_z$, thời gian chờ kỳ vọng $w_z$ (survival; vùng chưa đủ đợt chờ dùng mức chờ trung bình chung, có ghi nhãn).
 * `representative_point` để ước tính dịch chuyển $r_z$ (đường chim bay × `detour_factor`, không phải routing).
 
 ### 3.2. Công thức
-$$\text{Thu nhập/chuyến} = a + (b - c)\,\bar d_z - c\,r_z \qquad \text{Giờ/chuyến} = \frac{\bar d_z}{v_z} + \frac{r_z}{v_{rep}} + \frac{w_z}{60}$$
+$$\text{Cước khách}(d, v) = a + b\,(d-k_0)^+ + m\,\frac{(d-k_0)^+}{v}\cdot 60 \qquad \text{Tiền nhận}(d, v) = s\cdot\text{Cước khách}(d, v)$$
+$$\text{Thu nhập/chuyến} = \text{Tiền nhận}(\bar d_z, v_z) - c\,\bar d_z - c\,r_z \qquad \text{Giờ/chuyến} = \frac{\bar d_z}{v_z} + \frac{r_z}{v_{rep}} + \frac{w_z}{60}$$
 $$\text{Yield (đ/giờ)} = \frac{\text{Thu nhập/chuyến}}{\text{Giờ/chuyến}}$$
-Xăng được trừ cho cả chặng chở khách và chặng chạy rỗng. Số hạng chờ chỉ dùng khi MỌI vùng đều có giá trị chờ (riêng hoặc trung bình chung); nếu không, bỏ khỏi tất cả vùng để so sánh công bằng.
+Số phút tính phí là phút **di chuyển** sau $k_0$, ước tính bằng quãng còn lại / tốc độ chuyến (tốc độ học từ nhật ký; ở bảng what-if là giả định cấu hình 22 km/h, có nhãn). Xăng được trừ cho cả chặng chở khách và chặng chạy rỗng. Số hạng chờ chỉ dùng khi MỌI vùng đều có giá trị chờ.
 
-**Ngưỡng nhận cuốc** (thay hệ số `trip_accept_ratio`): cước ròng tối thiểu $= \text{mục tiêu đ/giờ} \times (t_{chuyến} + w)/60 + c\cdot d$, mục tiêu do tài xế đặt.
+**Ngưỡng nhận cuốc:** tiền nhận tối thiểu $= \text{mục tiêu đ/giờ} \times (t_{chuyến} + w)/60 + c\cdot d$; cước khách trả tương ứng $=$ tiền nhận tối thiểu $/ s$. Engine so với cước theo biểu cước cho cùng cự ly (đạt / chưa đạt) và nêu mỗi km thêm cần bao nhiêu so với biểu cước trả thêm $s\,(b + 60m/v)$.
+
+**Đối chiếu tỷ lệ nhận (khi có ≥ 20 chuyến có cự ly thật):** $\hat s = \text{median}\big(\text{net\_vnd} / \text{Cước khách}(d, \text{phút thật})\big)$ với phút tính phí $=$ `duration_min` $\times (d-k_0)^+/d$. Lệch hơn `tariff.share_check_tolerance` (0,10) so với $s$ ⇒ cảnh báo (thưởng/tip lẫn trong net, loại xe khác, chương trình khác).
+
+**Bảng what-if (Bậc 0, không cần nhật ký):** lưới cự ly × thời gian chờ → cước khách, tiền nhận, đ/giờ sau xăng, đ/giờ nếu $s$ = 0,5, tiền nhận/cước khách tối thiểu để đạt mục tiêu, và cự ly tối thiểu đạt mục tiêu cho từng mức chờ.
 
 ### 3.3. Pareto & độ nhạy
 * Pareto trên $(\text{Yield}, \text{P10 của Yield})$ — lợi nhuận vs độ chắc ăn. P10–P90 chỉ lan truyền dao động mẫu của cự ly và thời gian chờ trung bình vùng.
 * `analyze_top1` dao động `reposition_speed_kmh`, chi phí xăng, `detour_factor` $\pm 20\%$.
 
 ### 3.4. Loại trừ
-Thiếu `avg_trip_distance_km`/`avg_speed_kmh`, giá trị $\le 0$, thiếu tọa độ đại diện, hoặc $r_z >$ `max_reposition_km`. Không có biểu cước thì cả hướng là `insufficient_data` (xem bảng what-if ở Bậc 0).
+Thiếu `avg_trip_distance_km`/`avg_speed_kmh`, giá trị $\le 0$, thiếu tọa độ đại diện, hoặc $r_z >$ `max_reposition_km`. Chưa có nhật ký thật thì cả hướng là `insufficient_data`, kèm bảng what-if theo biểu cước.
 
 ---
 
@@ -81,14 +88,14 @@ Biến thiên $\alpha, \beta$ $\pm 20\%$; `margin_pct` $< 5\%$ ⇒ cạnh tranh 
 Thiếu `p_wait_le_pct[t0]` hoặc `expected_wait_min`, giá trị ngoài miền, hoặc vượt `max_reposition_km`.
 
 ### 4.5. Thang sẵn sàng dữ liệu
-Bậc 0: chưa có nhật ký — chỉ có bảng what-if + ngưỡng hòa vốn từ biểu cước nhập. Bậc 1: $\ge 20$ chuyến — fit $a, b$, xếp hạng vùng (độ tin cậy thấp). Bậc 2: $\ge 20$ đợt chờ — survival, Hướng 2. Bậc 3 (cộng đồng, k-ẩn danh): chưa có trong engine.
+Bậc 0: chưa có nhật ký — bảng what-if + ngưỡng hòa vốn từ biểu cước công bố (hoặc tài xế nhập). Bậc 1: $\ge 20$ chuyến thật — học cự ly/tốc độ theo vùng, xếp hạng vùng (độ tin cậy thấp), đối chiếu tỷ lệ nhận. Bậc 2: $\ge 20$ đợt chờ — survival, Hướng 2. Bậc 3 (cộng đồng, k-ẩn danh): chưa có trong engine.
 
 ---
 
 ### 4.6. Lớp ML tùy chọn (v5)
 Khi đủ dữ liệu và thắng cổng backtest, `P(chờ ≤ t)` và chờ kỳ vọng của Hướng 1/2 do mô hình hazard rời rạc tính cho giờ/mưa/vị trí hiện tại:
 $$h_k = P(\text{có cuốc trong ô } k \mid \text{còn chờ}, x), \quad S(t_k)=\prod_{j<k}(1-h_j), \quad P(\text{chờ}\le t)=1-S(t)$$
-Đợt chờ kết thúc vì `offline`/`moved` chỉ đóng góp các ô đã sống sót (kiểm duyệt). Chi tiết, cổng và số liệu: `engine/README.md` (mục "Lớp ML") và `docs/09_ML_REPORT.md`.
+Đợt chờ kết thúc vì `offline`/`moved` chỉ đóng góp các ô đã sống sót (kiểm duyệt). Mô hình chỉ học trên nhật ký THẬT; không có dữ liệu huấn luyện mô phỏng. Chi tiết và cổng: `engine/README.md` (mục "Lớp ML").
 
 ---
 
@@ -226,7 +233,12 @@ Mọi hằng số toán học đều được tham số hóa tại [`config/engi
 |---|:---:|:---:|---|
 | **`geo.detour_factor`** | `1.3` | Hệ số | Hệ số quy đổi cự ly đường chim bay Haversine sang cự ly thực tế trên đường bộ |
 | **`geo.reposition_speed_kmh`** | `20.0` | km/h | Vận tốc giả định của xe máy khi chạy rỗng xuyên khu vực |
-| **`geo.reposition_cost_vnd_per_km`** | `2000` | VNĐ/km | Chi phí xăng cộ và hao mòn xe máy ước tính trên mỗi kilomet chạy rỗng |
+| **`geo.reposition_cost_vnd_per_km`** | `2000` | VNĐ/km | Chi phí xăng dự phòng khi tài xế chưa nhập lít/100km và giá xăng (có nhãn) |
+| **`tariff.fare_base_vnd` / `fare_base_km`** | `12500` / `2` | VNĐ / km | Giá mở cửa trọn gói cho 2 km đầu (bảng giá công bố) |
+| **`tariff.fare_per_km_vnd`** | `4300` | VNĐ/km | Đơn giá mỗi km tiếp theo |
+| **`tariff.fare_per_min_vnd`** | `350` | VNĐ/phút | Phụ phí mỗi phút di chuyển sau 2 km đầu |
+| **`tariff.driver_share`** | `0.75` | Tỷ lệ | Phần cước tài xế nhận (giả định cố định; `driver_share_range` = [0.5, 0.75] dùng cho độ nhạy) |
+| **`tariff.share_check_tolerance`** | `0.10` | Tỷ lệ | Lệch tối đa giữa tỷ lệ nhận quan sát từ nhật ký và `driver_share` trước khi cảnh báo |
 | **`geo.at_area_radius_m`** | `500` | mét | Bán kính xem như tài xế đã ở ngay trong khu vực (cự ly chạy rỗng coi như $= 0$) |
 | **`routing.origin_tolerance_m`** | `800` | mét | Khoảng cách tối đa từ tài xế đến điểm xuất phát của mẫu routing OSRM |
 | **`what_if.assumed_trip_speed_kmh`** | `22.0` | km/h | Giả định tốc độ cuốc cho bảng what-if Bậc 0 (chưa có nhật ký để học) |

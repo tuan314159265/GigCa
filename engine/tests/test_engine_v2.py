@@ -16,10 +16,13 @@ from pathlib import Path
 from engine.src import config as cfgmod
 from engine.src.adapter import load_engine_input_from_dict, load_engine_input_from_file
 from engine.src.engine import run_driver_engine
-from engine.src.mock_data import (
+from engine.tests.fixtures import (
+    HANG_XANH,
     create_default_driver_context,
     create_default_driver_preferences,
     create_mock_engine_input,
+    full_scenario_payload,
+    zone_id_near,
 )
 from engine.src.robustness import analyze_top1
 from engine.src.scorers.maintain_position import score_maintain_position
@@ -29,17 +32,17 @@ from engine.src.types import AreaSample, DriverContext, DriverEconomics, DriverP
 from engine.src.weather import analyze_weather
 
 ROOT = Path(__file__).resolve().parents[2]
-FULL_FIXTURE = ROOT / "data" / "fixtures" / "hcmc_full_simulated_snapshot.json"
 DEMO_SNAPSHOT = ROOT / "data" / "samples" / "engine_input" / "hcmc_demo_snapshot.json"
 
-HANG_XANH = (10.801, 106.711)
-HANG_XANH_ZONE = "zone_2003_19448"  # the log-derived zone around Hàng Xanh (areas now come from the driver's own log)
-ECON = DriverEconomics(12000, 4800, 528, "driver_input", "driver_input", 90000)
+# the log-derived zone around Hàng Xanh (areas come from the TEST driver log, built in engine/tests/fixtures)
+HANG_XANH_ZONE = zone_id_near(full_scenario_payload(), *HANG_XANH)
+# published tariff shape: 12.500đ for the first 2 km, 4.300đ/km, 350đ/min after 2 km, 75% to the driver; fuel 528đ/km
+ECON = DriverEconomics(12500, 4300, 528, "published_tariff", "driver_input", 90000,
+                       fare_base_km=2.0, fare_per_min_vnd=350, driver_share=0.75)
 
 
 def full_payload() -> dict:
-    with open(FULL_FIXTURE, "r", encoding="utf-8") as f:
-        return json.load(f)
+    return full_scenario_payload()
 
 
 def load_full(mutate=None):

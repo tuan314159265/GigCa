@@ -1,5 +1,11 @@
-"""Tests for the ML layer (v5): context-aware wait model + gate, conformal cycle band, bandit, Vietnamese intake and the
-number guard. Data is the seeded SYNTHETIC simulator with a known ground truth (engine/src/ml/simulate.py)."""
+"""Tests for the ML layer (v5): wait-model gate, conformal cycle band, bandit posterior, Vietnamese intake and the
+number guard.
+
+There is NO simulator and NO claim of real-world accuracy here: the inputs are TEST INPUTS built in the test files
+(waits that do not depend on context, the deterministic test driver log). The tests pin the MECHANICS — the gate refuses
+a model without evidence, probabilities are valid, results are deterministic, too little data is reported — not how well
+a model would do on real drivers (that can only be measured on real logs, through the same backtest gate).
+"""
 
 from __future__ import annotations
 
@@ -12,22 +18,17 @@ from datetime import datetime, timedelta
 from engine.src.adapter import parse_trip_log, parse_wait_spells
 from engine.src.explain_check import grounded_explanation, numbers_in, verify_numbers
 from engine.src.intake import apply_to_payload, llm_extract, parse_intake_vi, validate_extraction
-from engine.src.ml.bandit import posterior_table, simulate_policies
+from engine.src.ml.bandit import posterior_table
 from engine.src.ml.cycle_model import backtest_cycles, build_cycles, fit_cycle_model
-from engine.src.ml.simulate import FUEL_VND_PER_KM, simulate_driver, true_mean_yield
 from engine.src.ml.wait_model import backtest_wait, fit_wait_model
 from engine.src.types import WaitSpell
+from engine.tests.fixtures import TEST_PROFILE, full_scenario_payload, make_log
 from engine.tests.test_v3_personal_model import no_driver_payload, run
 
-SIM = simulate_driver()
-SPELLS, _ = parse_wait_spells(SIM["wait_spells"])
-TRIPS, _ = parse_trip_log(SIM["trip_log"])
-
-
-def sim_payload() -> dict:
-    p = no_driver_payload(SIM["trip_log"], SIM["wait_spells"], profile=True)
-    p["generated_at"] = SIM["generated_at"]
-    return p
+FUEL_VND_PER_KM = TEST_PROFILE["fuel_l_per_100km"] * TEST_PROFILE["fuel_price_vnd_per_l"] / 100.0
+_LOG, _SPELLS = make_log(days=14, per_day=6, with_waits=True)
+TRIPS, _ = parse_trip_log(_LOG)
+LOG_SPELLS, _ = parse_wait_spells(_SPELLS)
 
 
 def null_spells(seed: int, n: int = 300) -> list[WaitSpell]:
@@ -44,35 +45,28 @@ def null_spells(seed: int, n: int = 300) -> list[WaitSpell]:
     return out
 
 
+SPELLS = null_spells(11)
+
+
 class TestWaitModel(unittest.TestCase):
-    def test_context_model_beats_baseline_and_context_is_what_helps(self) -> None:
+    def test_backtest_reports_against_the_baseline_by_time(self) -> None:
         bt = backtest_wait(SPELLS)
         self.assertEqual(bt["status"], "ok")
-        self.assertTrue(bt["passes"])
-        self.assertGreater(bt["nll_gain"], 0.01)  # better held-out censored log-likelihood than per-cell Kaplan–Meier
-        self.assertTrue(bt["context_helps"])  # ... and better than the same model WITHOUT hour/rain/place
-        self.assertGreater(bt["c_index_model"], bt["c_index_baseline"])
-        self.assertLess(bt["split_at"], "2026-10-07")  # the test slice is the LATER part of the history
-
-    def test_model_recovers_ground_truth_directions(self) -> None:
-        m = fit_wait_model(SPELLS)
-        night = m.predict(datetime(2026, 10, 7, 22, 0), 10.7890, 106.6910, 0.0, [10])["expected_wait_min"]
-        peak = m.predict(datetime(2026, 10, 7, 18, 0), 10.7890, 106.6910, 0.0, [10])["expected_wait_min"]
-        rain = m.predict(datetime(2026, 10, 7, 14, 0), 10.7890, 106.6910, 4.0, [10])["expected_wait_min"]
-        dry = m.predict(datetime(2026, 10, 7, 14, 0), 10.7890, 106.6910, 0.0, [10])["expected_wait_min"]
-        self.assertGreater(night, peak)  # nights are slow, peak hours are fast
-        self.assertLess(rain, dry)  # rain shortens the wait in the simulated truth
+        for key in ("passes", "beats_baseline", "context_helps", "split_at"):
+            self.assertIn(key, bt)
 
     def test_probabilities_are_valid_and_monotone(self) -> None:
         m = fit_wait_model(SPELLS)
-        p = m.predict(datetime(2026, 10, 7, 12, 0), 10.7725, 106.698, None, [10, 20])
+        self.assertIsNotNone(m)
+        p = m.predict(datetime(2026, 10, 7, 12, 0), 10.77, 106.69, None, [10, 20])
         self.assertTrue(0 <= p["p_le"]["10"] <= p["p_le"]["20"] <= 1)
         self.assertGreaterEqual(p["expected_wait_min"], 0)
 
     def test_gate_keeps_baseline_when_there_is_no_context_signal(self) -> None:
-        # waits independent of hour/rain/place: the context ablation must NOT show a gain on most draws
+        # waits independent of hour/rain/place: the context ablation must NOT show a gain
         helps = [backtest_wait(null_spells(s))["context_helps"] for s in (1, 3, 4)]
         self.assertFalse(any(helps))
+        self.assertFalse(any(backtest_wait(null_spells(s))["passes"] for s in (1, 3, 4)))
 
     def test_too_few_spells_is_reported_not_modelled(self) -> None:
         bt = backtest_wait(SPELLS[:30])
@@ -86,26 +80,20 @@ class TestWaitModel(unittest.TestCase):
         self.assertIsNone(fit_wait_model(off))
 
     def test_deterministic(self) -> None:
-        a, b = backtest_wait(SPELLS), backtest_wait(SPELLS)
-        self.assertEqual(a, b)
+        self.assertEqual(backtest_wait(SPELLS), backtest_wait(SPELLS))
 
 
 class TestCycleBand(unittest.TestCase):
     def test_cycles_pair_each_trip_with_its_wait(self) -> None:
-        cycles = build_cycles(TRIPS, SPELLS, FUEL_VND_PER_KM)
+        cycles = build_cycles(TRIPS, LOG_SPELLS, FUEL_VND_PER_KM)
         self.assertEqual(len(cycles), len(TRIPS))
         self.assertTrue(all(c.wait_min >= 0 and c.km > 0 for c in cycles))
 
-    def test_conformal_band_does_not_under_cover(self) -> None:
-        bt = backtest_cycles(build_cycles(TRIPS, SPELLS, FUEL_VND_PER_KM))
-        self.assertEqual(bt["status"], "ok")
-        self.assertGreaterEqual(bt["coverage_conformal"], bt["nominal_coverage"] - 0.10)
-        self.assertTrue(bt["calibrated"])
-
     def test_band_is_ordered_and_needs_enough_cycles(self) -> None:
-        cycles = build_cycles(TRIPS, SPELLS, FUEL_VND_PER_KM)
+        cycles = build_cycles(TRIPS, LOG_SPELLS, FUEL_VND_PER_KM)
         m = fit_cycle_model(cycles)
-        p = m.predict(datetime(2026, 10, 7, 18, 0), 10.7725, 106.698, 0.0)
+        self.assertIsNotNone(m)
+        p = m.predict(datetime(2026, 9, 27, 13, 0), 10.7725, 106.698, 0.0)
         self.assertLessEqual(p["low"], p["median"])
         self.assertLessEqual(p["median"], p["high"])
         self.assertIsNone(fit_cycle_model(cycles[:20]))
@@ -126,48 +114,44 @@ class TestBandit(unittest.TestCase):
         self.assertFalse(tab["known_bad"]["explore"])
         self.assertEqual(tab, posterior_table(rewards, 5.0, 4000, 7))  # fixed seed -> deterministic
 
-    def test_thompson_beats_greedy_once_the_history_is_long_enough(self) -> None:
-        # Honest scope: with ~100 pulls greedy is as good or better; exploration only pays off over hundreds of cycles.
-        r = simulate_policies(horizon=600, seeds=20)
-        reg = r["cumulative_regret_vnd_per_hour"]
-        self.assertLess(reg["thompson"], reg["greedy"])
-        self.assertGreater(r["best_zone_pick_rate_last_50"]["thompson"], r["best_zone_pick_rate_last_50"]["greedy"])
-        self.assertEqual(r["best_zone"], max(r["true_mean_yield_vnd_per_hour"], key=r["true_mean_yield_vnd_per_hour"].get))
-
-    def test_truth_sampler_is_consistent(self) -> None:
-        self.assertGreater(true_mean_yield("ben_thanh", 18, 0.0, n=4000), 50_000)
-
 
 class TestEngineIntegration(unittest.TestCase):
-    def test_ml_overrides_waits_only_when_it_passes_the_gate(self) -> None:
-        out = run(sim_payload(), lat=10.7725, lng=106.698)
+    def test_ml_block_reports_the_gate_and_is_consistent_with_its_use(self) -> None:
+        out = run(full_scenario_payload(), lat=10.7725, lng=106.698)
         ml = out.ml_insights
-        self.assertTrue(ml["wait_model"]["used"])
-        self.assertTrue(ml["wait_model"]["backtest"]["passes"])
-        pos = out.objectives["maintain_position"]
-        self.assertIn("mô hình học từ lịch sử của bạn", pos.candidates[0].explanation)
-        self.assertTrue(any("MÔ HÌNH ML" in a for a in out.assumptions_used))
-        self.assertTrue(all(c["low"] <= c["median"] <= c["high"] for c in ml["cycle_yield"]["zones"]))
-        self.assertIn("bandit", ml)
+        self.assertIsNotNone(ml)
+        wm = ml["wait_model"]
+        self.assertIn("backtest", wm)
+        if wm["used"]:  # a model may only replace the baseline when it passed the backtest gate
+            self.assertTrue(wm["backtest"]["passes"])
+            self.assertTrue(any("MÔ HÌNH ML" in a for a in out.assumptions_used))
+        else:
+            self.assertFalse(any("MÔ HÌNH ML" in a for a in out.assumptions_used))
 
     def test_no_data_means_no_ml_block(self) -> None:
         self.assertIsNone(run(no_driver_payload()).ml_insights)
 
     def test_baseline_is_kept_when_gate_fails(self) -> None:
-        p = sim_payload()
+        p = full_scenario_payload()
         p["wait_spells"] = p["wait_spells"][:40]  # too few spells to backtest
         out = run(p, lat=10.7725, lng=106.698)
         self.assertFalse(out.ml_insights["wait_model"]["used"])
-        self.assertNotIn("mô hình học từ lịch sử", out.objectives["maintain_position"].candidates[0].explanation if out.objectives["maintain_position"].candidates else "")
 
     def test_output_is_deterministic(self) -> None:
-        p = sim_payload()
+        p = full_scenario_payload()
         self.assertEqual(run(copy.deepcopy(p), lat=10.7725, lng=106.698), run(copy.deepcopy(p), lat=10.7725, lng=106.698))
 
 
 class TestIntake(unittest.TestCase):
     TEXT = ("Cước mở cửa 12k, 4.800đ/km, xe ăn 2,2 lít/100km, giá xăng 24.000. Tôi muốn kiếm 100k/giờ, "
             "mưa là nghỉ, không đi quá 3km.")
+
+    def test_parses_published_tariff_sentence(self) -> None:
+        r = parse_intake_vi("2 km đầu: 12.500 đồng, mỗi km tiếp theo: 4.300 đồng, cộng 350 đồng/phút. Tài xế nhận 75%.")
+        self.assertEqual(r.profile, {"fare_base_km": 2.0, "fare_base_vnd": 12500.0, "fare_per_km_vnd": 4300.0,
+                                     "fare_per_min_vnd": 350.0, "driver_share": 0.75})
+        self.assertEqual(r.unparsed, [])
+        self.assertEqual(validate_extraction("nhận 75%", {"driver_share": 0.75}).profile, {"driver_share": 0.75})
 
     def test_parses_profile_preferences_and_context(self) -> None:
         r = parse_intake_vi(self.TEXT)
@@ -202,7 +186,7 @@ class TestIntake(unittest.TestCase):
 
 class TestNumberGuard(unittest.TestCase):
     def setUp(self) -> None:
-        self.out = run(sim_payload(), lat=10.7725, lng=106.698)
+        self.out = run(full_scenario_payload(), lat=10.7725, lng=106.698)
         self.y = self.out.objectives["max_trip_value"].plan.key_metrics["yield_vnd_per_hour"]
 
     def test_number_extraction_handles_vietnamese_and_english_formats(self) -> None:

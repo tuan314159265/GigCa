@@ -126,7 +126,8 @@ flowchart TD
 ### 4.4. Hiện Thực 4 Bộ Lập Kế Hoạch Chiến Lược: [`scorers/`](src/scorers/)
 
 #### Hướng 1: Kế Hoạch Săn Cuốc Giá Trị Cao ([`max_trip_value.py`](src/scorers/max_trip_value.py))
-* **Khi `INSUFFICIENT`:** Báo trạng thái trung thực `insufficient_data`, giải thích rõ chưa có biểu cước/nhật ký chuyến của tài xế (chỉ trả bảng what-if nếu đã nhập biểu cước).
+* **Biểu cước:** cước khách trả = 12.500đ cho 2 km đầu + 4.300đ/km tiếp theo + 350đ/phút di chuyển sau 2 km đầu (`config/engine_config.json` → `tariff`, có `source`); tài xế nhận `driver_share` = 75% (giả định cố định, thực tế 50–75%). Tài xế nhập biểu cước riêng thì ghi đè từng trường và kết quả ghi nhãn nguồn.
+* **Khi `INSUFFICIENT`:** Báo trạng thái trung thực `insufficient_data` vì chưa có nhật ký chuyến THẬT; luôn kèm bảng kịch bản what-if theo biểu cước (cước khách trả, tiền nhận, đ/giờ, cước tối thiểu để đạt mục tiêu, cự ly tối thiểu).
 * **Khi `AVAILABLE` / `PARTIAL`:**
   * Chọn vùng (học từ nhật ký của tài xế) có thu nhập ròng/giờ cao nhất, đã trừ xăng cả chặng chở khách và chạy rỗng.
   * Xây dựng `DirectionPlan`:
@@ -134,7 +135,7 @@ flowchart TD
     * *Bước 2 (5–15 phút):* Bật app và thiết lập ưu tiên cuốc đường dài/sân bay.
     * *Bước 3 (15–20 phút):* Thiết lập giới hạn chờ tối đa 20 phút để tránh thời gian chờ rỗng.
     * *Bước 4 (Sau cuốc):* Bật tính năng đón khách chiều ngược về trung tâm để tối ưu hóa km di chuyển.
-  * Chỉ số dự phóng: `expected_net_value_vnd`, `net_after_fuel_vnd`, `estimated_duration_min`, `yield_vnd_per_hour` (+ khoảng P10–P90), `min_accept_fare_vnd`.
+  * Chỉ số dự phóng: `expected_net_value_vnd` (tiền nhận theo biểu cước), `customer_fare_vnd`, `net_after_fuel_vnd`, `estimated_duration_min`, `yield_vnd_per_hour` (+ khoảng P10–P90), `min_accept_fare_vnd` (tiền nhận tối thiểu) và `min_accept_customer_fare_vnd` (cước khách trả tương ứng), `driver_share`.
   * Đánh đổi: Cuốc dài đưa xe ra xa trung tâm, cần chủ động tìm khách chiều về.
 
 #### Hướng 2: Kế Hoạch Bám Trụ Vùng Lõi & Vòng Quay Nhanh ([`maintain_position.py`](src/scorers/maintain_position.py))
@@ -183,9 +184,10 @@ flowchart TD
 * [`adapter.py`](src/adapter.py): Điều hợp nạp snapshot JSON và chuyển đổi kiểu dữ liệu an toàn.
 * [`explanation.py`](src/explanation.py): Định dạng chuỗi văn bản truy nguyên về số đo cụ thể.
 * [`uncertainty.py`](src/uncertainty.py): Đóng gói độ tin cậy, danh sách giả định và tuyên bố miễn trừ trách nhiệm.
-* [`mock_data.py`](src/mock_data.py): Bộ dữ liệu giả lập chuẩn trung tâm TP.HCM phục vụ chạy thử nghiệm.
+* [`whatif.py`](src/whatif.py): Bảng kịch bản theo biểu cước công bố (Bậc 0, không cần nhật ký): cước khách trả, tiền tài xế nhận, đ/giờ, cước tối thiểu và cự ly tối thiểu để đạt mục tiêu.
+* Đầu vào kiểm thử (đặt tay) nằm ở [`../engine/tests/fixtures/`](tests/fixtures/) — chỉ unit test dùng; code chạy thật không import.
 * [`engine.py`](src/engine.py): Hàm điều phối trung tâm `run_driver_engine(...)`, nhận input và trả về 4 kế hoạch hoàn chỉnh.
-* [`verify.py`](src/verify.py): Kịch bản kiểm tra độ phản ứng của engine theo các bối cảnh khác nhau.
+* [`verify.py`](src/verify.py): Kiểm tra trên dữ liệu THẬT: số học biểu cước, snapshot ETL, và mọi nhật ký thật trong `data/raw/driver_logs/`.
 
 ---
 
@@ -204,9 +206,10 @@ flowchart TD
 | [`explanation.py`](src/explanation.py) | Chuẩn hóa định dạng giải thích truy nguyên về số |
 | [`uncertainty.py`](src/uncertainty.py) | Quản lý độ tin cậy, giả định và tuyên bố giới hạn dữ liệu |
 | [`adapter.py`](src/adapter.py) | Bộ điều hợp chuyển đổi JSON Snapshot sang `EngineInput` |
-| [`mock_data.py`](src/mock_data.py) | Bộ dữ liệu giả lập & kịch bản phục vụ chạy thử nghiệm |
+| [`whatif.py`](src/whatif.py) | Bảng kịch bản theo biểu cước (công bố hoặc tài xế nhập), không xếp hạng vùng |
+| [`personal_model.py`](src/personal_model.py) | Học cự ly/tốc độ/thời gian chờ theo vùng từ nhật ký THẬT của tài xế; biểu cước + tỷ lệ nhận; đối chiếu tỷ lệ nhận quan sát |
 | [`engine.py`](src/engine.py) | Điểm vào chính (`run_driver_engine`), kết nối toàn bộ hệ thống |
-| [`verify.py`](src/verify.py) | Kịch bản kiểm tra tự động độ phản ứng của engine theo kịch bản |
+| [`verify.py`](src/verify.py) | Kiểm tra trên dữ liệu thật (biểu cước, snapshot ETL, nhật ký thật nếu có) |
 
 ---
 
@@ -252,15 +255,21 @@ return {
 Chạy thử nghiệm giao diện dòng lệnh tương tác:
 
 ```powershell
-# Chạy với bộ dữ liệu mô phỏng đầy đủ cả 4 kế hoạch
+# Snapshot ETL thật (Open-Meteo / OSM / OSRM) + biểu cước công bố: hai hướng kiếm tiền ở Bậc 0 (bảng kịch bản)
 python scripts/run_demo.py
 
-# Chạy với bộ dữ liệu ban đầu (thiếu cước phí, kiểm tra tính kỷ luật dữ liệu)
-python scripts/run_demo.py --baseline
+# Thêm xăng, mục tiêu đ/giờ (và biểu cước riêng nếu có) của tài xế
+python scripts/run_demo.py --profile data/raw/driver_logs/d01_profile.json
 
-# Chạy với các tham số bối cảnh tùy chỉnh
-python scripts/run_demo.py --idle 30 --rain low --horizon 120
+# Thêm nhật ký THẬT của tài xế (tạo bằng python -m data.driver_log_import, xem data/driver_input/README.md)
+python scripts/run_demo.py --driver-log data/raw/driver_logs/d01_engine_log.json --lat 10.7725 --lng 106.698
+
+# Kiểm tra trên dữ liệu thật; unit test dùng đầu vào đặt tay trong engine/tests/fixtures
+python scripts/verify_engine.py
+python -m unittest discover -s engine/tests -t .
 ```
+
+**Không còn dữ liệu mô phỏng trong đường chạy thật.** Bộ `data/fixtures/hcmc_full_simulated_snapshot.json`, `engine/src/ml/simulate.py`, `scripts/make_demo_driver_log.py` và `engine/src/mock_data.py` đã bị gỡ; một test (`test_tariff_and_driver_data.TestNoSimulatedDataInProductPath`) chặn việc đưa chúng trở lại.
 
 > **v2:** engine đã được nâng cấp (neo thời gian thật, nhận biết vị trí tài xế, loại thay vì bịa khi thiếu dữ liệu, kiểm tra độ vững, thứ tự xem xét 4 hướng). Xem [UPGRADE_V2.md](UPGRADE_V2.md).
 
@@ -268,14 +277,14 @@ python scripts/run_demo.py --idle 30 --rain low --horizon 120
 
 ## Lớp ML (v5): [`src/ml/`](src/ml/)
 
-Mọi mô hình chỉ học từ dữ liệu của CHÍNH tài xế (đợt chờ, chuyến, biểu cước) và đều bị **cổng backtest** kiểm soát: chỉ thay baseline thống kê khi thắng nó trên phần lịch sử *mới hơn* (chia theo thời gian), cùng thước đo. Báo cáo số liệu: [`docs/09_ML_REPORT.md`](../docs/09_ML_REPORT.md) (sinh bằng `python scripts/ml_report.py`, dữ liệu mô phỏng có sự thật nền).
+Mọi mô hình chỉ học từ dữ liệu THẬT của chính tài xế (đợt chờ, chuyến) và đều bị **cổng backtest** kiểm soát: chỉ thay baseline thống kê khi thắng nó trên phần lịch sử *mới hơn* (chia theo thời gian), cùng thước đo. **Không có dữ liệu huấn luyện mô phỏng** và không công bố độ chính xác nào trước khi có nhật ký thật: dưới `ml.min_spells` / `ml.min_cycles` engine không fit gì và nói rõ; unit test chỉ kiểm cơ chế (cổng từ chối khi không có bằng chứng, xác suất hợp lệ, tất định).
 
 | Thành phần | File | Làm gì | Cổng / giới hạn |
 |---|---|---|---|
 | Thời gian chờ có ngữ cảnh | `wait_model.py` | Survival rời rạc (hazard) trên đợt chờ theo giờ, thứ, mưa, vị trí; offline/đổi chỗ là bị kiểm duyệt. Ghi đè `P(chờ ≤ t)` và chờ kỳ vọng theo vùng cho thời điểm hiện tại | Phải thắng Kaplan–Meier theo ô VÀ thắng mô hình không ngữ cảnh (đối chứng) trên tập kiểm tra; ≥ 60 đợt chờ |
 | Khoảng conformal | `cycle_model.py` | Hồi quy phân vị + CQR cho năng suất một chu kỳ (chờ + chuyến), khoảng 80% | Không hiển thị nếu độ phủ trên tập kiểm tra thấp hơn danh nghĩa quá 10 điểm %; ≥ 60 chu kỳ |
-| Bandit Thompson | `bandit.py` | `p_best` và cờ "nên thử" cho vùng ít dữ liệu nhưng còn cơ hội | Chỉ giải thích, không tự đổi khuyến nghị; lợi thế chỉ rõ khi lịch sử dài (xem báo cáo) |
-| Nhập liệu tiếng Việt | `intake.py` | Câu như "muốn 100k/giờ, mưa là nghỉ" → hồ sơ/tùy chọn; kiểm khoảng hợp lý; có thể cắm LLM nhưng mọi số phải xuất hiện trong câu | Luôn cần tài xế xác nhận |
+| Bandit Thompson | `bandit.py` | `p_best` và cờ "nên thử" cho vùng ít dữ liệu nhưng còn cơ hội | Chỉ giải thích, không tự đổi khuyến nghị; chưa có đánh giá trên dữ liệu thật |
+| Nhập liệu tiếng Việt | `intake.py` | Câu như "2 km đầu 12.500đ, mỗi km tiếp theo 4.300đ, 350đ/phút, nhận 75%, muốn 100k/giờ, mưa là nghỉ" → hồ sơ/tùy chọn; kiểm khoảng hợp lý; có thể cắm LLM nhưng mọi số phải xuất hiện trong câu | Luôn cần tài xế xác nhận |
 | Kiểm tra số trong giải thích | `explain_check.py` | LLM chỉ diễn đạt lại; số nào không truy được về output engine thì loại văn bản, dùng lời của engine | Cần nhưng chưa đủ: chứng minh không bịa số, không chứng minh dùng số đúng chỗ |
 | Nhập chuyến từ văn bản OCR | `earnings_import.py` | Văn bản (OCR/vision) của lịch sử chuyến → ứng viên `trip_log`; thiếu trường hoặc điểm đón không có trong bảng tọa độ thì trả về `needs_input`, không điền mặc định | Số tiền có thể là cước gộp nên luôn gắn `amount_to_confirm`; tài xế phải xác nhận trước khi dùng. OCR nằm ngoài engine |
 | Cộng đồng (Bậc 3, nguyên mẫu) | `ml/community.py` | Gộp ẩn danh theo ô với k-ẩn danh (ô < k tài xế bị loại), mỗi tài xế tính một lần; co Bayes thực nghiệm cho tài xế mới | CHƯA nối vào engine; k-ẩn danh không phải differential privacy |

@@ -58,6 +58,16 @@ DEFAULTS: dict[str, Any] = {
         "slot_convention": "preceding_hour",
     },
     "traffic": {"smooth_ratio": 0.8, "congested_ratio": 0.5, "max_age_min": 30},
+    "tariff": {
+        "fare_base_vnd": 12500,
+        "fare_base_km": 2.0,
+        "fare_per_km_vnd": 4300,
+        "fare_per_min_vnd": 350,
+        "driver_share": 0.75,
+        "driver_share_range": [0.5, 0.75],
+        "share_check_tolerance": 0.10,
+        "source": "",
+    },
     "max_trip_value": {"max_wait_min": 20},
     "maintain_position": {"wait_penalty_per_min": 1.5, "reposition_penalty_per_km": 2.0, "wait_thresholds_min": [10, 20]},
     "rest_spot": {
@@ -103,7 +113,6 @@ DEFAULTS: dict[str, Any] = {
         "min_spells_per_zone": 4,
         "min_wait_events_per_zone": 2,
         "wait_horizon_min": 30,
-        "fit_min_distance_sd_km": 0.5,
     },
     "what_if": {"trip_km": [2, 5, 10], "wait_min": [5, 10, 20], "assumed_trip_speed_kmh": 22.0},
     "ml": {
@@ -191,13 +200,21 @@ def validate_config(cfg: dict[str, Any]) -> list[str]:
         problems.append("personal_model: cần min_trips_per_zone >= 2 và min_trips_total >= min_trips_per_zone")
     if pm["zone_cell_m"] <= 0 or pm["shrinkage_k"] < 0 or pm["interval_z"] <= 0 or pm["daypart_window_h"] <= 0:
         problems.append("personal_model: zone_cell_m, daypart_window_h, interval_z phải > 0 và shrinkage_k >= 0")
-    if (pm["wait_horizon_min"] <= 0 or pm["min_spells_per_zone"] < 2 or pm["fit_min_distance_sd_km"] < 0
+    if (pm["wait_horizon_min"] <= 0 or pm["min_spells_per_zone"] < 2
             or pm["min_wait_events_per_zone"] < 1 or pm["min_wait_events_per_zone"] > pm["min_spells_per_zone"]
             or pm["min_spells_total"] < pm["min_spells_per_zone"]):
         problems.append(
-            "personal_model: wait_horizon_min > 0, fit_min_distance_sd_km >= 0, "
+            "personal_model: wait_horizon_min > 0, "
             "1 <= min_wait_events_per_zone <= min_spells_per_zone <= min_spells_total"
         )
+    ta = cfg["tariff"]
+    rng = ta["driver_share_range"]
+    if (float(ta["fare_base_vnd"]) < 0 or float(ta["fare_per_km_vnd"]) <= 0 or float(ta["fare_base_km"]) < 0
+            or float(ta["fare_per_min_vnd"]) < 0 or not 0 < float(ta["driver_share"]) <= 1
+            or len(rng) != 2 or not 0 < float(rng[0]) <= float(rng[1]) <= 1
+            or not 0 <= float(ta["share_check_tolerance"]) < 1):
+        problems.append("tariff: fare_base_vnd >= 0, fare_per_km_vnd > 0, fare_base_km >= 0, fare_per_min_vnd >= 0, "
+                        "0 < driver_share <= 1, driver_share_range = [thấp, cao] trong (0, 1], 0 <= share_check_tolerance < 1")
     wi = cfg["what_if"]
     if not wi["trip_km"] or not wi["wait_min"] or min(wi["trip_km"]) <= 0 or min(wi["wait_min"]) < 0 or wi["assumed_trip_speed_kmh"] <= 0:
         problems.append("what_if: trip_km/wait_min không rỗng, trip_km > 0, wait_min >= 0, assumed_trip_speed_kmh > 0")
@@ -252,6 +269,7 @@ REST_CFG = ENGINE_CONFIG["rest_spot"]
 ROBUSTNESS_CFG = ENGINE_CONFIG["robustness"]
 PRIORITY_CFG = ENGINE_CONFIG["priority"]
 PERSONAL_CFG = ENGINE_CONFIG["personal_model"]
+TARIFF_CFG = ENGINE_CONFIG["tariff"]
 COUNTERFACTUAL_CFG = ENGINE_CONFIG["counterfactual"]
 WHAT_IF_CFG = ENGINE_CONFIG["what_if"]
 ML_CFG = ENGINE_CONFIG["ml"]

@@ -106,7 +106,7 @@ class EngineInput:
     is_demo: bool = False
     data_status_reasons: dict[str, str] = field(default_factory=dict)
     trip_log: list["TripRecord"] = field(default_factory=list)  # nhật ký chuyến của chính tài xế (tùy chọn)
-    driver_profile: "DriverProfile | None" = None  # biểu cước + xe + mục tiêu do CHÍNH tài xế nhập (tùy chọn)
+    driver_profile: "DriverProfile | None" = None  # biểu cước + xe + mục tiêu do CHÍNH tài xế nhập (tùy chọn; thiếu thì dùng biểu cước công bố trong config)
     wait_spells: list["WaitSpell"] = field(default_factory=list)  # các đợt chờ cuốc do app companion ghi (tùy chọn)
 
 
@@ -131,15 +131,21 @@ class TripRecord:
 
 @dataclass(frozen=True)
 class DriverProfile:
-    """What the DRIVER tells us about their own tariff, vehicle and goal (never market data).
+    """What the DRIVER tells us about their tariff, vehicle and goal (never market data).
 
-    net fare per trip ~ fare_base_vnd + fare_per_km_vnd * km (before fuel). Every field is optional: a missing field
-    stays None and the engine says what it cannot do without it."""
-    fare_base_vnd: float | None = None  # a — giá mở cửa/phần cố định mỗi chuyến
-    fare_per_km_vnd: float | None = None  # b — đơn giá theo km mà tài xế thấy hằng ngày
+    Tariff fields describe the CUSTOMER-FACING price list (what the customer pays):
+        gross fare = fare_base_vnd                                   if km <= fare_base_km
+                   = fare_base_vnd + fare_per_km_vnd·(km − fare_base_km) + fare_per_min_vnd·(moving minutes after fare_base_km)
+    and the driver receives `driver_share` of it (net, before fuel). Every field is optional: a missing field stays None and
+    the engine falls back to the PUBLISHED tariff in config (`tariff`), labelled as such — never to an invented number."""
+    fare_base_vnd: float | None = None  # a — giá mở cửa: trọn gói cho fare_base_km đầu (khách trả)
+    fare_per_km_vnd: float | None = None  # b — đơn giá mỗi km tiếp theo (khách trả)
     fuel_l_per_100km: float | None = None
     fuel_price_vnd_per_l: float | None = None
     target_vnd_per_hour: float | None = None  # mục tiêu thu nhập ròng/giờ do tài xế đặt
+    fare_base_km: float | None = None  # số km gói trong giá mở cửa (vd. 2 km đầu)
+    fare_per_min_vnd: float | None = None  # phụ phí mỗi phút di chuyển sau fare_base_km (khách trả)
+    driver_share: float | None = None  # tỷ lệ tài xế thực nhận trên cước khách trả, trong (0, 1]
 
     @property
     def fuel_cost_vnd_per_km(self) -> float | None:
@@ -154,16 +160,49 @@ WaitEnd = Literal["trip", "offline", "moved"]
 
 @dataclass(frozen=True)
 class DriverEconomics:
-    """Resolved per-driver money parameters the scorers use: net fare = a + b·km (before fuel), fuel c VND/km.
+    """Resolved money parameters the scorers use.
 
-    `tariff_source` says whether (a, b) were fitted from the driver's own log or typed in by the driver;
-    `fuel_source` says whether c comes from the driver's vehicle inputs or from the config fallback."""
+        gross(km, v)  = a + b·max(0, km − k0) + m·max(0, km − k0)/v·60      (khách trả; v = tốc độ chuyến km/h)
+        net(km, v)    = s · gross(km, v)                                    (tài xế nhận, trước xăng)
+        income        = net − c·km                                          (sau xăng chặng chở khách)
+
+    The per-minute term needs the MOVING minutes after the first k0 km; the engine estimates them as the remaining
+    distance divided by the trip speed (learned from the driver's log, or the labelled what-if assumption).
+    With k0 = m = 0 and s = 1 this is the old linear model net = a + b·km.
+
+    `tariff_source`: "published_tariff" (config), "driver_input" or "mixed"; `share_source`: "config" or "driver_input";
+    `fuel_source`: "driver_input" or "config_default"."""
     fare_base_vnd: float  # a
     fare_per_km_vnd: float  # b
     fuel_cost_vnd_per_km: float  # c
-    tariff_source: str  # "fitted_from_log" | "driver_input"
-    fuel_source: str  # "driver_input" | "config_default"
+    tariff_source: str
+    fuel_source: str
     target_vnd_per_hour: float | None = None
+    fare_base_km: float = 0.0  # k0
+    fare_per_min_vnd: float = 0.0  # m
+    driver_share: float = 1.0  # s
+    share_source: str = "config"
+    tariff_reference: str | None = None  # nguồn biểu cước công bố (ghi trong config) — để truy vết
+
+    def moving_min_after_base(self, km: float, speed_kmh: float) -> float:
+        """Estimated moving minutes after the first k0 km (remaining distance / trip speed)."""
+        if speed_kmh <= 0:
+            return 0.0
+        return max(0.0, km - self.fare_base_km) / speed_kmh * 60.0
+
+    def gross_fare_vnd(self, km: float, minutes_after_base: float) -> float:
+        extra_km = max(0.0, km - self.fare_base_km)
+        extra_min = max(0.0, minutes_after_base) if extra_km > 0 else 0.0
+        return self.fare_base_vnd + self.fare_per_km_vnd * extra_km + self.fare_per_min_vnd * extra_min
+
+    def net_fare_vnd(self, km: float, speed_kmh: float) -> float:
+        """What the driver receives for a trip of `km` at `speed_kmh` (before fuel)."""
+        return self.driver_share * self.gross_fare_vnd(km, self.moving_min_after_base(km, speed_kmh))
+
+    def net_per_extra_km(self, speed_kmh: float) -> float:
+        """Driver's net for each km beyond k0 (per-km price + per-minute price at this speed), before fuel."""
+        per_min_as_km = self.fare_per_min_vnd * 60.0 / speed_kmh if speed_kmh > 0 else 0.0
+        return self.driver_share * (self.fare_per_km_vnd + per_min_as_km)
 
 
 @dataclass(frozen=True)
@@ -201,7 +240,7 @@ class TripValueCandidate:
     """Candidate area evaluated for propensity of long-distance and high-value trips (spec.md 5.1)."""
     area_id: str
     area_name: str = ""
-    expected_net_value_vnd: float | None = None  # a + b·d̄_z: cước ròng/chuyến TRƯỚC xăng, từ biểu cước của tài xế
+    expected_net_value_vnd: float | None = None  # s·cước(d̄_z, v_z): tiền tài xế nhận/chuyến TRƯỚC xăng theo biểu cước
     net_after_fuel_vnd: float | None = None  # expected_net_value_vnd - c·d̄_z (đã trừ xăng chặng chở khách)
     estimated_duration_min: int | None = None  # thời gian chặng chở khách = d̄_z / v_z
     avg_trip_distance_km: float | None = None  # d̄_z: cự ly cuốc TB xuất phát từ vùng, TÍNH TỪ NHẬT KÝ của tài xế
@@ -214,7 +253,7 @@ class TripValueCandidate:
     reposition_min: float | None = None
     reposition_cost_vnd: float | None = None
     wait_min: float | None = None  # thời gian chờ kỳ vọng w_z của vùng (survival); None nếu không đủ dữ liệu cho mọi ứng viên
-    yield_vnd_per_hour: float | None = None  # [a + (b-c)·d̄ - c·r] / giờ (chặng chở khách + dịch chuyển + chờ)
+    yield_vnd_per_hour: float | None = None  # [net(d̄, v) − c·d̄ − c·r] / giờ (chặng chở khách + dịch chuyển + chờ)
     pareto_optimal: bool | None = None  # không bị vùng khác vượt trội đồng thời về năng suất và P10 của năng suất (lợi nhuận vs độ chắc ăn)
     # --- Nâng cấp v3: bằng chứng và bất định (chỉ có khi dữ liệu cho biết số mẫu / sai số) ---
     evidence_n: int | None = None  # số chuyến thật đứng sau ước lượng của khu vực (nhật ký tài xế)
@@ -358,7 +397,7 @@ class DriverRecommendationOutput:
     tradeoff_matrix: dict[str, Any] | None = None  # đánh đổi định lượng giữa 4 hướng trên cùng thước đo
     data_roadmap: list[dict[str, Any]] | None = None  # dữ liệu nào đang chặn hướng nào và cách mở khóa
     data_tier: dict[str, Any] | None = None  # bậc sẵn sàng dữ liệu 0-3 của dữ liệu do chính tài xế cung cấp
-    what_if: dict[str, Any] | None = None  # bảng kịch bản + ngưỡng hòa vốn từ biểu cước tài xế nhập (không xếp hạng vùng)
+    what_if: dict[str, Any] | None = None  # bảng kịch bản + ngưỡng hòa vốn từ biểu cước (công bố hoặc tài xế nhập), không xếp hạng vùng
     decision_boundaries: dict[str, Any] | None = None  # "điều gì làm khuyến nghị đổi" (chỉ khi explain=True)
     ml_insights: dict[str, Any] | None = None  # v5: mô hình ML trên dữ liệu của tài xế (chờ có ngữ cảnh, khoảng conformal, bandit) + kết quả backtest
 

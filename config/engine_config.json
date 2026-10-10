@@ -70,9 +70,23 @@
     "max_age_min": 30,
     "note": "Đề xuất tạm. ratio = current_speed / free_flow_speed; edge quá cũ (observed_at) bị loại"
   },
+  "tariff": {
+    "fare_base_vnd": 12500,
+    "fare_base_km": 2.0,
+    "fare_per_km_vnd": 4300,
+    "fare_per_min_vnd": 350,
+    "driver_share": 0.75,
+    "driver_share_range": [
+      0.5,
+      0.75
+    ],
+    "share_check_tolerance": 0.1,
+    "source": "Biểu cước xe máy do nhóm cung cấp (2 km đầu 12.500đ; mỗi km tiếp theo 4.300đ; +350đ/phút di chuyển sau 2 km đầu). CẦN GHI: tên sàn/dịch vụ, URL hoặc ảnh chụp bảng giá công bố, ngày truy cập.",
+    "note": "Biểu cước KHÁCH TRẢ (công bố). Tài xế nhận driver_share của cước (cố định 75% — giả định của nhóm; thực tế 50–75% tùy sàn/chương trình, engine báo thêm năng suất ở mức thấp nhất của driver_share_range). Số phút tính phí = (cự ly − fare_base_km) / tốc độ chuyến × 60. Tài xế nhập biểu cước riêng trong driver_profile thì ghi đè từng trường. share_check_tolerance: nếu tỷ lệ thực nhận quan sát từ nhật ký (trung vị net/cước) lệch hơn mức này so với driver_share thì engine cảnh báo."
+  },
   "max_trip_value": {
     "max_wait_min": 20,
-    "note": "Đề xuất tạm. Ngưỡng nhận cuốc KHÔNG còn là hệ số tự đặt: cước ròng tối thiểu = mục_tiêu_đ/giờ × (thời gian chuyến + chờ)/60 + xăng, với mục tiêu do tài xế nhập (DriverProfile.target_vnd_per_hour)"
+    "note": "Đề xuất tạm. Ngưỡng nhận cuốc KHÔNG còn là hệ số tự đặt: tiền thực nhận tối thiểu = mục_tiêu_đ/giờ × (thời gian chuyến + chờ)/60 + xăng, với mục tiêu do tài xế nhập (DriverProfile.target_vnd_per_hour); engine quy đổi thêm ra cước khách trả tương ứng (÷ driver_share)."
   },
   "maintain_position": {
     "wait_penalty_per_min": 1.5,
@@ -172,10 +186,9 @@
     "max_age_days": 60,
     "min_spells_per_zone": 4,
     "wait_horizon_min": 30,
-    "fit_min_distance_sd_km": 0.5,
     "min_spells_total": 20,
     "min_wait_events_per_zone": 2,
-    "note": "Đề xuất tạm — chưa hiệu chỉnh. Nhật ký chuyến + đợt chờ do chính tài xế cung cấp: gom vùng theo ô lưới zone_cell_m, lọc khung giờ ±daypart_window_h quanh giờ hiện tại, co (shrink) số liệu vùng về trung bình cá nhân với trọng số k mẫu; interval_z=1.2816 ứng với khoảng ~80% (P10–P90). wait_horizon_min: khung quan sát (phút) khi tính thời gian chờ kỳ vọng (restricted mean) — phải ≥ ngưỡng P(chờ ≤ t) lớn nhất; tài xế thường đổi chỗ sau khoảng thời gian này nên dữ liệu sau mốc đó rất thưa. min_spells_per_zone: số đợt chờ tối thiểu để một vùng có số liệu chờ. fit_min_distance_sd_km: độ phân tán cự ly tối thiểu để fit biểu cước a + b·km (nếu không đủ thì dùng biểu cước tài xế nhập hoặc báo thiếu). min_spells_total / min_wait_events_per_zone: số đợt chờ tối thiểu toàn nhật ký / số đợt kết thúc bằng có cuốc tối thiểu mỗi vùng (đợt bị kiểm duyệt không chứng minh được thời gian chờ)."
+    "note": "Đề xuất tạm — chưa hiệu chỉnh. Nhật ký chuyến + đợt chờ do chính tài xế cung cấp: gom vùng theo ô lưới zone_cell_m, lọc khung giờ ±daypart_window_h quanh giờ hiện tại, co (shrink) số liệu vùng về trung bình cá nhân với trọng số k mẫu; interval_z=1.2816 ứng với khoảng ~80% (P10–P90). wait_horizon_min: khung quan sát (phút) khi tính thời gian chờ kỳ vọng (restricted mean) — phải ≥ ngưỡng P(chờ ≤ t) lớn nhất; tài xế thường đổi chỗ sau khoảng thời gian này nên dữ liệu sau mốc đó rất thưa. min_spells_per_zone: số đợt chờ tối thiểu để một vùng có số liệu chờ. min_spells_total / min_wait_events_per_zone: số đợt chờ tối thiểu toàn nhật ký / số đợt kết thúc bằng có cuốc tối thiểu mỗi vùng (đợt bị kiểm duyệt không chứng minh được thời gian chờ)."
   },
   "what_if": {
     "trip_km": [
@@ -189,7 +202,7 @@
       20
     ],
     "assumed_trip_speed_kmh": 22.0,
-    "note": "Bảng kịch bản cho Bậc 0 (chưa có nhật ký): cuốc X km × chờ Y phút → đ/giờ theo biểu cước tài xế nhập. assumed_trip_speed_kmh là GIẢ ĐỊNH đề xuất tạm (chưa có nhật ký để học tốc độ); khi có nhật ký, engine dùng tốc độ học từ nhật ký."
+    "note": "Bảng kịch bản cho Bậc 0 (chưa có nhật ký): cuốc X km × chờ Y phút → đ/giờ theo biểu cước (công bố trong 'tariff' hoặc tài xế nhập). assumed_trip_speed_kmh là GIẢ ĐỊNH đề xuất tạm (chưa có nhật ký để học tốc độ) và ảnh hưởng cả phụ phí theo phút; khi có nhật ký, engine dùng tốc độ học từ nhật ký."
   },
   "counterfactual": {
     "idle_scan_max_min": 120,

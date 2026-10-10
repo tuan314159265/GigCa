@@ -17,11 +17,11 @@ _NOT_OK = ("missing", "stale", "not_integrated", "partial", None)
 
 _UNLOCK: dict[str, list[str]] = {
     "trip_value": [
-        "Bậc 0: nhập biểu cước (giá mở cửa, đơn giá/km), lít/100km, giá xăng, mục tiêu đ/giờ — engine cho bảng kịch bản và mức cước tối thiểu ngay.",
-        "Bậc 1: nhật ký chuyến của chính tài xế (giờ bắt đầu, điểm đón, cước ròng, thời lượng, cự ly) — ≥ 20 chuyến để fit biểu cước và xếp hạng vùng. Nguồn tự nguyện, không cần nền tảng chia sẻ dữ liệu.",
+        "Bậc 0: biểu cước công bố (cấu hình) + lít/100km, giá xăng, mục tiêu đ/giờ do tài xế nhập — engine cho bảng kịch bản và mức cước tối thiểu ngay.",
+        "Bậc 1: nhật ký chuyến THẬT của tài xế tham gia thử nghiệm (giờ bắt đầu, điểm đón, tiền thực nhận, thời lượng, cự ly) — ≥ 20 chuyến để học cự ly/tốc độ theo vùng, xếp hạng vùng và đối chiếu tỷ lệ thực nhận. Nhập bằng data/driver_log_import.py từ file CSV; có đồng ý của tài xế, không cần sàn chia sẻ dữ liệu.",
     ],
     "booking_and_destinations": [
-        "Bậc 2: ghi các đợt chờ (app companion nhận diện đứng yên hoặc nút 'bắt đầu chờ') kèm cách kết thúc: có cuốc / offline / đổi chỗ — engine tính thời gian chờ bằng survival, không còn bị nhiễm giờ nghỉ.",
+        "Bậc 2: ghi các đợt chờ THẬT (app companion nhận diện đứng yên, nút 'bắt đầu chờ', hoặc tài xế ghi giờ vào CSV) kèm cách kết thúc: có cuốc / offline / đổi chỗ — engine tính thời gian chờ bằng survival, không còn bị nhiễm giờ nghỉ.",
         "Bậc 3: dữ liệu cộng đồng ẩn danh, gộp theo vùng-giờ với ngưỡng k-ẩn danh — chưa có trong engine.",
     ],
     "verified_waiting_places": [

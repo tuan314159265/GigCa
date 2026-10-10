@@ -1,0 +1,11 @@
+{
+  "_huong_dan": "Điền số của CHÍNH tài xế. Để null những trường không biết: biểu cước/tỷ lệ nhận sẽ lấy theo bảng giá công bố trong config/engine_config.json (mục 'tariff') và được ghi nhãn trong kết quả. driver_share là phân số (0.75 = 75%).",
+  "fare_base_vnd": null,
+  "fare_base_km": null,
+  "fare_per_km_vnd": null,
+  "fare_per_min_vnd": null,
+  "driver_share": null,
+  "fuel_l_per_100km": null,
+  "fuel_price_vnd_per_l": null,
+  "target_vnd_per_hour": null
+}

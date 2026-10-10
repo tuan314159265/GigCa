@@ -22,6 +22,8 @@ def load_for_engine(
     *,
     traffic_edges: list[dict[str, Any]] | None = None,
     trip_log: list[dict[str, Any]] | None = None,
+    wait_spells: list[dict[str, Any]] | None = None,
+    driver_profile: dict[str, Any] | None = None,
 ):
     """Convert a Data contract snapshot to the Engine's typed ``EngineInput``.
 
@@ -30,8 +32,9 @@ def load_for_engine(
     parameter. ``traffic_edges`` is an optional Engine-runtime extension because
     contract 0.1 has no traffic field; callers must pass normalized observations
     with a real segment identity and fetch time. ``trip_log`` is likewise an optional runtime extension: the driver's own
-    completed trips, used by the Engine's personal model for the earning lenses when no market fare data exists. No mock fares or booking data
-    are synthesized here.
+    completed trips, used by the Engine's personal model for the earning lenses when no market fare data exists;
+    ``wait_spells`` and ``driver_profile`` are the driver's own waits and tariff/vehicle/goal (see data/driver_input/ and
+    data/driver_log_import.py). No mock fares, logs or booking data are synthesized here.
     """
     try:
         from engine.src.adapter import load_engine_input_from_dict
@@ -66,6 +69,10 @@ def load_for_engine(
         # Driver-contributed trip log (not part of contract 0.1): started_at, pickup_lat/lng, net_vnd, duration_min,
         # optional dropoff_lat/lng. The Engine rejects incomplete rows and never fills in missing fields.
         runtime_payload["trip_log"] = trip_log
+    if wait_spells:
+        runtime_payload["wait_spells"] = wait_spells
+    if driver_profile:
+        runtime_payload["driver_profile"] = driver_profile
     if traffic_edges:
         runtime_payload["traffic"] = traffic_edges
         statuses = [dict(item) for item in snapshot.get("data_status", []) if isinstance(item, dict)]

@@ -17,9 +17,11 @@ from typing import Any, Callable
 RANGES: dict[str, tuple[float, float]] = {
     "fare_base_vnd": (0, 100_000), "fare_per_km_vnd": (1_000, 30_000), "fuel_l_per_100km": (0.5, 10.0),
     "fuel_price_vnd_per_l": (10_000, 60_000), "target_vnd_per_hour": (10_000, 500_000),
+    "fare_base_km": (0.5, 5.0), "fare_per_min_vnd": (0, 5_000), "driver_share": (0.3, 1.0),
     "max_reposition_km": (0.3, 30.0), "idle_duration_min": (0, 480),
 }
-PROFILE_FIELDS = ("fare_base_vnd", "fare_per_km_vnd", "fuel_l_per_100km", "fuel_price_vnd_per_l", "target_vnd_per_hour")
+PROFILE_FIELDS = ("fare_base_vnd", "fare_per_km_vnd", "fuel_l_per_100km", "fuel_price_vnd_per_l", "target_vnd_per_hour",
+                  "fare_base_km", "fare_per_min_vnd", "driver_share")
 CONTEXT_FIELDS = ("max_reposition_km", "idle_duration_min")
 _NUM = r"(\d{1,3}(?:[.,]\d{3})+|\d+(?:[.,]\d+)?)"
 _UNIT = r"\s*(k|nghìn|nghin|ngàn|ngan|tr|triệu|trieu|đ|d|vnd|đồng|dong)?"
@@ -79,9 +81,23 @@ def parse_intake_vi(text: str) -> IntakeResult:
         if _check(res, name, val, m.group(0).strip()):
             bucket[name] = val
 
-    # per-km tariff and opening fare
+    # opening fare for the first N km: "2 km đầu: 12.500 đồng"
+    m_open = re.search(r"(\d+(?:[.,]\d+)?)\s*km\s*đầu\D{0,12}" + _NUM + _UNIT, t)
+    if m_open:
+        consumed.append(m_open.span())
+        if _check(res, "fare_base_km", _to_number(m_open.group(1)), m_open.group(0).strip()):
+            res.profile["fare_base_km"] = _to_number(m_open.group(1))
+        val = _money(m_open.group(2), m_open.group(3))
+        if _check(res, "fare_base_vnd", val, m_open.group(0).strip()):
+            res.profile["fare_base_vnd"] = val
+    # per-km tariff ("4.800đ/km" or "mỗi km tiếp theo: 4.300 đồng") and opening fare ("giá mở cửa 12k")
     take(_NUM + _UNIT + r"\s*(?:/|một|mỗi|mot|moi|trên|tren)\s*km", "fare_per_km_vnd", lambda m: _money(m.group(1), m.group(2)), res.profile)
+    take(r"(?:mỗi|một|moi|mot)\s*km(?:\s*tiếp theo|\s*tiep theo|\s*sau|\s*kế tiếp)?\W{0,6}" + _NUM + _UNIT, "fare_per_km_vnd",
+         lambda m: _money(m.group(1), m.group(2)), res.profile)
     take(r"(?:giá mở cửa|mở cửa|cước mở|giá khởi điểm|khởi điểm)\D{0,12}" + _NUM + _UNIT, "fare_base_vnd", lambda m: _money(m.group(1), m.group(2)), res.profile)
+    # per-minute charge ("350 đồng/phút", "350đ mỗi phút") and the driver's share ("tài xế nhận 75%")
+    take(_NUM + _UNIT + r"\s*(?:/|một|mỗi|mot|moi)\s*(?:phút|phut)", "fare_per_min_vnd", lambda m: _money(m.group(1), m.group(2)), res.profile)
+    take(r"(?:nhận|hưởng|được|nhan|huong)\D{0,10}(\d{1,3}(?:[.,]\d+)?)\s*%", "driver_share", lambda m: _to_number(m.group(1)) / 100.0, res.profile)
     # fuel use and price
     take(_NUM + r"\s*(?:lít|lit|l)\s*(?:/|trên|tren)\s*100\s*km", "fuel_l_per_100km", lambda m: _to_number(m.group(1)), res.profile)
     take(r"(?:giá xăng|xăng)\D{0,12}" + _NUM + _UNIT, "fuel_price_vnd_per_l", lambda m: _money(m.group(1), m.group(2)), res.profile)
@@ -120,7 +136,7 @@ def validate_extraction(text: str, fields: dict[str, Any]) -> IntakeResult:
     """Check an externally produced (e.g. LLM) extraction: known field, in range, and the number must occur in the text."""
     res = IntakeResult()
     nums = {_to_number(m) for m in re.findall(_NUM, _fold(text))}
-    expanded = set(nums) | {n * 1_000 for n in nums} | {n * 1_000_000 for n in nums}
+    expanded = set(nums) | {n * 1_000 for n in nums} | {n * 1_000_000 for n in nums} | {n / 100.0 for n in nums}  # 75% -> 0.75
     for name, value in fields.items():
         if name == "rain_tolerance_level":
             if value in ("low", "medium", "high"):
@@ -149,7 +165,8 @@ def llm_extract(text: str, call_llm: Callable[[str], str]) -> IntakeResult:
     """Ask an LLM (any callable str -> str) for JSON, validate it, and fall back to the rules for whatever it got wrong."""
     prompt = (
         "Trích các trường từ câu của tài xế, chỉ trả JSON thuần, không giải thích. Chỉ dùng số xuất hiện trong câu. "
-        f"Trường hợp lệ: {', '.join(list(RANGES) + ['rain_tolerance_level (low|medium|high)'])}.\nCâu: {text}"
+        f"Trường hợp lệ: {', '.join(list(RANGES) + ['rain_tolerance_level (low|medium|high)'])}. "
+        "driver_share là phân số (75% -> 0.75).\nCâu: {text}"
     )
     try:
         data = json.loads(call_llm(prompt))

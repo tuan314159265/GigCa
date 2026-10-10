@@ -63,7 +63,7 @@ snapshot = source.get_engine_input(
 | `objective_readiness[]` | Mức sẵn sàng của bốn hướng gợi ý | Cho biết dữ liệu có đủ để đánh giá mục tiêu hay chưa, không phải điểm xếp hạng. |
 | `driver_preferences` | Tùy chọn được truyền vào, hiện có mức chịu mưa | Đây là input lựa chọn, không phải dữ liệu quan sát. |
 
-Contract là nguồn chuẩn về tên trường, kiểu và cấu trúc lồng nhau. JSON mẫu là nguồn tham khảo về giá trị cụ thể. Fixture mô phỏng đầy đủ tại [`fixtures/hcmc_full_simulated_snapshot.json`](fixtures/hcmc_full_simulated_snapshot.json) chỉ dùng cho demo/test logic; không nạp lẫn với dữ liệu provider vào DB.
+Contract là nguồn chuẩn về tên trường, kiểu và cấu trúc lồng nhau. JSON mẫu là nguồn tham khảo về giá trị cụ thể. Repo **không còn bộ dữ liệu mô phỏng** (`fixtures/hcmc_full_simulated_snapshot.json` đã gỡ — xem [`fixtures/README.md`](fixtures/README.md)); đầu vào kiểm thử của engine nằm riêng trong `engine/tests/fixtures/` và không được nạp vào DB hay dùng để trình bày.
 
 ## Cập nhật dữ liệu
 
@@ -84,18 +84,18 @@ Contract là nguồn chuẩn về tên trường, kiểu và cấu trúc lồng 
 | Sự kiện | `event_id`, `event_type`, `venue_location`, `starts_at`, `ends_at`, `expected_attendance` | Chưa có nguồn đã kiểm chứng. Nếu bổ sung, chỉ dùng làm ngữ cảnh địa điểm/thời gian; không tự suy ra lượng cuốc hoặc doanh thu. |
 | Nguồn cung xe | `available_vehicle_count`, `vehicle_density`, `observed_at` | Chưa có feed được cấp phép/xác nhận. Không có API Grab/Xanh SM đã xác nhận để đưa vào snapshot. |
 | Booking và điểm trả | `booking_rate`, `request_count`, `dropoff_count`, `favorable_dropoff_pct`, `avg_next_wait_min` | KHÔNG dùng: số tổng hợp do sàn định nghĩa, không kiểm chứng được; engine xóa các trường này. Thời gian chờ được tính từ đợt chờ (`wait_spells`) do chính tài xế ghi. |
-| Giá trị chuyến | `net_value_vnd`, `gross_fare_vnd`, `avg_duration_min`, `avg_trip_distance_km`, `long_trip_rate_pct` | KHÔNG dùng ở cấp thị trường. Thay bằng `driver_profile` (biểu cước a + b·km, xăng, mục tiêu đ/giờ), `trip_log` và `wait_spells` do chính tài xế cung cấp; cự ly/tốc độ theo vùng tính từ nhật ký. |
+| Giá trị chuyến | `net_value_vnd`, `gross_fare_vnd`, `avg_duration_min`, `avg_trip_distance_km`, `long_trip_rate_pct` | KHÔNG dùng ở cấp thị trường. Thay bằng biểu cước công bố (`config/engine_config.json` → `tariff`: 12.500đ/2 km đầu, 4.300đ/km, 350đ/phút sau 2 km; tài xế nhận 75%), `driver_profile` (xăng, mục tiêu đ/giờ, biểu cước riêng nếu có), và `trip_log`/`wait_spells` THẬT của tài xế thử nghiệm — nhập bằng [`driver_log_import.py`](driver_log_import.py) theo mẫu trong [`driver_input/`](driver_input/README.md). |
 | Ngữ cảnh phiên tài xế | `origin`, `idle_duration_min`, `horizon_min`, `max_reposition_km`, `rain_tolerance_level`, `goal_weights` | Là input theo phiên/cài đặt tài xế truyền vào lúc gọi Engine, không phải dữ liệu API hay snapshot nguồn. Hiện snapshot có thể kèm `rain_tolerance_level`; các trường ngữ cảnh còn lại thuộc input runtime. |
 
 Chi tiết nhà cung cấp và điều cần kiểm chứng xem tại [`docs/05_DATA_SOURCES_TO_VERIFY.md`](../docs/05_DATA_SOURCES_TO_VERIFY.md); mẫu OSM cafe grid xem tại [`samples/osm_poi_grid_hcmc.json`](samples/osm_poi_grid_hcmc.json). Việc fetch API thành công tại một thời điểm không xác nhận coverage, quyền sử dụng hay độ phù hợp production.
 
 ## Engine đang tính gì từ các trường này
 
-Engine có thể chạy công thức khi được đưa dữ liệu đầy đủ, nhưng database/contract Data hiện tại chưa cấp fare hay booking. Vì vậy hai hướng đầu chỉ chạy bằng dữ liệu do chính tài xế cung cấp (biểu cước, nhật ký chuyến, đợt chờ); không có thì trả `insufficient_data`. Fixture mô phỏng chứa dữ liệu của MỘT tài xế giả lập (sinh bởi `scripts/make_demo_driver_log.py`), không chứa dữ liệu thị trường.
+Database/contract Data không cấp fare hay booking cấp thị trường (không có nguồn được cấp phép). Hai hướng đầu chạy theo hai bậc, đều truy được nguồn: **Bậc 0** — biểu cước công bố + xăng/mục tiêu của tài xế → bảng kịch bản what-if và cước tối thiểu nên nhận (có ngay); **Bậc 1–2** — nhật ký chuyến và đợt chờ THẬT của tài xế thử nghiệm (có phiếu đồng ý, lưu ở `data/raw/`, git-ignore) → xếp hạng vùng, thời gian chờ. Chưa có nhật ký thì hai hướng trả `insufficient_data` kèm bảng kịch bản. Quy trình thu thập: [`driver_input/README.md`](driver_input/README.md).
 
 | Hướng | Đầu vào và phép tính trong Engine | Trạng thái với dữ liệu Data hiện tại |
 |---|---|---|
-| `max_trip_value` — tối đa giá trị/cuốc | Biểu cước a + b·km (fit từ nhật ký hoặc tài xế nhập), xăng c, cự ly/tốc độ/chờ theo vùng từ nhật ký: yield = [a + (b − c)·d̄ − c·r] / [d̄/v + r/v_rep + w/60]. Dịch chuyển r là ước tính đường chim bay × hệ số. | `partial`/độ tin cậy thấp khi tài xế có ≥ 20 chuyến; không có nhật ký thì `insufficient_data` (chỉ có bảng what-if). |
+| `max_trip_value` — tối đa giá trị/cuốc | Tiền nhận = s·[a + b·(d̄ − 2) + m·phút di chuyển sau 2 km] (biểu cước công bố, s = 75%), xăng c, cự ly/tốc độ/chờ theo vùng từ nhật ký thật: yield = [tiền nhận − c·d̄ − c·r] / [d̄/v + r/v_rep + w/60]. Dịch chuyển r là ước tính đường chim bay × hệ số. | `partial`/độ tin cậy thấp khi tài xế có ≥ 20 chuyến thật; không có nhật ký thì `insufficient_data` + bảng what-if theo biểu cước. |
 | `maintain_position` — giữ vị trí tốt | `100·P(chờ ≤ 10 phút) − 1.5 × chờ kỳ vọng − 2.0 × reposition_km` (0–100); P và chờ kỳ vọng từ survival trên đợt chờ của tài xế (offline/đổi chỗ là bị kiểm duyệt). Hệ số tạm, chưa hiệu chỉnh. | `partial`/thấp khi có ≥ 20 đợt chờ; nếu không `insufficient_data`. |
 | `rest_spot` — gợi ý điểm chờ/nghỉ | Dùng POI phù hợp, routing distance/time từ vị trí tài xế, giờ mở cửa nếu có và thời gian rảnh. Xếp fit theo thời gian đi + độ phù hợp loại địa điểm; ứng viên không có route phù hợp sẽ bị loại, không thay bằng Haversine. | `partial`: có thể đưa ứng viên chưa xác minh ra xem xét; sample hiện không xác nhận quyền dừng/đỗ, giờ mở cửa hay suitability cho xe máy. |
 | `safety_comfort` — an toàn, đỡ mệt | So dự báo xác suất/lượng mưa với `rain_tolerance_level`; traffic dùng tốc độ hiện tại so với tốc độ free-flow, lọc observation quá 30 phút, tạo congestion index/nhãn segment. Không tính mật độ xe và không định tuyến tránh kẹt. | `partial`: mưa là forecast theo vùng/giờ mẫu; traffic có thể thiếu hoặc chỉ có một vài segment. Chưa có gió, nhiệt, UV để đánh giá thời tiết ngoài mưa; tín hiệu mệt (nếu dùng) đến từ ngữ cảnh phiên tài xế như thời gian rảnh, không suy ra từ thời tiết. |
@@ -106,7 +106,7 @@ Các ngưỡng mưa, hệ số phạt, mốc phân loại traffic và cấu hìn
 
 - `data_status` mô tả tình trạng từng nguồn; `partial` phải được hiểu theo phạm vi trong `reason`, còn `stale`, `missing` và `not_integrated` không được dùng như số 0.
 - `objective_readiness` là cổng trước khi xếp hạng: `max_trip_value` và `maintain_position` thiếu dữ liệu cốt lõi; `rest_spot` là `partial` khi chỉ có ứng viên chưa xác minh; `safety_comfort` là `partial` khi còn ít nhất một feed mưa/traffic dùng được, nếu không sẽ thiếu dữ liệu.
-- `position_score`, `yield_vnd_per_hour`, `fit_score`, rain flags và congestion index là kết quả Engine, không phải trường crawl từ nhà cung cấp. Trong đó các giá trị của hai scorer đầu chỉ có ý nghĩa khi đầu vào cần thiết có thật; fixture mô phỏng phải giữ nhãn mô phỏng.
+- `position_score`, `yield_vnd_per_hour`, `fit_score`, rain flags và congestion index là kết quả Engine, không phải trường crawl từ nhà cung cấp. Trong đó các giá trị của hai scorer đầu chỉ có ý nghĩa khi đầu vào cần thiết có thật (nhật ký thật của tài xế).
 - Bốn hướng là bốn góc nhìn độc lập, không gộp thành một điểm chung. Tài xế vẫn là người quyết định cuối cùng.
 
 Chi tiết pipeline và trạng thái kiểm tra API xem tại [`etl/README.md`](etl/README.md). Lịch chạy job chưa được cài trong repo; cấu hình lịch thuộc môi trường triển khai.
