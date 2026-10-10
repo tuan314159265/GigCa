@@ -19,6 +19,11 @@ dist/
 build/
 .vite/
 
+# Command Code local agent context (not shared)
+AGENTS.md
+.commandcode/settings.local.json
+.commandcode/taste/
+
 # Local data, caches, and editor/OS files
 data/raw/**
 !data/raw/.gitkeep
