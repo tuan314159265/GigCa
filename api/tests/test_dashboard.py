@@ -16,10 +16,17 @@ class DashboardTests(unittest.TestCase):
     def test_recomputes_and_enforces_radius(self):
         full = recommend({})
         limited = recommend({"context": {"max_reposition_km": 0}})
-        self.assertEqual(full["snapshot"]["mode"], "simulation")
+        self.assertEqual(full["snapshot"]["mode"], "sample")
         self.assertEqual(len(full["objectives"]), 4)
-        self.assertNotEqual(full["objectives"], limited["objectives"])
+        self.assertIsNone(full["objectives"]["max_trip_value"]["plan"])
         self.assertEqual(limited["objectives"]["rest_spot"]["status"], "insufficient_data")
+
+    def test_legacy_simulation_does_not_load_fabricated_market_data(self):
+        result = recommend({"mode": "simulation"})
+        self.assertIsNone(result["objectives"]["max_trip_value"]["plan"])
+        self.assertIsNone(result["objectives"]["maintain_position"]["plan"])
+        self.assertIn("ml_insights", result)
+        self.assertTrue(any("simulation" in note for note in result["snapshot"]["limitations"]))
 
     def test_source_sample_does_not_invent_fares(self):
         result = recommend({"mode": "sample"})

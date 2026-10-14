@@ -9,7 +9,7 @@ from __future__ import annotations
 import unittest
 
 from engine.src.engine import run_driver_engine
-from engine.src.mock_data import (
+from engine.tests.fixtures import (
     MOCK_POI_CANDIDATES,
     create_default_driver_context,
     create_default_driver_preferences,

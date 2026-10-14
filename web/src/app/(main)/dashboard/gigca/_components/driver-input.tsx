@@ -4,12 +4,13 @@ import { useEffect, useState } from "react";
 import { LocateFixed, RefreshCw } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Field, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field";
+import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSet } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useGigca } from "../../_components/gigca/gigca-provider";
 import { previewOnly } from "../../_components/gigca/preview";
 import type { DriverInput } from "../../_components/gigca/types";
+import { LocationSearch } from "./location-search";
 
 export function DriverForm() {
   const { input, run, busy } = useGigca();
@@ -54,18 +55,23 @@ export function DriverForm() {
       className="flex flex-col gap-4 p-4"
     >
       <FieldSet disabled={previewOnly || busy}>
+        <LocationSearch disabled={previewOnly || busy} onSelect={(lat, lng) => {
+          setGpsError("");
+          setDraft((current) => ({ ...current, context: { ...current.context, current_lat: lat, current_lng: lng } }));
+        }} />
         <FieldGroup className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           {(
             [
-              ["idle_duration_min", "Đã chờ (phút)", 0, 1440, 1],
-              ["horizon_min", "Xét trong (phút)", 1, 480, 1],
-              ["max_reposition_km", "Di chuyển tối đa (km)", 0.1, 50, 0.1],
+              ["idle_duration_min", "Đã chờ (phút)", 0, 1440, 1, "Số phút bạn đã chờ mà chưa nhận được cuốc mới."],
+              ["horizon_min", "Xét trong (phút)", 1, 480, 1, "Khoảng thời gian sắp tới dùng để đánh giá gợi ý và dự báo mưa."],
+              ["max_reposition_km", "Di chuyển tối đa (km)", 0.1, 50, 0.1, "Quãng đường tối đa bạn sẵn sàng đi từ vị trí hiện tại tới điểm được gợi ý."],
             ] as const
-          ).map(([key, label, min, max, step]) => (
+          ).map(([key, label, min, max, step, description]) => (
             <Field key={key} data-disabled={previewOnly || busy}>
               <FieldLabel htmlFor={key}>{label}</FieldLabel>
               <Input
                 id={key}
+                aria-describedby={`${key}-description`}
                 type="number"
                 required
                 min={min}
@@ -74,6 +80,7 @@ export function DriverForm() {
                 value={draft.context[key]}
                 onChange={(event) => update(key, event.target.value === "" ? NaN : Number(event.target.value))}
               />
+              <FieldDescription id={`${key}-description`}>{description}</FieldDescription>
             </Field>
           ))}
           <Field data-disabled={previewOnly || busy}>
@@ -83,7 +90,7 @@ export function DriverForm() {
               disabled={previewOnly || busy}
               onValueChange={(value) => setDraft({ ...draft, rain_tolerance_level: value })}
             >
-              <SelectTrigger id="rain-tolerance" className="w-full">
+              <SelectTrigger id="rain-tolerance" aria-describedby="rain-tolerance-description" className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -94,6 +101,9 @@ export function DriverForm() {
                 </SelectGroup>
               </SelectContent>
             </Select>
+            <FieldDescription id="rain-tolerance-description">
+              Ít: muốn tránh mưa; Vừa: chịu được mưa nhẹ; Cao: chấp nhận mưa nhiều hơn trước khi được gợi ý tránh mưa.
+            </FieldDescription>
           </Field>
         </FieldGroup>
         <div className="flex flex-wrap items-center gap-2">
@@ -113,7 +123,7 @@ export function DriverForm() {
             <RefreshCw data-icon="inline-start" />
             {busy ? "Đang tính" : "Tính gợi ý"}
           </Button>
-          <details className="ml-auto text-sm">
+          <details className="ml-auto w-full text-sm sm:w-80">
             <summary className="cursor-pointer text-muted-foreground">Tọa độ</summary>
             <FieldGroup className="mt-3 grid grid-cols-2 gap-3">
               <Field>

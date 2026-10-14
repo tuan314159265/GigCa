@@ -1,8 +1,8 @@
 {
-  "schema_version": "0.2-demo_simulation",
-  "snapshot_id": "hcmc_full_simulated_district1",
+  "_test_only": "ĐẦU VÀO KIỂM THỬ (unit test) — KHÔNG PHẢI DỮ LIỆU. Các giá trị thời tiết/POI/routing/giao thông ở đây được đặt tay để kiểm tra từng nhánh logic của engine (ví dụ POI đã/chưa xác minh, đoạn đường thông thoáng/ùn tắc, giờ mưa). Không nạp vào database, không dùng cho demo/báo cáo kết quả.",
+  "schema_version": "test_fixture",
+  "snapshot_id": "unit_test_scenario",
   "generated_at": "2026-09-27T14:00:00+07:00",
-  "simulation_label": "Bộ dữ liệu mô phỏng hoàn chỉnh cả 4 lăng kính cho Decision Engine",
   "data_status": [
     {
       "dataset": "weather",
@@ -36,32 +36,36 @@
     },
     {
       "dataset": "vehicle_density",
-      "status": "available",
-      "reason": "Mật độ xe cạnh tranh trong ngưỡng cân bằng"
+      "status": "missing",
+      "reason": "Không có feed mật độ xe được cấp phép."
     },
     {
       "dataset": "booking_and_destinations",
-      "status": "available",
-      "reason": "Phân bố điểm đến và tỷ lệ giữ vị trí trung tâm sau chuyến"
+      "status": "not_integrated",
+      "reason": "Không có nguồn booking/điểm đến thị trường kiểm chứng được; thời gian chờ học từ các đợt chờ của chính tài xế (mô phỏng)."
     },
     {
       "dataset": "trip_value",
-      "status": "available",
-      "reason": "Giá cước bình quân và doanh thu ròng dự kiến theo từng khu vực"
+      "status": "not_integrated",
+      "reason": "Không có nguồn cước thị trường kiểm chứng được; thu nhập theo vùng học từ nhật ký chuyến và biểu cước của chính tài xế (mô phỏng)."
     }
   ],
   "objective_readiness": [
     {
       "objective": "max_trip_value",
-      "status": "available",
-      "blocking_datasets": [],
-      "reason": "Đã có dữ liệu giá cước và chỉ số nhu cầu để xếp hạng khu vực giá trị cao."
+      "status": "insufficient_data",
+      "blocking_datasets": [
+        "trip_value"
+      ],
+      "reason": "Không có dữ liệu thị trường; hướng này chỉ chạy được từ dữ liệu của chính tài xế (biểu cước, nhật ký chuyến, đợt chờ)."
     },
     {
       "objective": "maintain_position",
-      "status": "available",
-      "blocking_datasets": [],
-      "reason": "Đã có phân bố điểm đến để đánh giá khả năng giữ vị trí thuận lợi sau chuyến."
+      "status": "insufficient_data",
+      "blocking_datasets": [
+        "booking_and_destinations"
+      ],
+      "reason": "Không có dữ liệu thị trường; hướng này chỉ chạy được từ dữ liệu của chính tài xế (biểu cước, nhật ký chuyến, đợt chờ)."
     },
     {
       "objective": "rest_spot",
@@ -83,22 +87,12 @@
       "spatial_scope": "polygon",
       "representative_point": {
         "latitude": 10.7725,
-        "longitude": 106.6980
+        "longitude": 106.698
       },
       "poi_counts_by_category": {
         "amenity": 820,
         "shop": 210,
         "public_transport": 95
-      },
-      "trip_value": {
-        "gross_fare_vnd": 95000,
-        "net_value_vnd": 78000,
-        "avg_duration_min": 24,
-        "demand_index": 4.8
-      },
-      "destination_distribution": {
-        "favorable_dropoff_pct": 84.0,
-        "avg_next_wait_min": 5
       },
       "routing_samples": [
         {
@@ -132,23 +126,13 @@
       "area_name": "Khu vực Chợ Tân Định - Hai Bà Trưng",
       "spatial_scope": "polygon",
       "representative_point": {
-        "latitude": 10.7890,
-        "longitude": 106.6910
+        "latitude": 10.789,
+        "longitude": 106.691
       },
       "poi_counts_by_category": {
         "amenity": 640,
         "shop": 180,
         "public_transport": 70
-      },
-      "trip_value": {
-        "gross_fare_vnd": 76000,
-        "net_value_vnd": 63000,
-        "avg_duration_min": 18,
-        "demand_index": 3.9
-      },
-      "destination_distribution": {
-        "favorable_dropoff_pct": 78.0,
-        "avg_next_wait_min": 8
       },
       "routing_samples": []
     },
@@ -157,23 +141,13 @@
       "area_name": "Khu vực Hồ Con Rùa - Võ Thị Sáu",
       "spatial_scope": "polygon",
       "representative_point": {
-        "latitude": 10.7830,
-        "longitude": 106.6960
+        "latitude": 10.783,
+        "longitude": 106.696
       },
       "poi_counts_by_category": {
         "amenity": 512,
         "shop": 140,
         "public_transport": 65
-      },
-      "trip_value": {
-        "gross_fare_vnd": 68000,
-        "net_value_vnd": 56000,
-        "avg_duration_min": 16,
-        "demand_index": 3.5
-      },
-      "destination_distribution": {
-        "favorable_dropoff_pct": 72.0,
-        "avg_next_wait_min": 9
       },
       "routing_samples": []
     },
@@ -182,23 +156,13 @@
       "area_name": "Khu vực Ngã Tư Hàng Xanh (Vùng ven)",
       "spatial_scope": "polygon",
       "representative_point": {
-        "latitude": 10.8010,
-        "longitude": 106.7110
+        "latitude": 10.801,
+        "longitude": 106.711
       },
       "poi_counts_by_category": {
         "amenity": 380,
         "shop": 110,
         "public_transport": 50
-      },
-      "trip_value": {
-        "gross_fare_vnd": 115000,
-        "net_value_vnd": 89000,
-        "avg_duration_min": 35,
-        "demand_index": 2.8
-      },
-      "destination_distribution": {
-        "favorable_dropoff_pct": 42.0,
-        "avg_next_wait_min": 18
       },
       "routing_samples": []
     }
@@ -208,7 +172,7 @@
       "poi_id": "poi_highlands_01",
       "name": "Highlands Coffee Nhà Thờ Đức Bà (Có bãi đỗ xe máy riêng)",
       "latitude": 10.7798,
-      "longitude": 106.6990,
+      "longitude": 106.699,
       "category": "cafe",
       "subcategory": "coffee_shop",
       "verified": true,
@@ -224,7 +188,7 @@
       "poi_id": "poi_trung_nguyen_02",
       "name": "Cà phê Trung Nguyên Legend Lê Duẩn (Có chỗ nghỉ & sạc điện thoại)",
       "latitude": 10.7785,
-      "longitude": 106.6980,
+      "longitude": 106.698,
       "category": "cafe",
       "subcategory": "coffee_shop",
       "verified": true,
@@ -254,8 +218,8 @@
     {
       "poi_id": "poi_petrolimex_03",
       "name": "Cây xăng Petrolimex Số 1 Nguyễn Thị Minh Khai (Có bơm lốp & WC miễn phí)",
-      "latitude": 10.7810,
-      "longitude": 106.7020,
+      "latitude": 10.781,
+      "longitude": 106.702,
       "category": "gas_station",
       "subcategory": "fuel",
       "verified": true,

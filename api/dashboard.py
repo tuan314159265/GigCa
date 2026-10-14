@@ -18,7 +18,7 @@ from api.provider_proxy import GigCaHandler, ROOT, read_tomtom_key, tomtom_url, 
 
 
 def recommend(payload: dict, *, include_snapshot: bool = False) -> dict:
-    mode = payload.get("mode", "simulation")
+    mode = payload.get("mode", "sample")
     if mode not in ("simulation", "sample", "pipeline", "database", "live"):
         raise ValueError("Chế độ dữ liệu không hợp lệ.")
     raw = payload.get("context", {})
@@ -67,9 +67,13 @@ def recommend(payload: dict, *, include_snapshot: bool = False) -> dict:
     elif mode == "pipeline":
         snapshot = build_engine_input(ROOT / "data/samples")
     else:
-        filename = (ROOT / "data/fixtures/hcmc_full_simulated_snapshot.json" if mode == "simulation"
-                    else ROOT / "data/samples/engine_input/hcmc_demo_snapshot.json")
+        # Keep the old mode name compatible, but never load fabricated market data.
+        filename = ROOT / "data/samples/engine_input/hcmc_demo_snapshot.json"
         snapshot = json.loads(filename.read_text(encoding="utf-8"))
+        if mode == "simulation":
+            snapshot.setdefault("limitations", []).append(
+                "Chế độ simulation cũ hiện dùng snapshot nguồn mẫu; không sinh cuốc, thu nhập hoặc nhật ký tài xế."
+            )
     data = load_for_engine(snapshot)
     result = asdict(run_driver_engine(data, DriverContext(**values), prefs))
     result["snapshot"] = {"id": data.snapshot_id, "mode": mode, "as_of": data.generated_at,
@@ -124,7 +128,7 @@ class DashboardHandler(GigCaHandler):
             return
         # Serve only APIs here, not repository files.
         path = urlsplit(self.path).path
-        if path not in {"/api/health", "/api/weather", "/api/pois", "/api/traffic", "/api/route"} and not re.fullmatch(r"/api/map/tiles/\d{1,2}/\d+/\d+\.png", path):
+        if path not in {"/api/health", "/api/weather", "/api/pois", "/api/traffic", "/api/route", "/api/locations/search"} and not re.fullmatch(r"/api/map/tiles/\d{1,2}/\d+/\d+\.png", path):
             self.send_error(404)
             return
         super().do_GET()

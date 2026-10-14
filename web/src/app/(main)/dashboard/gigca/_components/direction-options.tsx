@@ -7,7 +7,7 @@ import { directions, statuses } from "../../_components/gigca/labels";
 import { objectives, type Objective } from "../../_components/gigca/types";
 
 export function DirectionOptions({ selected, onSelect }: { selected: Objective; onSelect: (key: Objective) => void }) {
-  const { result, busy } = useGigca();
+  const { result } = useGigca();
   return (
     <section aria-label="Phương án của bạn" className="min-w-0 px-4 pb-3">
       <ToggleGroup
@@ -22,7 +22,7 @@ export function DirectionOptions({ selected, onSelect }: { selected: Objective; 
           const direction = result?.objectives[key];
           const Icon = directions[key].icon;
           return (
-            <ToggleGroupItem key={key} value={key} disabled={!direction || busy}>
+            <ToggleGroupItem key={key} value={key}>
               <span className="flex items-center gap-2"><Icon />{directions[key].title}</span>
               {direction && <Badge variant="secondary">{statuses[direction.status]}</Badge>}
             </ToggleGroupItem>

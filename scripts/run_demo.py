@@ -24,78 +24,65 @@ if sys.stderr.encoding.lower() != "utf-8":
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from engine.src.adapter import load_engine_input_from_file
+import json
+
+from data.engine_bridge import load_for_engine
+from data.driver_log_import import attach_driver_log
 from engine.src.advisor import consult_driver_advisor
 from engine.src.engine import run_driver_engine
-from engine.src.mock_data import (
-    create_default_driver_context,
-    create_default_driver_preferences,
-    create_mock_engine_input,
-)
+from engine.src.types import DriverContext, DriverPreferences
+
+REAL_SNAPSHOT = ROOT / "data" / "samples" / "engine_input" / "hcmc_demo_snapshot.json"
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Chạy thử GigCa Decision Engine với bối cảnh tài xế tùy chỉnh")
-    parser.add_argument(
-        "--rain",
-        choices=["low", "medium", "high"],
-        default="medium",
-        help="Mức chịu mưa của tài xế (mặc định: medium)",
+    parser = argparse.ArgumentParser(
+        description="Chạy GigCa Decision Engine trên dữ liệu THẬT (snapshot ETL + biểu cước công bố + dữ liệu tài xế nếu có)"
     )
-    parser.add_argument(
-        "--idle",
-        type=int,
-        default=25,
-        help="Thời gian tài xế đã rảnh chờ cuốc (phút, mặc định: 25)",
-    )
-    parser.add_argument(
-        "--horizon",
-        type=int,
-        default=180,
-        help="Khung giờ lập kế hoạch tiếp theo (phút, mặc định: 180)",
-    )
-    parser.add_argument(
-        "--snapshot",
-        type=str,
-        default=None,
-        help="Đường dẫn file snapshot JSON cụ thể",
-    )
-    parser.add_argument(
-        "--baseline",
-        action="store_true",
-        help="Chạy ở chế độ dữ liệu ban đầu (thiếu dữ liệu giá cước và cuốc xe)",
-    )
+    parser.add_argument("--rain", choices=["low", "medium", "high"], default="medium",
+                        help="Mức chịu mưa của tài xế (mặc định: medium)")
+    parser.add_argument("--idle", type=int, default=25, help="Thời gian tài xế đã rảnh chờ cuốc (phút, mặc định: 25)")
+    parser.add_argument("--horizon", type=int, default=180, help="Khung giờ lập kế hoạch tiếp theo (phút, mặc định: 180)")
+    parser.add_argument("--lat", type=float, default=10.7769, help="Vĩ độ tài xế")
+    parser.add_argument("--lng", type=float, default=106.7009, help="Kinh độ tài xế")
+    parser.add_argument("--snapshot", type=str, default=None,
+                        help="Snapshot JSON theo contract Data (mặc định: snapshot ETL thật data/samples/engine_input/...)")
+    parser.add_argument("--driver-log", type=str, default=None,
+                        help="Nhật ký THẬT của tài xế do data/driver_log_import.py tạo (trip_log + wait_spells + hồ sơ)")
+    parser.add_argument("--profile", type=str, default=None,
+                        help="JSON hồ sơ tài xế (xăng, mục tiêu đ/giờ, biểu cước riêng nếu có) — ghi đè hồ sơ trong --driver-log")
     args = parser.parse_args()
 
-    full_sim_path = ROOT / "data" / "fixtures" / "hcmc_full_simulated_snapshot.json"
-
-    # 1. Khởi tạo Input
-    if args.snapshot:
-        snapshot_path = Path(args.snapshot)
-        if not snapshot_path.exists():
-            print(f"[LỖI] Không tìm thấy file snapshot tại: {snapshot_path}")
-            return 1
-        print(f"-> Đang nạp dữ liệu từ snapshot: {snapshot_path}")
-        engine_input = load_engine_input_from_file(snapshot_path)
-    elif args.baseline:
-        print("-> Đang dùng bộ dữ liệu ban đầu (Baseline: thiếu dữ liệu giá cước/booking)")
-        engine_input = create_mock_engine_input()
-    elif full_sim_path.exists():
-        print(f"-> Đang dùng bộ dữ liệu mô phỏng hoàn chỉnh cả 4 hướng (Full Simulation): {full_sim_path.name}")
-        engine_input = load_engine_input_from_file(full_sim_path)
+    # 1. Khởi tạo Input: chỉ dữ liệu thật (không còn bộ mô phỏng)
+    snapshot_path = Path(args.snapshot) if args.snapshot else REAL_SNAPSHOT
+    if not snapshot_path.exists():
+        print(f"[LỖI] Không tìm thấy file snapshot tại: {snapshot_path}")
+        return 1
+    print(f"-> Đang nạp snapshot: {snapshot_path}")
+    payload = json.loads(snapshot_path.read_text(encoding="utf-8"))
+    if args.driver_log:
+        log = json.loads(Path(args.driver_log).read_text(encoding="utf-8"))
+        payload = attach_driver_log(payload, log)
+        prov = log.get("provenance") or {}
+        print(f"-> Nhật ký tài xế {prov.get('driver_pseudonym')} ({prov.get('collected_via')}): "
+              f"{len(payload['trip_log'])} chuyến, {len(payload['wait_spells'])} đợt chờ")
     else:
-        print("-> Đang dùng bộ dữ liệu mô phỏng mặc định")
-        engine_input = create_mock_engine_input()
-
+        print("-> Chưa có nhật ký tài xế: hai hướng kiếm tiền chỉ có bảng kịch bản theo biểu cước (Bậc 0)")
+    if args.profile:
+        payload["driver_profile"] = {**(payload.get("driver_profile") or {}),
+                                     **{k: v for k, v in json.loads(Path(args.profile).read_text(encoding="utf-8")).items()
+                                        if not k.startswith("_") and v is not None}}
+    engine_input = load_for_engine(
+        payload,
+        trip_log=payload.get("trip_log"),
+        wait_spells=payload.get("wait_spells"),
+        driver_profile=payload.get("driver_profile"),
+    )
 
     # 2. Khởi tạo ngữ cảnh và tùy chọn tài xế
-    ctx = create_default_driver_context(
-        lat=10.7769,
-        lng=106.7009,
-        idle_min=args.idle,
-        horizon_min=args.horizon,
-    )
-    prefs = create_default_driver_preferences(rain_tolerance=args.rain)
+    ctx = DriverContext(current_lat=args.lat, current_lng=args.lng, idle_duration_min=args.idle,
+                        horizon_min=args.horizon, max_reposition_km=3.0)
+    prefs = DriverPreferences(rain_tolerance_level=args.rain)
 
     # 3. Chạy Decision Engine
     output = run_driver_engine(engine_input, ctx, prefs)
@@ -162,6 +149,27 @@ def main() -> int:
         print(f"     • {plan.contingency_fallback}")
         if res.caveat:
             print(f"  ► LƯU Ý DỮ LIỆU: {res.caveat}")
+        print()
+
+    # Bảng kịch bản theo biểu cước (Bậc 0 — có ngay, không cần nhật ký)
+    wi = output.what_if
+    if wi:
+        print("=" * 80)
+        print("[BẢNG KỊCH BẢN THEO BIỂU CƯỚC — KHÔNG PHẢI DỰ ĐOÁN]")
+        print("=" * 80)
+        for note in wi["notes"]:
+            print(f"  • {note}")
+        print(f"  {'km':>4} {'chờ':>5} {'cước khách':>11} {'bạn nhận':>9} {'sau xăng':>9} {'đ/giờ':>9}"
+              + (f" {'cần nhận':>9}" if wi.get("target_vnd_per_hour") else ""))
+        for r in wi["rows"]:
+            line = (f"  {r['trip_km']:>4g} {r['wait_min']:>4}' {r['customer_fare_vnd']:>11,} {r['net_before_fuel_vnd']:>9,} "
+                    f"{r['net_after_fuel_vnd']:>9,} {r['yield_vnd_per_hour']:>9,}")
+            if "min_fare_for_target_vnd" in r:
+                line += f" {r['min_fare_for_target_vnd']:>9,} {'✓' if r['tariff_meets_target'] else '✗'}"
+            print(line)
+        for b in wi.get("break_even_trip_km") or []:
+            km = f"≥ {b['min_trip_km']:g} km" if b["min_trip_km"] is not None else "không cuốc nào ≤ 40 km đạt"
+            print(f"  ▸ Chờ {b['wait_min']} phút: cuốc cần {km} để đạt mục tiêu")
         print()
 
     # Cố vấn chiến lược: So sánh & Phân tích 4 kế hoạch

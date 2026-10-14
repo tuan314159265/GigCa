@@ -1,5 +1,7 @@
 # GigCa
 
+Hướng dẫn đồng bộ engine/data mới và cài dependency backend trên nhánh tích hợp: [docs/INTEGRATION_SYNC.md](docs/INTEGRATION_SYNC.md).
+
 Dashboard chính nằm trong **web/**. Backend chạy **python -m api.v1_server** từ root repo. Xem [hướng dẫn chạy chung](docs/REPOSITORY_GUIDE.md). `api/provider_proxy.py` giữ proxy provider; Data Explorer cũ nằm trong `docs/legacy-data-explorer/`.
 
 GigCa hỗ trợ tài xế chọn khu vực nên chờ hoặc nghỉ dựa trên mạng lưới đường, dữ liệu thời tiết và các nguồn dữ liệu được kiểm chứng. Kết quả là gợi ý có giải thích, không phải cam kết về cuốc xe hay thu nhập.

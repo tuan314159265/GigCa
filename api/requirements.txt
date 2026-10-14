@@ -1,0 +1,2 @@
+-r ../data/db/requirements.txt
+-r ../engine/requirements.txt
