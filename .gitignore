@@ -36,4 +36,7 @@ data/processed/**
 
 docs/
 *.md
-
+# Next.js frontend generated output
+.next/
+out/
+*.tsbuildinfo

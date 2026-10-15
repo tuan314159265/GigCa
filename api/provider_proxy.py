@@ -17,7 +17,7 @@ from datetime import datetime, timezone
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.error import HTTPError, URLError
-from urllib.parse import parse_qs, unquote, urlencode, urlsplit
+from urllib.parse import parse_qs, quote, unquote, urlencode, urlsplit
 from urllib.request import Request, urlopen
 
 
@@ -38,6 +38,8 @@ CACHE_LOCK = threading.Lock()
 
 
 def read_tomtom_key() -> str:
+    if os.environ.get("API_TOMTOM", "").strip():
+        return os.environ["API_TOMTOM"].strip()
     env_path = ROOT / ".env"
     if not env_path.is_file():
         raise RuntimeError("Thiếu file .env chứa API_TOMTOM.")
@@ -105,6 +107,31 @@ def get_weather(lat: float, lon: float) -> dict:
     from data.db.live_observations import read_scheduled_weather
 
     return read_scheduled_weather(lat, lon)
+
+
+def search_locations(query: str) -> dict:
+    query = query.strip()
+    if not 2 <= len(query) <= 160:
+        raise ValueError("Nhập tên địa điểm từ 2 đến 160 ký tự.")
+    response = request_json(tomtom_url(
+        f"https://api.tomtom.com/search/2/search/{quote(query, safe='')}.json",
+        {"countrySet": "VN", "limit": 5, "language": "vi-VN"},
+    ))
+    places = []
+    for item in response.get("results", []):
+        position = item.get("position") or {}
+        lat, lng = position.get("lat"), position.get("lon")
+        if isinstance(lat, bool) or isinstance(lng, bool):
+            continue
+        if not isinstance(lat, (int, float)) or not isinstance(lng, (int, float)):
+            continue
+        if not math.isfinite(lat) or not math.isfinite(lng) or not (-90 <= lat <= 90 and -180 <= lng <= 180):
+            continue
+        address = (item.get("address") or {}).get("freeformAddress", "")
+        places.append({"id": item.get("id") or f"{lat}:{lng}",
+                       "name": (item.get("poi") or {}).get("name") or address or query,
+                       "address": address, "lat": lat, "lng": lng})
+    return {"provider": "TomTom Search API", "places": places}
 
 
 def get_pois(lat: float, lon: float, radius: int, query: str) -> dict:
@@ -182,7 +209,7 @@ class GigCaHandler(SimpleHTTPRequestHandler):
     server_version = "GigCaDataExplorer/0.1"
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, directory=str(ROOT), **kwargs)
+        super().__init__(*args, directory=str(ROOT / "docs" / "legacy-data-explorer"), **kwargs)
 
     def log_message(self, format_string: str, *args) -> None:
         # Avoid logging query values (coordinates and provider parameters).
@@ -210,6 +237,9 @@ class GigCaHandler(SimpleHTTPRequestHandler):
             return
 
         try:
+            if path == "/api/locations/search":
+                self.send_json(search_locations(params.get("q", [""])[0]))
+                return
             if path == "/api/weather":
                 lat = number(params, "lat", DEFAULT_CENTER[0], -90, 90)
                 lon = number(params, "lon", DEFAULT_CENTER[1], -180, 180)
@@ -245,7 +275,8 @@ class GigCaHandler(SimpleHTTPRequestHandler):
                 response = request_json(
                     tomtom_url(
                         f"{TOMTOM_ROUTE}/{locations}/json",
-                        {"traffic": "true", "travelMode": "motorcycle", "sectionType": ["traffic", "travelMode"]},
+                        {"traffic": "true", "travelMode": "motorcycle", "instructionsType": "coded",
+                         "sectionType": ["traffic", "travelMode", "importantRoadStretch"]},
                     )
                 )
                 routes = response.get("routes", [])

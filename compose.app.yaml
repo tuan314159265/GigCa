@@ -1,0 +1,39 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    environment:
+      API_TOMTOM: ${API_TOMTOM:-}
+      GIGCA_DATA_MODE: ${GIGCA_DATA_MODE:-live}
+      GIGCA_SESSION_DB: /app/.cache/backend.sqlite3
+      GIGCA_API_HOST: 0.0.0.0
+    volumes:
+      - gigca_sessions:/app/.cache
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+  frontend:
+    build:
+      context: ./web
+      args:
+        NEXT_PUBLIC_GIGCA_PREVIEW: ${NEXT_PUBLIC_GIGCA_PREVIEW:-false}
+        GIGCA_API_URL: http://backend:8000
+    ports:
+      - "127.0.0.1:${GIGCA_FRONTEND_PORT:-3000}:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+volumes:
+  gigca_sessions:
