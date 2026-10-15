@@ -33,7 +33,7 @@ class TestStrategicDirectionPlans(unittest.TestCase):
         assert plan is not None
 
         self.assertEqual(plan.plan_id, "safety_comfort")
-        self.assertIn("Cửa sổ thời tiết còn an toàn", plan.summary)
+        self.assertIn("Dự báo mưa có thể vượt mức bạn chọn", plan.summary)
         self.assertEqual(len(plan.steps), 4)
         self.assertIn("Chỉ nhận cuốc ngắn", plan.steps[0].action)
         self.assertIn("Chuẩn bị sẵn sàng áo mưa", plan.steps[1].action)
@@ -57,7 +57,7 @@ class TestStrategicDirectionPlans(unittest.TestCase):
         plan = safety_res.plan
         assert plan is not None
 
-        self.assertIn("Mưa lớn đang diễn ra", plan.summary)
+        self.assertIn("Dự báo có mưa lớn", plan.summary)
         self.assertIn("Tấp xe vào lề có mái che", plan.steps[0].action)
         self.assertEqual(plan.key_metrics["weather_action_signal"], "TRU_MUA_NGAY")
 

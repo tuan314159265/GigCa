@@ -6,7 +6,11 @@ from data.live_collector import collect_for_origin,_cache
 from api.dashboard import recommend
 
 class LiveTests(unittest.TestCase):
-    def setUp(self):_cache.clear();self.calls=[]
+    def setUp(self):
+        _cache.clear();self.calls=[]
+        patcher=patch('api.main_model.load_saved_model',side_effect=ValueError('test: no model artifact'))
+        patcher.start()
+        self.addCleanup(patcher.stop)
     def response(self,url):
         self.calls.append(url)
         if 'open-meteo' in url:

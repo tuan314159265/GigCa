@@ -82,6 +82,7 @@ def build_ml_insights(
     # ---- 1. wait model, gated by the backtest ----
     bt = _cached(("bt_wait", skey), lambda: backtest_wait(spells, cfg))
     wm: dict[str, Any] = {"backtest": bt, "used": False}
+    predictions = []
     if bt.get("passes") and now_local is not None and any(a.destination_distribution for a in areas):
         model = _cached(("fit_wait", skey), lambda: fit_wait_model(spells, cfg))
         if model is not None:
@@ -89,10 +90,17 @@ def build_ml_insights(
             n_over = 0
             for a in areas:
                 dd, pt = a.destination_distribution, valid_point(a.representative_point)
-                if not dd or pt is None:
+                if pt is None:
                     new_areas.append(a)
                     continue
                 pr = model.predict(now_local, pt[0], pt[1], rain, thresholds)
+                predictions.append({"area_id": a.area_id,
+                    "p_wait_le_pct": {k: round(100.0 * v, 1) for k, v in pr["p_le"].items()},
+                    "expected_wait_min": round(pr["expected_wait_min"], 1),
+                    "median_wait_min": pr["median_wait_min"], "model": f"hazard_ml:{model.family}"})
+                if not dd:
+                    new_areas.append(a)
+                    continue
                 new_dd = {
                     **dd,
                     "p_wait_le_pct": {k: round(100.0 * v, 1) for k, v in pr["p_le"].items()},
@@ -112,17 +120,36 @@ def build_ml_insights(
         notes.append(f"Mô hình ML thời gian chờ {why} trên tập kiểm tra theo thời gian, nên vẫn dùng baseline.")
     elif bt.get("status") != "ok":
         notes.append(f"Chưa dùng ML cho thời gian chờ: {bt.get('reason', 'không đủ dữ liệu')}.")
+    wm["zones"] = [{"area_id": a.area_id,
+                     "p_wait_le_pct": a.destination_distribution.get("p_wait_le_pct", {}),
+                     "expected_wait_min": a.destination_distribution.get("expected_wait_min"),
+                     "median_wait_min": a.destination_distribution.get("median_wait_min"),
+                     "model": a.destination_distribution.get("model", "historical_baseline")}
+                    for a in areas if a.destination_distribution]
+    if wm['used']:
+        wm['zones'] = predictions
     info["wait_model"] = wm
+    info["areas"] = [{"id": a.area_id, "name": a.area_name or a.area_id,
+                      "lat": a.representative_point.get("latitude"),
+                      "lng": a.representative_point.get("longitude")} for a in areas]
 
     # ---- 2 + 3. cycle yield band and bandit (need the tariff's fuel cost) ----
     econ = pm.economics
     if econ is not None and trips:
         ckey = (skey, tuple((t.started_at, t.pickup_lat, t.pickup_lng, t.net_vnd, t.duration_min, t.distance_km) for t in trips),
                 round(econ.fuel_cost_vnd_per_km, 3))
-        cycles = _cached(("cycles", ckey), lambda: build_cycles(trips, spells, econ.fuel_cost_vnd_per_km))
+        def matched_cycles():
+            report: dict[str, Any] = {}
+            values = build_cycles(trips, spells, econ.fuel_cost_vnd_per_km, matching_report=report)
+            return values, report
+        cycles, matching = _cached(("cycles_matching_v1", ckey), matched_cycles)
         bc = _cached(("bt_cycle", ckey), lambda: backtest_cycles(cycles, cfg))
-        cy: dict[str, Any] = {"backtest": bc, "zones": []}
-        if bc.get("status") == "ok" and bc.get("calibrated") is not False and now_local is not None:
+        cy: dict[str, Any] = {"backtest": bc, "zones": [],
+                              "matching": {key: value for key, value in matching.items() if key != "rows"}}
+        if matching.get("counts", {}).get("unmatched", 0) or matching.get("counts", {}).get("ambiguous", 0):
+            notes.append("Một số chuyến chưa ghép chắc chắn với đợt chờ; vẫn giữ trong lịch sử, không dùng cho model chu kỳ. "
+                         "Mẫu chu kỳ ghép được thiên về cuốc đón gần; chưa tính thời gian/chi phí đi đón.")
+        if bc.get("status") == "ok" and bc.get("calibrated") is True and now_local is not None:
             cm = _cached(("fit_cycle", ckey), lambda: fit_cycle_model(cycles, cfg))
             if cm is not None:
                 for a in areas:
@@ -130,7 +157,8 @@ def build_ml_insights(
                     if a.trip_value and pt is not None:
                         cy["zones"].append({"area_id": a.area_id, **cm.predict(now_local, pt[0], pt[1], rain)})
         elif bc.get("status") == "ok":
-            notes.append("Khoảng conformal của năng suất chu kỳ phủ thấp hơn mức danh nghĩa trên tập kiểm tra nên không hiển thị.")
+            notes.append("Chưa đủ mẫu kiểm tra khoảng dự đoán năng suất chu kỳ." if bc.get("calibrated") is None
+                         else "Khoảng dự đoán năng suất chu kỳ không đạt kiểm tra độ phủ nên không hiển thị.")
         info["cycle_yield"] = cy
 
         rewards: dict[str, list[float]] = {}

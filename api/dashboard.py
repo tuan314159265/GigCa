@@ -17,7 +17,7 @@ from engine.src.types import DriverContext, DriverPreferences
 from api.provider_proxy import GigCaHandler, ROOT, read_tomtom_key, tomtom_url, request_upstream, cached, get_traffic
 
 
-def recommend(payload: dict, *, include_snapshot: bool = False) -> dict:
+def recommend(payload: dict, *, include_snapshot: bool = False, personal_input: dict | None = None) -> dict:
     mode = payload.get("mode", "sample")
     if mode not in ("simulation", "sample", "pipeline", "database", "live"):
         raise ValueError("Chế độ dữ liệu không hợp lệ.")
@@ -74,8 +74,18 @@ def recommend(payload: dict, *, include_snapshot: bool = False) -> dict:
             snapshot.setdefault("limitations", []).append(
                 "Chế độ simulation cũ hiện dùng snapshot nguồn mẫu; không sinh cuốc, thu nhập hoặc nhật ký tài xế."
             )
+    # This is server-owned data loaded after authenticating a driver, never request JSON.
+    if personal_input is not None:
+        snapshot = {**snapshot, **{key: personal_input[key] for key in
+                    ('driver_profile',) if key in personal_input}}
+    # Main app uses the saved pooled model. Account history is retained in DB,
+    # but personal fitting is deferred; never inject synthetic records as history.
+    snapshot = {**snapshot, 'trip_log': [], 'wait_spells': []}
     data = load_for_engine(snapshot)
-    result = asdict(run_driver_engine(data, DriverContext(**values), prefs))
+    from api.main_model import apply_main_model
+    ctx = DriverContext(**values)
+    output = apply_main_model(run_driver_engine(data, ctx, prefs), data, ctx, prefs)
+    result = asdict(output)
     result["snapshot"] = {"id": data.snapshot_id, "mode": mode, "as_of": data.generated_at,
                           "sources": snapshot.get("data_status", []),
                           "limitations": snapshot.get("limitations", [])}
@@ -90,6 +100,10 @@ def recommend(payload: dict, *, include_snapshot: bool = False) -> dict:
     result["areas"] = [{"id": a.area_id, "name": a.area_name or a.area_id,
                         "lat": a.representative_point.get("latitude"), "lng": a.representative_point.get("longitude")}
                        for a in data.areas]
+    known = {a['id'] for a in result['areas']}
+    result['areas'].extend(a for a in (result.get('ml_insights') or {}).get('areas', []) if a['id'] not in known)
+    from api.llm_explanations import apply_explanations
+    result = apply_explanations(result)
     if include_snapshot:
         result["_input_snapshot"] = snapshot
     return result
@@ -124,6 +138,10 @@ class DashboardHandler(GigCaHandler):
             except RuntimeError:
                 tomtom = False
             self.send_json({"tomtom": tomtom, "database": bool(os.environ.get("GIGCA_DATABASE_URL")),
+                            "research_demo": os.environ.get("GIGCA_RESEARCH_DEMO", "").lower() == "true",
+                            "data_mode": os.environ.get("GIGCA_DATA_MODE", "live"),
+                            "provider_status": {"tomtom": "configured_unverified" if tomtom else "missing_key",
+                                                "weather": "public_api_unverified"},
                             "recommendations": True, "modes": ["simulation", "sample", "pipeline", "database", "live"]})
             return
         # Serve only APIs here, not repository files.
@@ -161,7 +179,7 @@ def load_local_settings():
         return
     for line in path.read_text(encoding="utf-8").splitlines():
         name, sep, value = line.strip().partition("=")
-        if sep and name.strip() in {"GIGCA_DATABASE_URL", "GIGCA_AREA_ID", "GIGCA_DATA_MODE", "GIGCA_SESSION_DB", "SSL_CERT_FILE"}:
+        if sep and name.strip() in {"GIGCA_DATABASE_URL", "GIGCA_AREA_ID", "GIGCA_DATA_MODE", "GIGCA_SESSION_DB", "GIGCA_MAIN_MODEL_DIR", "SSL_CERT_FILE", "GIGCA_RESEARCH_DEMO", "GIGCA_RESEARCH_DATASET", "GIGCA_API_HOST", "GIGCA_API_PORT"}:
             value = value.strip().strip("\"'")
             if value:
                 os.environ.setdefault(name.strip(), value)

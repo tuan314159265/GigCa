@@ -13,6 +13,12 @@ from api.dashboard import DashboardHandler, recommend
 
 
 class DashboardTests(unittest.TestCase):
+    def setUp(self):
+        # Existing provider tests must not depend on ignored local model artifacts.
+        patcher = patch('api.main_model.load_saved_model', side_effect=ValueError('test: no artifact'))
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
     def test_recomputes_and_enforces_radius(self):
         full = recommend({})
         limited = recommend({"context": {"max_reposition_km": 0}})

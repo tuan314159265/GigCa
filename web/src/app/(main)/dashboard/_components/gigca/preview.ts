@@ -1,7 +1,7 @@
 import snapshot from "./preview-recommendations.json";
 import type { Recommendation } from "./types";
 
-export const previewOnly = process.env.NEXT_PUBLIC_GIGCA_PREVIEW !== "false";
+export const previewOnly = process.env.NEXT_PUBLIC_GIGCA_PREVIEW === "true";
 export const previewRecommendation = {
   ...snapshot,
   snapshot: {

@@ -1,20 +1,32 @@
-import { api } from "./api";
+import { api, GigcaApiError } from "./api";
 import type { DriverInput, Recommendation } from "./types";
-type Session = { session_id: string; token: string; context_version: number };
+type Session = { session_id: string; context_version: number };
 let session: Session | null = null;
 let queue: Promise<unknown> = Promise.resolve();
 export function calculate(input: DriverInput): Promise<Recommendation> {
   const task = queue
     .catch(() => {})
     .then(async () => {
-      if (!session)
-        session = await api<Session>("/api/v1/sessions", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: "{}",
-        });
-      const headers = { "Content-Type": "application/json", Authorization: `Bearer ${session.token}` };
       try {
+        if (input.mode === "research") {
+          return await api<Recommendation>("/api/v1/research/recommendations", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              driver_id: input.research_driver_id,
+              context: input.context,
+              rain_tolerance_level: input.rain_tolerance_level,
+            }),
+          });
+        }
+        if (!session)
+          session = await api<Session>("/api/v1/sessions", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: "{}",
+          });
+        // The Next.js API proxy attaches the HttpOnly account cookie on the server.
+        const headers = { "Content-Type": "application/json" };
         const updated = await api<{ context_version: number }>(`/api/v1/sessions/${session.session_id}/context`, {
           method: "PATCH",
           headers,
@@ -32,6 +44,7 @@ export function calculate(input: DriverInput): Promise<Recommendation> {
         });
       } catch (error) {
         session = null;
+        if (error instanceof GigcaApiError && error.status === 401) window.location.replace("/auth/login");
         throw error;
       }
     });

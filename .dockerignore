@@ -12,3 +12,6 @@
 **/.venv
 **/.agents
 **/.codex
+
+artifacts
+.venv

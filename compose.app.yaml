@@ -6,10 +6,18 @@ services:
     environment:
       API_TOMTOM: ${API_TOMTOM:-}
       GIGCA_DATA_MODE: ${GIGCA_DATA_MODE:-live}
+      GIGCA_LLM_EXPLANATIONS: ${GIGCA_LLM_EXPLANATIONS:-false}
+      GIGCA_LLM_BASE_URL: ${GIGCA_LLM_BASE_URL:-https://api.shopaikey.com/v1}
+      GIGCA_LLM_API_KEY: ${GIGCA_LLM_API_KEY:-}
+      GIGCA_LLM_MODEL: ${GIGCA_LLM_MODEL:-}
       GIGCA_SESSION_DB: /app/.cache/backend.sqlite3
       GIGCA_API_HOST: 0.0.0.0
+      GIGCA_MAIN_MODEL_DIR: /app/main-model
+      GIGCA_CAMERA_CATALOG: /app/cameras/hcmc-public-cameras.json
     volumes:
       - gigca_sessions:/app/.cache
+      - ${GIGCA_MODEL_HOST_DIR:-./.cache/models/logistic-hazard-quantile-gb-hcmc}:/app/main-model:ro
+      - ./data/raw/cameras:/app/cameras:ro
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3)"]
       interval: 10s
@@ -18,6 +26,8 @@ services:
       start_period: 10s
     restart: unless-stopped
   frontend:
+    environment:
+      GIGCA_API_URL: http://backend:8000
     build:
       context: ./web
       args:

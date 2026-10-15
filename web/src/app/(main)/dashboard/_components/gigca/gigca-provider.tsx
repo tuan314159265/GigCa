@@ -12,6 +12,8 @@ type State = {
   error: string;
   tomtom: boolean;
   database: boolean;
+  researchAvailable: boolean;
+  capabilitiesError: string;
   run: (input: DriverInput) => Promise<boolean>;
   retry: () => Promise<boolean>;
 };
@@ -36,6 +38,8 @@ export function GigcaProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState("");
   const [database, setDatabase] = useState(false);
   const [tomtom, setTomtom] = useState(false);
+  const [researchAvailable, setResearchAvailable] = useState(false);
+  const [capabilitiesError, setCapabilitiesError] = useState("");
   const requestId = useRef(0);
   const lastRequested = useRef(input);
   const run = useCallback(async (next: DriverInput) => {
@@ -62,25 +66,34 @@ export function GigcaProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (previewOnly) return;
     const controller = new AbortController();
-    void api<{ tomtom: boolean; database: boolean }>("/api/capabilities", {
+    void api<{ tomtom: boolean; database: boolean; research_demo: boolean; data_mode: string }>("/api/capabilities", {
       signal: controller.signal,
     })
       .then((x) => {
         setTomtom(x.tomtom);
         setDatabase(x.database);
+        setResearchAvailable(x.research_demo);
+        setInput((current) => ({ ...current, mode: x.data_mode === "live" ? "live" : "sample" }));
       })
-      .catch(() => {});
+      .catch((error: unknown) => {
+        if (!controller.signal.aborted)
+          setCapabilitiesError(error instanceof Error ? error.message : "Không đọc được cấu hình backend.");
+      });
     return () => controller.abort();
   }, []);
   useEffect(() => {
-    if (previewOnly || !result || !Number.isFinite(input.context.current_lat)) return;
+    if (previewOnly || input.mode === "research" || !result || !Number.isFinite(input.context.current_lat)) return;
     const timer = window.setInterval(() => {
       if (!document.hidden) void run(input);
     }, 60000);
     return () => window.clearInterval(timer);
   }, [input, run, Boolean(result)]);
   return (
-    <Context.Provider value={{ input, result, busy, error, tomtom, database, run, retry }}>{children}</Context.Provider>
+    <Context.Provider
+      value={{ input, result, busy, error, tomtom, database, researchAvailable, capabilitiesError, run, retry }}
+    >
+      {children}
+    </Context.Provider>
   );
 }
 // Shared input/result must survive navigation between the four dashboard pages.

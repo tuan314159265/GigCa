@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import { Search } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -9,8 +9,9 @@ import { Input } from "@/components/ui/input";
 import { api } from "../../_components/gigca/api";
 
 interface Location { id: string; name: string; address: string; lat: number; lng: number }
-export function LocationSearch({ disabled, onSelect }: {
+export function LocationSearch({ disabled, onSelect, labelAction }: {
   disabled: boolean;
+  labelAction?: ReactNode;
   onSelect: (lat: number, lng: number) => void;
 }) {
   const [query, setQuery] = useState("");
@@ -31,7 +32,10 @@ export function LocationSearch({ disabled, onSelect }: {
     } finally { if (id === requestId.current) setLoading(false); }
   }
   return <Field>
-    <FieldLabel htmlFor="location-search">Vị trí xuất phát</FieldLabel>
+    <div className="flex flex-wrap items-center gap-3">
+      <FieldLabel htmlFor="location-search">Vị trí xuất phát</FieldLabel>
+      {labelAction}
+    </div>
     <div className="flex gap-2">
       <Input id="location-search" placeholder="Tên địa điểm hoặc địa chỉ, ví dụ: Chợ Bến Thành, TP.HCM"
         value={query} disabled={disabled} maxLength={160}

@@ -22,12 +22,13 @@ import numpy as np
 from sklearn.ensemble import GradientBoostingRegressor
 
 from engine.src.config import ML_CFG, TIME_CFG
+from engine.src.geo import haversine_m, valid_point
 from engine.src.ml.wait_model import _context
 from engine.src.timeutil import parse_local
 from engine.src.types import TripRecord, WaitSpell
 
-_MATCH_S = 120.0  # a trip belongs to the wait that ended within this many seconds of its start
-_MATCH_DEG = 0.003  # ... and started within ~330 m of the trip's pickup
+_MATCH_S = 300.0
+_MATCH_M = 500.0
 
 
 @dataclass(frozen=True)
@@ -43,44 +44,74 @@ class Cycle:
     yield_vnd_per_hour: float
 
 
-def build_cycles(trips: list[TripRecord], spells: list[WaitSpell], fuel_vnd_per_km: float) -> list[Cycle]:
-    """Pair each trip with the wait spell that ended in it. Trips without a distance or without a matching wait are skipped."""
+def build_cycles(trips: list[TripRecord], spells: list[WaitSpell], fuel_vnd_per_km: float,
+                 *, matching_report: dict[str, Any] | None = None) -> list[Cycle]:
+    """Infer only mutually unique causal pairs from ONE driver's records.
+
+    started_at remains pickup time. The schema has no trusted acceptance link, so
+    no match is labeled confirmed. Unmatched records remain untouched in the log.
+    Pickup travel time/fuel are still excluded from the legacy cycle target.
+    """
+    from collections import Counter
+    trip_counts = Counter(t.trip_id for t in trips)
+    spell_counts = Counter(w.spell_id for w in spells)
     off = int(TIME_CFG["local_utc_offset_minutes"])
     ended: dict[int, list[tuple[datetime, datetime, WaitSpell]]] = {}
     for w in spells:
-        if w.ended_by != "trip":
+        if w.ended_by != "trip" or spell_counts[w.spell_id] != 1:
             continue
         a, b = parse_local(w.start, off), parse_local(w.end, off)
-        if a is None or b is None or b < a:
+        if a is None or b is None or b < a or valid_point({"latitude": w.lat, "longitude": w.lng}) is None:
             continue
         ended.setdefault(int(b.timestamp() // 60), []).append((a, b, w))
     cycles: list[Cycle] = []
-    used: set[str] = set()
+    entries = []
+    claims: Counter = Counter()
     for t in sorted(trips, key=lambda x: (x.started_at, x.trip_id)):
         s = parse_local(t.started_at, off)
-        if s is None or t.distance_km is None or t.distance_km <= 0:
+        if (trip_counts[t.trip_id] != 1 or s is None or t.distance_km is None
+                or not math.isfinite(t.distance_km) or t.distance_km <= 0
+                or not math.isfinite(t.duration_min) or t.duration_min <= 0 or not math.isfinite(t.net_vnd)
+                or valid_point({"latitude": t.pickup_lat, "longitude": t.pickup_lng}) is None):
+            entries.append((t, s, [], "invalid_trip"))
             continue
         m = int(s.timestamp() // 60)
-        best = None
-        for mm in (m - 2, m - 1, m, m + 1, m + 2):
+        candidates = []
+        for mm in range(m - 5, m + 1):
             for a, b, w in ended.get(mm, []):
-                if w.spell_id in used:
-                    continue
-                gap = abs((b - s).total_seconds())
-                if gap <= _MATCH_S and abs(w.lat - t.pickup_lat) <= _MATCH_DEG and abs(w.lng - t.pickup_lng) <= _MATCH_DEG:
-                    if best is None or gap < best[0]:
-                        best = (gap, a, b, w)
-        if best is None:
+                gap = (s - b).total_seconds()
+                if 0 <= gap <= _MATCH_S and haversine_m(w.lat, w.lng, t.pickup_lat, t.pickup_lng) <= _MATCH_M:
+                    candidates.append((a, b, w))
+                    claims[w.spell_id] += 1
+        entries.append((t, s, candidates, None))
+    rows = []
+    for t, s, candidates, error in entries:
+        if error or not candidates:
+            rows.append({"trip_id": t.trip_id, "status": "invalid" if error else "unmatched",
+                         "reason": error or "no_candidate_within_5min_500m"})
             continue
-        _, a, b, w = best
-        used.add(w.spell_id)
+        if len(candidates) != 1 or claims[candidates[0][2].spell_id] != 1:
+            rows.append({"trip_id": t.trip_id, "status": "ambiguous", "reason": "multiple_trips_or_waits",
+                         "candidate_spell_ids": sorted(w.spell_id for _, _, w in candidates)})
+            continue
+        a, b, w = candidates[0]
         wait = (b - a).total_seconds() / 60.0
         hours = (wait + t.duration_min) / 60.0
         if hours <= 0:
             continue
         cycles.append(Cycle(a, t.pickup_lat, t.pickup_lng, w.rain_mm, t.distance_km, t.net_vnd, wait, t.duration_min,
                             (t.net_vnd - fuel_vnd_per_km * t.distance_km) / hours))
+        rows.append({"trip_id": t.trip_id, "spell_id": w.spell_id, "status": "inferred",
+                     "pickup_gap_min": (s-b).total_seconds()/60,
+                     "straight_distance_m": haversine_m(w.lat, w.lng, t.pickup_lat, t.pickup_lng)})
     cycles.sort(key=lambda c: c.start)
+    if matching_report is not None:
+        counts = Counter(row["status"] for row in rows)
+        matching_report.update({"policy": "mutually_unique_causal_5min_500m_v1", "max_gap_seconds": _MATCH_S,
+                                "max_straight_distance_m": _MATCH_M, "trips": len(trips),
+                                "counts": {k: counts[k] for k in ("confirmed", "inferred", "ambiguous", "unmatched", "invalid")},
+                                "rows": rows,
+                                "note": "Only inferred pairs; pickup travel time/fuel excluded. Selection favors nearby pickups."})
     return cycles
 
 
@@ -88,24 +119,27 @@ def _features(cs: list[Cycle], ref: tuple[float, float]) -> np.ndarray:
     return np.asarray([_context(c.start, c.lat, c.lng, c.rain_mm, ref) for c in cs], dtype=float)
 
 
-def _qreg(q: float, seed: int) -> GradientBoostingRegressor:
-    return GradientBoostingRegressor(loss="quantile", alpha=q, n_estimators=80, max_depth=2, learning_rate=0.06,
-                                     subsample=0.8, min_samples_leaf=8, random_state=seed)
+def _qreg(q: float, seed: int, params: dict[str, Any] | None = None) -> GradientBoostingRegressor:
+    options = dict(n_estimators=80, max_depth=2, learning_rate=0.06, subsample=0.8, min_samples_leaf=8)
+    if params:
+        options.update(params)
+    return GradientBoostingRegressor(loss="quantile", alpha=q, random_state=seed, **options)
 
 
 class CycleYieldModel:
-    def __init__(self, alpha: float, seed: int) -> None:
+    def __init__(self, alpha: float, seed: int, quantile_params: dict[str, dict[str, Any]] | None = None) -> None:
         self.alpha, self.seed = alpha, seed
         self.ref: tuple[float, float] = (0.0, 0.0)
         self.q_hat = 0.0
         self._lo = self._md = self._hi = None
+        self.quantile_params = quantile_params or {}
 
     def fit(self, train: list[Cycle], calib: list[Cycle]) -> "CycleYieldModel":
         self.ref = (float(np.mean([c.lat for c in train])), float(np.mean([c.lng for c in train])))
         X, y = _features(train, self.ref), np.asarray([c.yield_vnd_per_hour for c in train])
-        self._lo = _qreg(self.alpha / 2, self.seed).fit(X, y)
-        self._md = _qreg(0.5, self.seed).fit(X, y)
-        self._hi = _qreg(1 - self.alpha / 2, self.seed).fit(X, y)
+        self._lo = _qreg(self.alpha / 2, self.seed, self.quantile_params.get('lower')).fit(X, y)
+        self._md = _qreg(0.5, self.seed, self.quantile_params.get('median')).fit(X, y)
+        self._hi = _qreg(1 - self.alpha / 2, self.seed, self.quantile_params.get('upper')).fit(X, y)
         Xc, yc = _features(calib, self.ref), np.asarray([c.yield_vnd_per_hour for c in calib])
         scores = np.maximum(self._lo.predict(Xc) - yc, yc - self._hi.predict(Xc))
         n = len(scores)

@@ -1,0 +1,4 @@
+# Local backend + ML training/model persistence + report figures.
+# Frontend dependencies are installed separately in web/ with npm ci.
+-r api/requirements.txt
+-r experiments/synthetic/requirements-plots.txt

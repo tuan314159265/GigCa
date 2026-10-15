@@ -11,13 +11,10 @@ import uuid
 from contextlib import contextmanager
 from pathlib import Path
 from api.dashboard import recommend, ROOT
+from api.driver_accounts import DriverAccounts
+from api.errors import ApiError
 
-class ApiError(Exception):
-    def __init__(self, status, code, message):
-        self.status, self.code = status, code
-        super().__init__(message)
-
-class Backend:
+class Backend(DriverAccounts):
     def __init__(self, path=None):
         self.path = str(path or os.environ.get('GIGCA_SESSION_DB', '.cache/backend.sqlite3'))
         if not Path(self.path).is_absolute():
@@ -31,6 +28,7 @@ class Backend:
               created REAL NOT NULL, context TEXT NOT NULL, result TEXT NOT NULL,
               idem TEXT, payload_hash TEXT, UNIQUE(session_id, idem));
             ''')
+            self.init_accounts(db)
     @contextmanager
     def db(self):
         db = sqlite3.connect(self.path, timeout=15)
@@ -41,17 +39,28 @@ class Backend:
                 yield db
         finally:
             db.close()
-    def create(self):
+    def create(self, account_token=None):
         sid, token = str(uuid.uuid4()), secrets.token_urlsafe(32)
         with self.db() as db:
+            driver = self.account(db, account_token) if account_token else None
+            if driver is not None:
+                token = account_token
             db.execute('INSERT INTO sessions VALUES(?,?,?,?,?,?)',
                        (sid, self.hash(token), time.time()+86400, 0, '{}', None))
+            if driver is not None:
+                db.execute('INSERT INTO driver_sessions VALUES(?,?)', (sid, driver['id']))
         return {'session_id':sid, 'token':token, 'context_version':0, 'expires_in_s':86400}
     @staticmethod
     def hash(value):
         return hashlib.sha256(value.encode()).hexdigest()
     def session(self, db, sid, token):
         row = db.execute('SELECT * FROM sessions WHERE id=?', (sid,)).fetchone()
+        owner = db.execute('SELECT driver_id FROM driver_sessions WHERE session_id=?', (sid,)).fetchone()
+        if owner is not None:
+            driver = self.account(db, token)
+            if row is None or row['expires'] <= time.time() or driver['id'] != owner['driver_id']:
+                raise ApiError(401, 'invalid_session', 'Phiên không thuộc tài xế đang đăng nhập hoặc đã hết hạn.')
+            return row
         if not row or row['expires'] <= time.time() or not secrets.compare_digest(row['token_hash'], self.hash(token)):
             raise ApiError(401, 'invalid_session', 'Phiên không hợp lệ hoặc đã hết hạn.')
         return row
@@ -91,13 +100,15 @@ class Backend:
             if payload.get('context_version')!=row['version']:
                 raise ApiError(409,'context_conflict','Ngữ cảnh đã thay đổi.')
             ctx=json.loads(row['context'])
+            personal = self.personal_input(db, sid)
         if 'current_lat' not in ctx or 'current_lng' not in ctx:
             raise ApiError(422,'origin_required','Cần vị trí hiện tại để tính gợi ý.')
         context={'idle_duration_min':15,'horizon_min':60,'max_reposition_km':3,
                  **{k:v for k,v in ctx.items() if k!='rain_tolerance_level'}}
         if row['waiting'] is not None:context['idle_duration_min']=min(1440,int((time.time()-row['waiting'])/60))
         mode=os.environ.get('GIGCA_DATA_MODE','live')
-        raw=recommend({'mode':mode,'context':context,'rain_tolerance_level':ctx.get('rain_tolerance_level','medium')}, include_snapshot=True)
+        raw=recommend({'mode':mode,'context':context,'rain_tolerance_level':ctx.get('rain_tolerance_level','medium')},
+                      include_snapshot=True, personal_input=personal)
         snapshot=raw.pop('_input_snapshot')
         rid=str(uuid.uuid4())
         output={**raw,'recommendation_id':rid,'context_version':row['version'],

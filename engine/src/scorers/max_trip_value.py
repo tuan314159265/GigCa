@@ -267,7 +267,7 @@ def score_max_trip_value(
 
     trade = [
         "Chi phí dịch chuyển là ước tính từ đường chim bay; cước thực tế phụ thuộc thời điểm và cầu.",
-        "Engine không dự báo xác suất có cuốc — kết quả dựa trên cuốc và đợt chờ ĐÃ XẢY RA của chính bạn.",
+        "Không dự báo nhu cầu toàn thị trường; số liệu chờ nếu có được ước lượng từ lịch sử cuốc và đợt chờ của tài xế.",
     ]
     lo_share = float(TARIFF_CFG["driver_share_range"][0])
     if E.share_source != "driver_input" and lo_share < E.driver_share:

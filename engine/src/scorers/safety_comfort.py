@@ -60,8 +60,8 @@ def _road_sentence(ta: TrafficAnalysis) -> tuple[str, str]:
     """(corridor sentence, avoid sentence) built only from real edges."""
     if not ta.usable:
         return ("chưa có dữ liệu giao thông nên chưa chỉ ra được hành lang thông thoáng", "")
-    corr = f"đoạn đang thông thoáng theo dữ liệu: {', '.join(ta.smooth[:3])}" if ta.smooth else "không có đoạn nào thông thoáng trong dữ liệu"
-    avoid = f"đoạn ùn tắc/chậm cần né: {', '.join((ta.congested + ta.slow)[:3])}" if (ta.congested or ta.slow) else ""
+    corr = "Có đoạn đường được ghi nhận thông thoáng" if ta.smooth else "Chưa xác định được đoạn thông thoáng từ dữ liệu hiện có"
+    avoid = "Một số đoạn có dữ liệu đang đông xe hoặc ùn tắc; nên xem tình trạng tuyến trước khi di chuyển" if (ta.congested or ta.slow) else ""
     return corr, avoid
 
 
@@ -84,6 +84,7 @@ def score_safety_comfort(
         )
 
     level = driver_prefs.rain_tolerance_level
+    level_text = {'low':'ít','medium':'vừa','high':'cao'}.get(level,level)
     thr = RAIN_TOLERANCE_THRESHOLDS.get(level, RAIN_TOLERANCE_THRESHOLDS["medium"])
     thr_prob, thr_mm = float(thr["prob_pct"]), float(thr["mm"])
     off = int(TIME_CFG["local_utc_offset_minutes"])
@@ -121,12 +122,14 @@ def score_safety_comfort(
             return ""
         prob = "n/a" if f.prob_pct is None else f"{f.prob_pct:.0f}%"
         mm = "n/a" if f.mm is None else f"{f.mm:.1f}mm"
-        return f"khung {f.window}: {prob}, {mm} — vượt mức chịu mưa '{level}' (ngưỡng {thr_prob:.0f}% / {thr_mm:.1f}mm)"
+        return f"khung {f.window}: {prob}, {mm} — vượt mức chịu mưa {level_text} (ngưỡng {thr_prob:.0f}% / {thr_mm:.1f}mm)"
 
     if signal == SIGNAL_NOW:
-        lead = "Mưa lớn đang diễn ra hoặc sắp ập đến" if wa.heavy else f"Mưa vượt mức chịu đựng '{level}' đang diễn ra hoặc sắp ập đến"
-        plan_summary = f"{lead} ({rain_desc()}). Ưu tiên an toàn: tấp vào chỗ có mái che thay vì tiếp tục chạy."
-        plan_target = "Điểm có mái che / cây xăng gần nhất trên tuyến"
+        lead = "Mưa lớn đang diễn ra hoặc sắp ập đến" if wa.heavy else f"Mưa vượt mức chịu mưa {level_text} đang diễn ra hoặc sắp ập đến"
+        plan_summary = ("Dự báo có mưa lớn trong khung hiện tại. " if wa.heavy else
+                        "Dự báo hiện tại cho thấy mưa có thể vượt mức bạn chấp nhận. ")
+        plan_summary += "Ưu tiên tìm nơi dừng có mái che phù hợp và chờ điều kiện tốt hơn."
+        plan_target = "Tìm nơi dừng có mái che phù hợp"
         steps = [
             PlanStep(1, "Ngay lập tức (0 - 2 phút)", "Tấp xe vào lề có mái che hoặc cây xăng gần nhất",
                      "Bật xi-nhan, giảm tốc và vào khu vực có mái che kiên cố; tránh đứng dưới gốc cây lớn hoặc biển quảng cáo khi có dông gió.",
@@ -142,10 +145,7 @@ def score_safety_comfort(
                      "Quay lại ca chạy an toàn."),
         ]
     elif signal == SIGNAL_BEFORE:
-        plan_summary = (
-            f"Cửa sổ thời tiết còn an toàn trong ~{window_val} phút trước khi mưa vượt mức chịu đựng '{level}' "
-            f"(từ {first_start}; {rain_desc()}). Đường: {road_txt}."
-        )
+        plan_summary = f"Dự báo mưa có thể vượt mức bạn chọn từ {first_start}. Nếu tiếp tục chạy, ưu tiên cuốc ngắn và chuẩn bị nơi dừng có mái che."
         plan_target = "Chạy các đoạn thông thoáng theo dữ liệu" if ta.smooth else "Khu vực hiện tại, ưu tiên cuốc ngắn"
         steps = [
             PlanStep(1, f"0 - {cutoff} phút", f"Chỉ nhận cuốc ngắn (kết thúc trước {first_start})",
@@ -163,10 +163,16 @@ def score_safety_comfort(
                      "Quay lại ca chạy khi điều kiện đã ổn."),
         ]
     elif signal == SIGNAL_OK:
-        plan_summary = (
-            f"Trong {wa.covered_min} phút tới dự báo không vượt mức chịu mưa '{level}' (ngưỡng {thr_prob:.0f}% / {thr_mm:.1f}mm). "
-            f"Đường: {road_txt}."
-        )
+        probabilities = [f.prob_pct for f in wa.flags if f.prob_pct is not None]
+        if probabilities and max(probabilities) <= 30:
+            weather_reason = "phần dự báo hiện có cho thấy xác suất mưa thấp"
+        else:
+            weather_reason = "mức mưa trong phần dự báo hiện có vẫn nằm trong mức bạn chấp nhận"
+        plan_summary = f"Bạn có thể tiếp tục chờ trong khu vực hiện tại vì {weather_reason}."
+        if ta.congested or ta.slow:
+            plan_summary += " Một số đoạn có dữ liệu đang đông xe; xem tình trạng tuyến trước khi di chuyển."
+        elif not ta.usable:
+            plan_summary += " Chưa có thông tin giao thông để đánh giá tuyến đường."
         plan_target = "Chạy các đoạn thông thoáng theo dữ liệu" if ta.smooth else "Khu vực hiện tại"
         steps = [
             PlanStep(1, "Khung giờ hiện tại", "Lưu thông trên đoạn thông thoáng, né đoạn ùn tắc" if ta.usable else "Theo dõi dự báo và tình hình đường",
@@ -203,8 +209,10 @@ def score_safety_comfort(
     caveat = (
         "Chỉ dựa trên dự báo mưa theo giờ và tốc độ đoạn đường trong dữ liệu; không có dữ liệu gió, nhiệt, UV, ngập úng."
     )
-    if warnings:
-        caveat += " " + " ".join(warnings)
+    if wa.coverage_ratio < 1:
+        caveat += " Một số thời điểm trong khoảng bạn chọn chưa có dự báo; hãy kiểm tra lại trước khi đi."
+    if not ta.usable:
+        caveat += " Chưa đánh giá được giao thông."
 
     plan = DirectionPlan(
         plan_id="safety_comfort",
@@ -231,12 +239,12 @@ def score_safety_comfort(
             "traffic_edges_used": ta.used_edges,
         },
         trade_offs=(
-            "Né đoạn ùn tắc có thể làm quãng đường dài hơn; engine không có routing né kẹt nên không tính được chênh lệch cự ly/thời gian."
+            "Chưa có tuyến thay thế để so sánh. Xem thông tin từng đường trước khi chọn lộ trình."
             if ta.usable else
             "Không có dữ liệu giao thông nên không thể cân nhắc đánh đổi giữa né kẹt và quãng đường."
         ),
         contingency_fallback=(
-            "Nếu mưa lớn kèm gió mạnh hoặc đường ngập, tấp vào nơi có mái che và chờ; engine không có dữ liệu ngập/gió nên hãy tự đánh giá."
+            "Nếu thực tế xuất hiện mưa lớn hoặc đường ngập, tìm nơi dừng có mái che phù hợp và kiểm tra lại trước khi đi tiếp."
         ),
     )
     return ObjectiveResult(

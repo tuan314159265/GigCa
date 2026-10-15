@@ -93,12 +93,13 @@ def _fully_observed_bins(o: _Obs, b: float, nb: int) -> tuple[int, int | None]:
 class WaitHazardModel:
     family = FAMILY
 
-    def __init__(self, cfg: dict[str, Any], use_context: bool = True) -> None:
+    def __init__(self, cfg: dict[str, Any], use_context: bool = True, regularization_c: float = _C) -> None:
         self.cfg, self.use_context = cfg, use_context
         self.b, self.nb = _bins(cfg)
         self.ref: tuple[float, float] = (0.0, 0.0)
         self._scaler = StandardScaler()
-        self._clf = LogisticRegression(C=_C, max_iter=2000)
+        self.regularization_c = regularization_c
+        self._clf = LogisticRegression(C=regularization_c, max_iter=2000)
 
     def _row(self, ctx: list[float] | None, k: int) -> list[float]:
         onehot = [1.0 if i == k else 0.0 for i in range(self.nb)]

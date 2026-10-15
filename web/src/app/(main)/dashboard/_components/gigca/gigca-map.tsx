@@ -30,6 +30,7 @@ export function GigcaMap({ selected, focusedPlace }: { selected?: Objective; foc
   const [loadedRoutes, setLoadedRoutes] = useState<Map<string, RoadRoute>>(new Map());
   const [routing, setRouting] = useState(false);
   const [tick, setTick] = useState(0);
+  const [fallbackMap, setFallbackMap] = useState(false);
   const lat = input.context.current_lat;
   const lng = input.context.current_lng;
   const targets = useMemo(
@@ -74,8 +75,20 @@ export function GigcaMap({ selected, focusedPlace }: { selected?: Objective; foc
             : {}),
         },
       ).addTo(instance);
+      let switched = false;
       tiles.on("tileerror", () => {
-        if (!cancelled) setMapError("Không tải được nền bản đồ.");
+        if (cancelled) return;
+        if (tomtom && !previewOnly && !switched) {
+          switched = true;
+          instance.removeLayer(tiles);
+          setFallbackMap(true);
+          const fallback = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+            maxZoom: 19,
+          }).addTo(instance);
+          fallback.on("tileerror", () => setMapError("Không tải được nền OpenStreetMap. Kiểm tra mạng."));
+          fallback.on("tileload", () => setMapError(""));
+        } else if (!switched) setMapError("Không tải được nền bản đồ.");
       });
       if (previewOnly)
         L.tileLayer("/maps/labels/{z}/{x}/{y}.png", {
@@ -100,7 +113,7 @@ export function GigcaMap({ selected, focusedPlace }: { selected?: Objective; foc
     if (!tomtom || previewOnly) return;
     const timer = window.setInterval(() => {
       if (!document.hidden) setTick((value) => value + 1);
-    }, 60000);
+    }, 30000);
     return () => window.clearInterval(timer);
   }, [tomtom]);
 
@@ -108,7 +121,14 @@ export function GigcaMap({ selected, focusedPlace }: { selected?: Objective; foc
     let cancelled = false;
     setLoadedRoutes(new Map());
     setRouteError("");
-    if (previewOnly || !tomtom || !targets.length || !Number.isFinite(lat) || !Number.isFinite(lng)) {
+    if (
+      previewOnly ||
+      result?.snapshot.mode === "research" ||
+      !tomtom ||
+      !targets.length ||
+      !Number.isFinite(lat) ||
+      !Number.isFinite(lng)
+    ) {
       setRouting(false);
       return;
     }
@@ -126,7 +146,7 @@ export function GigcaMap({ selected, focusedPlace }: { selected?: Objective; foc
     return () => {
       cancelled = true;
     };
-  }, [lat, lng, tomtom, targets, tick]);
+  }, [lat, lng, tomtom, targets, tick, result?.snapshot.mode]);
 
   useEffect(() => {
     const instance = map.current;
@@ -180,17 +200,30 @@ export function GigcaMap({ selected, focusedPlace }: { selected?: Objective; foc
     const instance = map.current;
     const L = leaflet.current;
     if (!ready || !instance || !L || !Number.isFinite(lat) || !Number.isFinite(lng)) return;
+    const activeTarget = targets.find((target) => focusedPlace || (selected && target.objectives.includes(selected)));
+    const visibleTargets = activeTarget ? [activeTarget] : targets;
+    if (!visibleTargets.length) {
+      instance.setView([lat, lng], previewOnly ? 14 : 17, { animate: false });
+      return;
+    }
     const points: Leaflet.LatLngTuple[] = [
       [lat, lng],
-      ...targets.map((target) => [target.place.lat, target.place.lng] as Leaflet.LatLngTuple),
+      ...visibleTargets.flatMap((target) => {
+        const route = loadedRoutes.get(target.place.id);
+        return route
+          ? route.legs.flatMap((leg) =>
+              leg.points.map((point) => [point.latitude, point.longitude] as Leaflet.LatLngTuple),
+            )
+          : [[target.place.lat, target.place.lng] as Leaflet.LatLngTuple];
+      }),
     ];
-    instance.fitBounds(L.latLngBounds(points), { padding: [65, 65], maxZoom: previewOnly ? 14 : 15, animate: false });
-  }, [ready, lat, lng, targets]);
+    instance.fitBounds(L.latLngBounds(points), { padding: [65, 65], maxZoom: previewOnly ? 14 : 17, animate: false });
+  }, [ready, lat, lng, targets, selected, focusedPlace, loadedRoutes]);
 
   useEffect(() => {
     const instance = map.current;
     const L = leaflet.current;
-    if (!ready || !instance || !L || !traffic || !tomtom || previewOnly) return;
+    if (!ready || !instance || !L || !traffic || !tomtom || previewOnly || result?.snapshot.mode === "research") return;
     setTrafficError("");
     const layer = L.tileLayer(`/api/traffic/tiles/{z}/{x}/{y}.png?t=${tick}`, { opacity: 0.8, maxZoom: 19 }).addTo(
       instance,
@@ -199,7 +232,7 @@ export function GigcaMap({ selected, focusedPlace }: { selected?: Objective; foc
     return () => {
       instance.removeLayer(layer);
     };
-  }, [ready, traffic, tomtom, tick]);
+  }, [ready, traffic, tomtom, tick, result?.snapshot.mode]);
 
   const selectedTarget = targets.find((target) => focusedPlace || (selected && target.objectives.includes(selected)));
   const selectedRoute = selectedTarget && loadedRoutes.get(selectedTarget.place.id);
@@ -209,13 +242,16 @@ export function GigcaMap({ selected, focusedPlace }: { selected?: Objective; foc
         <div className="flex flex-wrap items-center gap-2">
           <MapPin className="size-4" />
           <h2 className="font-medium text-sm">Bản đồ & điểm chờ</h2>
-          <Badge variant="outline">{previewOnly ? "Nền bản đồ lưu sẵn" : tomtom ? "TomTom" : "OpenStreetMap"}</Badge>
+          <Badge variant="outline">
+            {previewOnly ? "Nền bản đồ lưu sẵn" : tomtom && !fallbackMap ? "TomTom" : "OpenStreetMap"}
+          </Badge>
+          {fallbackMap && <Badge variant="secondary">TomTom nền bản đồ không khả dụng</Badge>}
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button
             size="sm"
             variant="outline"
-            disabled={!tomtom || previewOnly}
+            disabled={!tomtom || previewOnly || result?.snapshot.mode === "research"}
             aria-pressed={traffic}
             onClick={() => setTraffic(!traffic)}
           >
@@ -226,7 +262,8 @@ export function GigcaMap({ selected, focusedPlace }: { selected?: Objective; foc
             size="icon-sm"
             variant="outline"
             aria-label="Về vị trí của tôi"
-            onClick={() => map.current?.setView([lat, lng], previewOnly ? 14 : 15, { animate: false })}
+            disabled={!Number.isFinite(lat) || !Number.isFinite(lng)}
+            onClick={() => map.current?.setView([lat, lng], previewOnly ? 14 : 18, { animate: false })}
           >
             <LocateFixed />
           </Button>
@@ -246,7 +283,7 @@ export function GigcaMap({ selected, focusedPlace }: { selected?: Objective; foc
           </Badge>
         )}
         {routing && <span role="status">Đang tải tuyến đường…</span>}
-        {previewOnly && (
+        {(previewOnly || result?.snapshot.mode === "research") && (
           <Badge variant="outline" className="ml-auto">
             Chưa có tuyến & giao thông trực tiếp
           </Badge>

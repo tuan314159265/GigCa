@@ -1,7 +1,8 @@
 export type Objective = "max_trip_value" | "maintain_position" | "rest_spot" | "safety_comfort";
 export type Status = "available" | "partial" | "insufficient_data";
 export interface DriverInput {
-  mode: "simulation" | "sample" | "pipeline" | "database";
+  mode: "simulation" | "sample" | "pipeline" | "database" | "live" | "research";
+  research_driver_id?: string;
   rain_tolerance_level: string;
   context: {
     current_lat: number;
@@ -50,6 +51,19 @@ export interface Place {
   parking_allowed?: boolean;
 }
 export interface Recommendation {
+  input_used?: { horizon_min?: number };
+  research_driver_id?: string;
+  origin_used?: { lat: number; lng: number };
+  ml_insights?: {
+    source?: string;
+    model_name?: string;
+    status?: string;
+    notes: string[];
+    wait_model?: { used: boolean; backtest: ModelBacktest; zones?: WaitPrediction[] };
+    cycle_yield?: { backtest: ModelBacktest; zones: { area_id: string; low: number; median: number; high: number }[] };
+    bandit?: { zones: Record<string, { evidence_n: number; explore: boolean; p_best: number }> };
+  } | null;
+  personal_model?: { status?: string; reason?: string; notes?: string[] } | null;
   generated_at: string;
   objectives: Record<Objective, ObjectiveResult>;
   assumptions_used: string[];
@@ -68,6 +82,33 @@ export interface Recommendation {
   }[];
   places: Place[];
   areas: Place[];
+}
+export interface ModelBacktest {
+  status: string;
+  reason?: string;
+  passes?: boolean;
+  calibrated?: boolean | null;
+  n_spells?: number;
+  n_cycles?: number;
+  n_test?: number;
+  mae_median_model_vnd?: number;
+  mae_train_mean_vnd?: number;
+  coverage_conformal?: number;
+}
+export interface WaitPrediction {
+  area_id: string;
+  p_wait_le_pct: Record<string, number | null>;
+  expected_wait_min: number | null;
+  median_wait_min: number | null;
+  model: string;
+}
+export interface ResearchDriver {
+  id: string;
+  description: string;
+  trips: number;
+  waits: number;
+  lat: number;
+  lng: number;
 }
 export const objectives: Objective[] = ["max_trip_value", "maintain_position", "rest_spot", "safety_comfort"];
 export const initialInput: DriverInput = {

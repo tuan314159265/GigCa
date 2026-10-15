@@ -26,6 +26,68 @@ export interface RouteRoad {
   delay: number | undefined;
   status: "smooth" | "moderate" | "congested" | "unknown";
 }
+export interface RoadGroup extends RouteRoad {
+  segments: RouteRoad[];
+  partial: boolean;
+}
+
+// One display row per street; keep every segment for detail instead of claiming
+// that the worst observed segment describes the entire street.
+export function groupRouteRoads(roads: RouteRoad[]): RoadGroup[] {
+  const groups = new Map<string, RoadGroup>();
+  const severity = { unknown: -1, smooth: 0, moderate: 1, congested: 2 };
+  for (const road of roads) {
+    const key = road.name === "Đoạn đường chưa có tên" ? road.id : road.name.trim().toLocaleLowerCase("vi-VN");
+    const group = groups.get(key);
+    if (!group) {
+      groups.set(key, { ...road, segments: [road], partial: road.status === "unknown" });
+      continue;
+    }
+    group.segments.push(road);
+    group.partial ||= road.status === "unknown";
+    if (severity[road.status] > severity[group.status]) group.status = road.status;
+    if (road.speed !== undefined)
+      group.speed = group.speed === undefined ? road.speed : Math.min(group.speed, road.speed);
+    // Traffic sections can overlap split rows: never sum duplicated delay values.
+    if (road.delay !== undefined)
+      group.delay = group.delay === undefined ? road.delay : Math.max(group.delay, road.delay);
+  }
+  return [...groups.values()];
+}
+
+export function routeStreetSequence(route: RoadRoute): string[] {
+  const names: string[] = [];
+  for (const road of routeRoads(route)) {
+    if (road.name !== names.at(-1)) names.push(road.name);
+  }
+  return names;
+}
+export function roadGroupGeometry(route: RoadRoute, group: RoadGroup): number[][][] {
+  const points = route.legs.flatMap((leg) => leg.points);
+  const ranges = group.segments
+    .map((segment) => segment.id.split(":").map(Number))
+    .filter(
+      ([start, end]) =>
+        Number.isInteger(start) && Number.isInteger(end) && start >= 0 && end < points.length && end >= start,
+    )
+    .sort((a, b) => a[0] - b[0]);
+  const merged: number[][] = [];
+  for (const [start, end] of ranges) {
+    const previous = merged.at(-1);
+    if (previous && start <= previous[1]) previous[1] = Math.max(previous[1], end);
+    else merged.push([start, end]);
+  }
+  if (!merged.length || merged.length > 40) return [];
+  const budget = Math.floor(500 / merged.length);
+  return merged.map(([start, end]) => {
+    const count = end - start + 1;
+    const indices =
+      count <= budget
+        ? Array.from({ length: count }, (_, i) => start + i)
+        : Array.from({ length: budget }, (_, i) => start + Math.round((i * (count - 1)) / (budget - 1)));
+    return indices.map((i) => [points[i].latitude, points[i].longitude]);
+  });
+}
 // Split at provider section boundaries: a jam on one part must not label the whole street.
 export function routeRoads(route: RoadRoute): RouteRoad[] {
   const points = route.legs.flatMap((leg) => leg.points);
@@ -33,10 +95,16 @@ export function routeRoads(route: RoadRoute): RouteRoad[] {
   const streets = sections.filter((s) => s.sectionType === "IMPORTANT_ROAD_STRETCH");
   const traffic = sections.filter((s) => s.sectionType === "TRAFFIC");
   const instructions = route.guidance?.instructions ?? [];
-  const boundaries = [...new Set([0, points.length - 1,
-    ...sections.flatMap((s) => [s.startPointIndex, s.endPointIndex]),
-    ...instructions.map((s) => s.pointIndex)])]
-    .filter((i) => Number.isInteger(i) && i >= 0 && i < points.length).sort((a, b) => a - b);
+  const boundaries = [
+    ...new Set([
+      0,
+      points.length - 1,
+      ...sections.flatMap((s) => [s.startPointIndex, s.endPointIndex]),
+      ...instructions.map((s) => s.pointIndex),
+    ]),
+  ]
+    .filter((i) => Number.isInteger(i) && i >= 0 && i < points.length)
+    .sort((a, b) => a - b);
   return boundaries.slice(0, -1).map((start, i) => {
     const end = boundaries[i + 1];
     const street = streets.find((s) => s.startPointIndex <= start && s.endPointIndex >= end);
@@ -49,8 +117,14 @@ export function routeRoads(route: RoadRoute): RouteRoad[] {
       name: street?.streetName?.text ?? instruction?.street ?? "Đoạn đường chưa có tên",
       speed: observation?.effectiveSpeedInKmh,
       delay: observation?.delayInSeconds,
-      status: magnitude === 0 ? "smooth" : magnitude === 1 ? "moderate"
-        : magnitude === 2 || magnitude === 3 || magnitude === 4 ? "congested" : "unknown",
+      status:
+        magnitude === 0
+          ? "smooth"
+          : magnitude === 1
+            ? "moderate"
+            : magnitude === 2 || magnitude === 3 || magnitude === 4
+              ? "congested"
+              : "unknown",
     };
   });
 }
@@ -92,6 +166,6 @@ export function roadRoute(lat: number, lng: number, place: Place): Promise<RoadR
       throw error;
     });
   if (cache.size >= 32) cache.delete(cache.keys().next().value!);
-  cache.set(key, { expires: Date.now() + 60000, promise });
+  cache.set(key, { expires: Date.now() + 30000, promise });
   return promise;
 }

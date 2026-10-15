@@ -34,3 +34,7 @@ data/processed/**
 .next/
 out/
 *.tsbuildinfo
+
+# Local agent installations are not application source
+web/.agents/
+web/skills-lock.json

@@ -12,12 +12,20 @@ import { previewOnly } from "../../_components/gigca/preview";
 import type { DriverInput } from "../../_components/gigca/types";
 import { LocationSearch } from "./location-search";
 
+function mainInput(value: DriverInput): DriverInput {
+  return {
+    ...value,
+    mode: value.mode === "research" ? "live" : value.mode,
+    research_driver_id: undefined,
+  };
+}
+
 export function DriverForm() {
   const { input, run, busy } = useGigca();
-  const [draft, setDraft] = useState(input);
+  const [draft, setDraft] = useState(() => mainInput(input));
   const [gpsError, setGpsError] = useState("");
   const [locating, setLocating] = useState(false);
-  useEffect(() => setDraft(input), [input]);
+  useEffect(() => setDraft(mainInput(input)), [input]);
   const update = (key: keyof DriverInput["context"], value: number) =>
     setDraft((current) => ({ ...current, context: { ...current.context, [key]: value } }));
   function locate() {
@@ -40,7 +48,7 @@ export function DriverForm() {
         setLocating(false);
       },
       () => {
-        setGpsError("Không lấy được vị trí. Bạn có thể nhập tọa độ.");
+        setGpsError("Không lấy được vị trí. Bạn có thể tìm địa điểm bằng tên hoặc nhập tọa độ.");
         setLocating(false);
       },
       { timeout: 10000 },
@@ -55,16 +63,79 @@ export function DriverForm() {
       className="flex flex-col gap-4 p-4"
     >
       <FieldSet disabled={previewOnly || busy}>
-        <LocationSearch disabled={previewOnly || busy} onSelect={(lat, lng) => {
-          setGpsError("");
-          setDraft((current) => ({ ...current, context: { ...current.context, current_lat: lat, current_lng: lng } }));
-        }} />
+        <div className="grid min-w-0 items-start gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+        <LocationSearch
+          labelAction={
+          <Button type="button" variant="outline" onClick={locate} disabled={previewOnly || busy || locating}>
+            <LocateFixed data-icon="inline-start" />
+            {locating ? "Đang lấy vị trí" : "Vị trí của tôi"}
+          </Button>
+          }
+          disabled={previewOnly || busy}
+          onSelect={(lat, lng) => {
+            setGpsError("");
+            setDraft((current) => ({
+              ...current,
+              context: { ...current.context, current_lat: lat, current_lng: lng },
+            }));
+          }}
+        />
+          <div className="xl:pt-3">
+            <FieldGroup className="grid grid-cols-2 gap-3">
+              <Field>
+                <FieldLabel htmlFor="latitude">Vĩ độ</FieldLabel>
+                <Input
+                  id="latitude"
+                  type="number"
+                  required
+                  min={-90}
+                  max={90}
+                  step="any"
+                  value={Number.isFinite(draft.context.current_lat) ? draft.context.current_lat : ""}
+                  onChange={(event) =>
+                    update("current_lat", event.target.value === "" ? NaN : Number(event.target.value))
+                  }
+                />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="longitude">Kinh độ</FieldLabel>
+                <Input
+                  id="longitude"
+                  type="number"
+                  required
+                  min={-180}
+                  max={180}
+                  step="any"
+                  value={Number.isFinite(draft.context.current_lng) ? draft.context.current_lng : ""}
+                  onChange={(event) =>
+                    update("current_lng", event.target.value === "" ? NaN : Number(event.target.value))
+                  }
+                />
+              </Field>
+            </FieldGroup>
+
+          </div>
+        </div>
         <FieldGroup className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           {(
             [
               ["idle_duration_min", "Đã chờ (phút)", 0, 1440, 1, "Số phút bạn đã chờ mà chưa nhận được cuốc mới."],
-              ["horizon_min", "Xét trong (phút)", 1, 480, 1, "Khoảng thời gian sắp tới dùng để đánh giá gợi ý và dự báo mưa."],
-              ["max_reposition_km", "Di chuyển tối đa (km)", 0.1, 50, 0.1, "Quãng đường tối đa bạn sẵn sàng đi từ vị trí hiện tại tới điểm được gợi ý."],
+              [
+                "horizon_min",
+                "Xét trong (phút)",
+                1,
+                480,
+                1,
+                "Khoảng thời gian sắp tới dùng để đánh giá gợi ý và dự báo mưa.",
+              ],
+              [
+                "max_reposition_km",
+                "Di chuyển tối đa (km)",
+                0.1,
+                50,
+                0.1,
+                "Quãng đường tối đa bạn sẵn sàng đi từ vị trí hiện tại tới điểm được gợi ý.",
+              ],
             ] as const
           ).map(([key, label, min, max, step, description]) => (
             <Field key={key} data-disabled={previewOnly || busy}>
@@ -107,10 +178,7 @@ export function DriverForm() {
           </Field>
         </FieldGroup>
         <div className="flex flex-wrap items-center gap-2">
-          <Button type="button" variant="outline" onClick={locate} disabled={previewOnly || busy || locating}>
-            <LocateFixed data-icon="inline-start" />
-            {locating ? "Đang lấy vị trí" : "Vị trí của tôi"}
-          </Button>
+
           <Button
             type="submit"
             disabled={
@@ -123,41 +191,7 @@ export function DriverForm() {
             <RefreshCw data-icon="inline-start" />
             {busy ? "Đang tính" : "Tính gợi ý"}
           </Button>
-          <details className="ml-auto w-full text-sm sm:w-80">
-            <summary className="cursor-pointer text-muted-foreground">Tọa độ</summary>
-            <FieldGroup className="mt-3 grid grid-cols-2 gap-3">
-              <Field>
-                <FieldLabel htmlFor="latitude">Vĩ độ</FieldLabel>
-                <Input
-                  id="latitude"
-                  type="number"
-                  required
-                  min={-90}
-                  max={90}
-                  step="any"
-                  value={Number.isFinite(draft.context.current_lat) ? draft.context.current_lat : ""}
-                  onChange={(event) =>
-                    update("current_lat", event.target.value === "" ? NaN : Number(event.target.value))
-                  }
-                />
-              </Field>
-              <Field>
-                <FieldLabel htmlFor="longitude">Kinh độ</FieldLabel>
-                <Input
-                  id="longitude"
-                  type="number"
-                  required
-                  min={-180}
-                  max={180}
-                  step="any"
-                  value={Number.isFinite(draft.context.current_lng) ? draft.context.current_lng : ""}
-                  onChange={(event) =>
-                    update("current_lng", event.target.value === "" ? NaN : Number(event.target.value))
-                  }
-                />
-              </Field>
-            </FieldGroup>
-          </details>
+
         </div>
       </FieldSet>
       {gpsError && (

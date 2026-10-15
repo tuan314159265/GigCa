@@ -87,6 +87,9 @@ def validate_trips(rows: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], li
     warnings: list[dict[str, Any]] = []
     seen: set[str] = set()
     for i, r in enumerate(rows, start=2):  # row 1 is the header
+        if str(r.get("source_kind", "")).strip().lower() == "synthetic":
+            rejected.append({"row": i, "reason": "dữ liệu synthetic chỉ dùng nghiên cứu, không nhập vào lịch sử thật"})
+            continue
         missing = [f for f in TRIP_REQUIRED if _blank(r.get(f))]
         if missing:
             rejected.append({"row": i, "reason": f"thiếu trường bắt buộc: {', '.join(missing)}"})
@@ -138,6 +141,9 @@ def validate_waits(rows: list[dict[str, Any]]) -> tuple[list[dict[str, Any]], li
     warnings: list[dict[str, Any]] = []
     seen: set[str] = set()
     for i, r in enumerate(rows, start=2):
+        if str(r.get("source_kind", "")).strip().lower() == "synthetic":
+            rejected.append({"row": i, "reason": "dữ liệu synthetic chỉ dùng nghiên cứu, không nhập vào lịch sử thật"})
+            continue
         missing = [f for f in WAIT_REQUIRED if _blank(r.get(f))]
         if missing:
             rejected.append({"row": i, "reason": f"thiếu trường bắt buộc: {', '.join(missing)}"})

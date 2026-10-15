@@ -1,0 +1,83 @@
+{
+  "provenance": {
+    "kind": "synthetic",
+    "persona_source": "assistant_authored",
+    "created_on": "2026-10-14",
+    "model": "conversation_assistant",
+    "note": "Persona được LLM trợ lý soạn trong phiên làm việc này. Tham số là giả thuyết có kiểm soát, không phải phân bố đo được từ tài xế thật; không phải output của Ollama hoặc thí nghiệm nhiều dòng LLM."
+  },
+  "personas": [
+    {
+      "driver_id": "D01", "description": "Tài xế ảo bán thời gian ca sáng, ưu tiên hai vùng quen, chỉ nhận khách ở gần, thường giữ vị trí nếu chưa chờ lâu.",
+      "home_zone": "Z1", "preferred_zones": ["Z1", "Z2"], "start_hour": 7, "shift_hours": 4,
+      "work_probability": 0.7, "patience_min": 25, "move_probability": 0.3, "pickup_radius_m": 150,
+      "rain_tolerance_mm": 1, "driver_share": 0.7, "fuel_l_per_100km": 1.8, "fuel_price_vnd_per_l": 22000
+    },
+    {
+      "driver_id": "D02", "description": "Tài xế ảo toàn thời gian ca chiều, linh hoạt giữa trung tâm và phía đông bắc, chịu mưa vừa, sẵn sàng chuyển chỗ sau thời gian chờ trung bình.",
+      "home_zone": "Z2", "preferred_zones": ["Z2", "Z1", "Z4"], "start_hour": 13, "shift_hours": 9,
+      "work_probability": 0.85, "patience_min": 20, "move_probability": 0.65, "pickup_radius_m": 400,
+      "rain_tolerance_mm": 3, "driver_share": 0.75, "fuel_l_per_100km": 2.2, "fuel_price_vnd_per_l": 22000
+    },
+    {
+      "driver_id": "D03", "description": "Tài xế ảo toàn thời gian ca sớm, thường quay về vùng phía tây, chấp nhận đi đón xa hơn và kiên nhẫn trước khi chuyển vùng.",
+      "home_zone": "Z5", "preferred_zones": ["Z5", "Z3", "Z2"], "start_hour": 6, "shift_hours": 9,
+      "work_probability": 0.8, "patience_min": 35, "move_probability": 0.45, "pickup_radius_m": 900,
+      "rain_tolerance_mm": 5, "driver_share": 0.65, "fuel_l_per_100km": 2.6, "fuel_price_vnd_per_l": 22000
+    },
+    {
+      "driver_id": "D04", "description": "Tài xế ảo làm thêm buổi tối, giới hạn phạm vi đón, dễ nghỉ khi mưa, ưu tiên vùng gần nhà hơn là chuyển chỗ liên tục.",
+      "home_zone": "Z6", "preferred_zones": ["Z6", "Z1"], "start_hour": 17, "shift_hours": 5,
+      "work_probability": 0.6, "patience_min": 18, "move_probability": 0.25, "pickup_radius_m": 200,
+      "rain_tolerance_mm": 0.8, "driver_share": 0.7, "fuel_l_per_100km": 2, "fuel_price_vnd_per_l": 22000
+    },
+    {
+      "driver_id": "D05", "description": "Tài xế ảo ca ngày dài, ít kiên nhẫn chờ, thường thử nhiều vùng quen, mức chịu mưa trung bình.",
+      "home_zone": "Z3", "preferred_zones": ["Z3", "Z5", "Z1", "Z2"], "start_hour": 8, "shift_hours": 9,
+      "work_probability": 0.9, "patience_min": 12, "move_probability": 0.8, "pickup_radius_m": 500,
+      "rain_tolerance_mm": 2, "driver_share": 0.75, "fuel_l_per_100km": 2.1, "fuel_price_vnd_per_l": 22000
+    },
+    {
+      "driver_id": "D06", "description": "Tài xế ảo chủ yếu chạy chiều tối phía đông bắc, kiên nhẫn, chấp nhận đi đón xa và mưa nhiều hơn nhóm còn lại.",
+      "home_zone": "Z4", "preferred_zones": ["Z4", "Z2", "Z1"], "start_hour": 14, "shift_hours": 8,
+      "work_probability": 0.85, "patience_min": 40, "move_probability": 0.35, "pickup_radius_m": 1100,
+      "rain_tolerance_mm": 7, "driver_share": 0.7, "fuel_l_per_100km": 2.8, "fuel_price_vnd_per_l": 22000
+    },
+    {
+      "driver_id": "D07", "description": "Tài xế ảo bán thời gian giữa ngày, chạy vài ngày mỗi tuần, giữ phạm vi quen nhỏ và tránh chặng đón xa.",
+      "home_zone": "Z2", "preferred_zones": ["Z2", "Z3"], "start_hour": 9, "shift_hours": 4,
+      "work_probability": 0.5, "patience_min": 22, "move_probability": 0.4, "pickup_radius_m": 180,
+      "rain_tolerance_mm": 1.5, "driver_share": 0.65, "fuel_l_per_100km": 1.7, "fuel_price_vnd_per_l": 22000
+    },
+    {
+      "driver_id": "D08", "description": "Tài xế ảo ca chiều dài, hay đổi vùng phía nam và trung tâm, khả năng chấp nhận mưa ở mức vừa, xe tiêu hao cao hơn.",
+      "home_zone": "Z6", "preferred_zones": ["Z6", "Z1", "Z3"], "start_hour": 12, "shift_hours": 10,
+      "work_probability": 0.8, "patience_min": 16, "move_probability": 0.75, "pickup_radius_m": 650,
+      "rain_tolerance_mm": 3.5, "driver_share": 0.7, "fuel_l_per_100km": 3, "fuel_price_vnd_per_l": 22000
+    },
+    {
+      "driver_id": "D09", "description": "Tài xế ảo ca sáng trung bình, kiên nhẫn, ưu tiên khách gần và hai vùng trung tâm thay vì thử nhiều vùng.",
+      "home_zone": "Z1", "preferred_zones": ["Z1", "Z2"], "start_hour": 7, "shift_hours": 6,
+      "work_probability": 0.75, "patience_min": 30, "move_probability": 0.2, "pickup_radius_m": 250,
+      "rain_tolerance_mm": 2.5, "driver_share": 0.75, "fuel_l_per_100km": 1.9, "fuel_price_vnd_per_l": 22000
+    },
+    {
+      "driver_id": "D10", "description": "Tài xế ảo ca tối linh hoạt, hoạt động không đều, nhanh đổi chỗ nếu chưa có cuốc và sẵn sàng tới đón ở khoảng cách vừa.",
+      "home_zone": "Z5", "preferred_zones": ["Z5", "Z3", "Z2"], "start_hour": 16, "shift_hours": 6,
+      "work_probability": 0.55, "patience_min": 10, "move_probability": 0.85, "pickup_radius_m": 450,
+      "rain_tolerance_mm": 2, "driver_share": 0.65, "fuel_l_per_100km": 2.4, "fuel_price_vnd_per_l": 22000
+    },
+    {
+      "driver_id": "D11", "description": "Tài xế ảo ca ngày ổn định, thử nhiều vùng nhưng chỉ nhận điểm đón rất gần, xe tiết kiệm nhiên liệu.",
+      "home_zone": "Z3", "preferred_zones": ["Z3", "Z1", "Z5"], "start_hour": 8, "shift_hours": 8,
+      "work_probability": 0.9, "patience_min": 20, "move_probability": 0.6, "pickup_radius_m": 120,
+      "rain_tolerance_mm": 4, "driver_share": 0.7, "fuel_l_per_100km": 1.6, "fuel_price_vnd_per_l": 22000
+    },
+    {
+      "driver_id": "D12", "description": "Tài xế ảo bán thời gian ca chiều, kiên nhẫn nhưng thường nghỉ hơn là chuyển chỗ, mức chịu mưa thấp và phạm vi đón trung bình.",
+      "home_zone": "Z4", "preferred_zones": ["Z4", "Z2"], "start_hour": 14, "shift_hours": 4,
+      "work_probability": 0.65, "patience_min": 32, "move_probability": 0.2, "pickup_radius_m": 350,
+      "rain_tolerance_mm": 1.2, "driver_share": 0.75, "fuel_l_per_100km": 2, "fuel_price_vnd_per_l": 22000
+    }
+  ]
+}

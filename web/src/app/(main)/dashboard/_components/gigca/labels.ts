@@ -10,6 +10,7 @@ export const directions = {
 export const statuses = { available: "Có dữ liệu", partial: "Một phần", insufficient_data: "Chưa đủ dữ liệu" };
 export const modes: Record<string, string> = {
   preview: "Preview",
+  research: "Mô phỏng nghiên cứu",
   live: "Theo vị trí hiện tại",
   simulation: "Mô phỏng",
   sample: "Snapshot mẫu",

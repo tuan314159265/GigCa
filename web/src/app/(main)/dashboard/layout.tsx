@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { Search } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { redirect } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { GigcaProvider } from "./_components/gigca/gigca-provider";
 
@@ -16,8 +16,12 @@ import { getPreference } from "@/server/server-actions";
 
 import { LayoutControls } from "./_components/header/layout-controls";
 import { ThemeSwitcher } from "./_components/header/theme-switcher";
+import { DriverMenu } from "./_components/header/driver-menu";
+import { currentDriver } from "@/server/auth";
 
 export default async function Layout({ children }: Readonly<{ children: ReactNode }>) {
+  const driver = await currentDriver();
+  if (!driver) redirect("/auth/login");
   const cookieStore = await cookies();
   const defaultOpen = cookieStore.get("sidebar_state")?.value !== "false";
   const [variant, collapsible] = await Promise.all([
@@ -70,9 +74,7 @@ export default async function Layout({ children }: Readonly<{ children: ReactNod
             <div className="flex items-center gap-2">
               <LayoutControls />
               <ThemeSwitcher />
-              <Avatar className="size-8 rounded-lg">
-                <AvatarFallback>TX</AvatarFallback>
-              </Avatar>
+              <DriverMenu driver={driver} />
             </div>
           </div>
         </header>

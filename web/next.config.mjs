@@ -18,7 +18,8 @@ const nextConfig = {
   },
   async rewrites() {
     const backend = process.env.GIGCA_API_URL || "http://127.0.0.1:8000";
-    return [{ source: "/api/:path*", destination: `${backend}/api/:path*` }];
+    // Dynamic /api/v1 route handler must run before the legacy provider proxy.
+    return { fallback: [{ source: "/api/:path*", destination: `${backend}/api/:path*` }] };
   },
 };
 

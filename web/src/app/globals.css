@@ -410,3 +410,11 @@ html:has([data-landing-page]) {
 .gigca-direction-cards [data-slot="toggle-group-item"]:focus-visible {
   opacity: 1;
 }
+
+/* No implied recommendation before the first calculation. */
+.gigca-direction-cards[data-ready="false"] [data-slot="toggle-group-item"] {
+  background: transparent;
+  border-color: transparent;
+  color: var(--card-foreground);
+  opacity: 0.65;
+}
