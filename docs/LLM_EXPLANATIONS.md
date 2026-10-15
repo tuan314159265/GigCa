@@ -55,3 +55,22 @@ evidence IDs and POI context for inspection. This is optional additive response 
 frontend reads the existing `plan.summary` field with no new UI required.
 
 Tests: `python -B -m unittest api.tests.test_llm_explanations -v`.
+
+## Google Gemini fallback
+
+Set `GIGCA_GEMINI_API_KEY` to a Google AI Studio **Gemini** key (a Maps key alone is not sufficient).
+`GIGCA_GEMINI_MODEL` defaults to `gemini-3.8-flash`; select a model available to your project.
+Official integration: https://ai.google.dev/gemini-api/docs/openai .
+Fixed Google endpoint: `https://generativelanguage.googleapis.com/v1beta/openai/chat/completions`.
+
+Order: configured compatible provider -> configured Gemini -> original engine summary.
+If only Gemini is configured, it is called directly. Each provider is attempted once, timeout 12 s;
+there is no extra retry. Invalid JSON, truncated output, validation errors and network failures
+trigger the next provider. Valid objectives from the first provider are retained; only missing
+objectives are requested from Gemini. Same grounding checks apply to both providers.
+Metadata includes sanitized provider/model/status/reason per attempt, never keys or raw errors.
+Successful results are cached 5 minutes, fingerprinted by provider configuration and credential hash;
+failed attempts are not cached. Gemini quota/billing belongs to the Google project.
+No training, ranking, target, personal-history or money calculation changes.
+
+After editing `.env`, rebuild/recreate backend. Do not commit `.env` or paste keys into chat.

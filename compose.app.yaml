@@ -10,6 +10,8 @@ services:
       GIGCA_LLM_BASE_URL: ${GIGCA_LLM_BASE_URL:-https://api.shopaikey.com/v1}
       GIGCA_LLM_API_KEY: ${GIGCA_LLM_API_KEY:-}
       GIGCA_LLM_MODEL: ${GIGCA_LLM_MODEL:-}
+      GIGCA_GEMINI_API_KEY: ${GIGCA_GEMINI_API_KEY:-}
+      GIGCA_GEMINI_MODEL: ${GIGCA_GEMINI_MODEL:-gemini-3.8-flash}
       GIGCA_SESSION_DB: /app/.cache/backend.sqlite3
       GIGCA_API_HOST: 0.0.0.0
       GIGCA_MAIN_MODEL_DIR: /app/main-model

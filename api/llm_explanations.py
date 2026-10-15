@@ -59,7 +59,8 @@ class NoRedirect(HTTPRedirectHandler):
         return None
 
 def settings():
-    keys = ('GIGCA_LLM_BASE_URL', 'GIGCA_LLM_API_KEY', 'GIGCA_LLM_MODEL', 'GIGCA_LLM_EXPLANATIONS')
+    keys = ('GIGCA_LLM_BASE_URL', 'GIGCA_LLM_API_KEY', 'GIGCA_LLM_MODEL', 'GIGCA_LLM_EXPLANATIONS',
+            'GIGCA_GEMINI_API_KEY', 'GIGCA_GEMINI_MODEL')
     values = {}
     path = ROOT / '.env'
     if path.is_file():
@@ -265,6 +266,61 @@ def validate_selection(document, evidence):
     if not selected: raise ValueError('invalid_explanation')
     return selected
 
+class CompositionFailed(ValueError):
+    def __init__(self, attempts):
+        super().__init__('all_providers_failed')
+        self.attempts = attempts
+
+
+def providers_for(cfg):
+    providers = []
+    if cfg.get('GIGCA_LLM_API_KEY') and cfg.get('GIGCA_LLM_MODEL'):
+        providers.append({'name':'compatible', 'base':cfg.get('GIGCA_LLM_BASE_URL','https://api.shopaikey.com/v1').rstrip('/'),
+                          'key':cfg['GIGCA_LLM_API_KEY'], 'model':cfg['GIGCA_LLM_MODEL']})
+    if cfg.get('GIGCA_GEMINI_API_KEY'):
+        providers.append({'name':'gemini', 'base':'https://generativelanguage.googleapis.com/v1beta/openai',
+                          'key':cfg['GIGCA_GEMINI_API_KEY'], 'model':cfg.get('GIGCA_GEMINI_MODEL') or 'gemini-3.8-flash'})
+    return providers
+
+
+def compose_with_fallback(providers, facts):
+    selected = {}; attempts = []
+    for provider in providers:
+        missing = {key:value for key,value in facts.items() if key not in selected}
+        if not missing: break
+        attempt = {'provider':provider['name'], 'model':provider['model']}
+        try:
+            url = urlsplit(provider['base'])
+            if url.scheme != 'https' or not url.hostname or url.username or url.password or url.query or url.fragment:
+                raise ValueError('invalid_configuration')
+            payload = {'local_time':datetime.now(timezone(timedelta(hours=7))).isoformat(), 'evidence':missing}
+            raw = request_json(provider['base']+'/chat/completions',
+                {'model':provider['model'], 'stream':False, 'max_tokens':1200,
+                 'messages':[{'role':'system','content':SYSTEM_PROMPT},
+                             {'role':'user','content':json.dumps(payload,ensure_ascii=False)}]},
+                {'Authorization':'Bearer '+provider['key']},timeout=12)
+            choice = raw['choices'][0]
+            if choice.get('finish_reason') != 'stop': raise ValueError('incomplete')
+            text = choice['message']['content'].strip()
+            if text.startswith('```json') and text.endswith('```'):text=text[7:-3].strip()
+            rows = validate_selection(json.loads(text),missing)
+            selected.update({key:{**row,'provider':provider['name'],'model':provider['model']} for key,row in rows.items()})
+            attempt.update(status='ok', objectives=list(rows))
+        except TimeoutError:
+            attempt.update(status='failed', reason='provider_timeout')
+        except json.JSONDecodeError:
+            attempt.update(status='failed', reason='invalid_json')
+        except ValueError as error:
+            reason=str(error)
+            allowed=('incomplete','invalid_objectives','invalid_explanation','invalid_configuration')
+            attempt.update(status='failed', reason=reason if reason in allowed else 'provider_error')
+        except Exception:
+            attempt.update(status='failed', reason='provider_error')
+        attempts.append(attempt)
+    if not selected:raise CompositionFailed(attempts)
+    return selected, attempts
+
+
 def apply_explanations(result):
     cfg = settings()
     if cfg.get('GIGCA_LLM_EXPLANATIONS','false').lower() != 'true': return result
@@ -274,13 +330,10 @@ def apply_explanations(result):
     def fallback(reason):
         result['explanation_status'] = {'source':'engine', 'reason':reason}
         return result
-    if not cfg.get('GIGCA_LLM_API_KEY') or not cfg.get('GIGCA_LLM_MODEL'): return fallback('missing_configuration')
+    providers = providers_for(cfg)
+    if not providers:return fallback('missing_configuration')
     if not _SLOTS.acquire(blocking=False): return fallback('busy')
     try:
-        base = cfg.get('GIGCA_LLM_BASE_URL','https://api.shopaikey.com/v1').rstrip('/')
-        url = urlsplit(base)
-        if url.scheme != 'https' or not url.hostname or url.username or url.password or url.query or url.fragment:
-            return fallback('invalid_configuration')
         areas = result.get('areas',[])
         contexts = {}; facts = {}
         if result.get('snapshot',{}).get('mode') == 'live':
@@ -297,26 +350,19 @@ def apply_explanations(result):
                 if point not in contexts: contexts[point] = poi_context(*point)
                 context = contexts[point]
             facts[key] = evidence_for(result,key,context)
-        payload = {'local_time':datetime.now(timezone(timedelta(hours=7))).isoformat(), 'evidence':facts}
-        fingerprint = hashlib.sha256(json.dumps([base,cfg['GIGCA_LLM_MODEL'],SYSTEM_PROMPT,facts],sort_keys=True,ensure_ascii=False).encode()).hexdigest()
-        def generate():
-            raw = request_json(base+'/chat/completions',
-                {'model':cfg['GIGCA_LLM_MODEL'], 'stream':False, 'max_tokens':1200,
-                 'messages':[{'role':'system','content':SYSTEM_PROMPT},
-                             {'role':'user','content':json.dumps(payload,ensure_ascii=False)}]},
-                {'Authorization':'Bearer '+cfg['GIGCA_LLM_API_KEY']},timeout=12)
-            choice = raw['choices'][0]
-            if choice.get('finish_reason') != 'stop': raise ValueError('incomplete')
-            text = choice['message']['content'].strip()
-            if text.startswith('```json') and text.endswith('```'): text=text[7:-3].strip()
-            return validate_selection(json.loads(text),facts)
-        composed = cached(('llm_explanation',fingerprint),300,generate)
+        identities = [{k:v for k,v in p.items() if k != 'key'} | {'credential_hash':hashlib.sha256(p['key'].encode()).hexdigest()} for p in providers]
+        fingerprint = hashlib.sha256(json.dumps([identities,SYSTEM_PROMPT,facts],sort_keys=True,ensure_ascii=False).encode()).hexdigest()
+        composed, attempts = cached(('llm_explanation',fingerprint),300,lambda:compose_with_fallback(providers,facts))
         for key, row in composed.items():
             plans[key]['summary'] = row['text']
-        result['explanation_status'] = {'source':'llm_grounded_composition', 'model':cfg['GIGCA_LLM_MODEL'],
-                                       'prompt_version':'driver-natural-poi-v4', 'evidence':facts,
+        result['explanation_status'] = {'source':'llm_grounded_composition', 'model':','.join(dict.fromkeys(row['model'] for row in composed.values())),
+                                       'attempts':attempts, 'prompt_version':'driver-natural-poi-v4', 'evidence':facts,
                                        'selection':composed, 'fallback_objectives':[k for k in plans if k not in composed],
                                        'poi_context':list(contexts.values())}
+    except CompositionFailed as error:
+        fallback('all_providers_failed')
+        result['explanation_status']['attempts'] = error.attempts
+        return result
     except TimeoutError:
         return fallback('provider_timeout')
     except json.JSONDecodeError:

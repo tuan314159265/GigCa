@@ -2,7 +2,7 @@ import copy
 import json
 import unittest
 from unittest.mock import patch
-from api.llm_explanations import apply_explanations, validate_selection, evidence_for, classified_poi, poi_context, poi_group
+from api.llm_explanations import apply_explanations, validate_selection, evidence_for, classified_poi, poi_context, poi_group, compose_with_fallback, providers_for, CompositionFailed
 
 TEXT='Trong các điểm đang so sánh, khu vực này có năng suất dự kiến tốt nhất. Bạn cần cân nhắc quãng đường di chuyển trước khi tới điểm chờ.'
 class ExplanationTests(unittest.TestCase):
@@ -38,6 +38,51 @@ class ExplanationTests(unittest.TestCase):
         facts={'max_trip_value':{'engine':'a','tradeoff':'b'}}
         out=validate_selection(self.document(ids=['max_trip_value','tradeoff']),facts)
         self.assertEqual(out['max_trip_value']['evidence_ids'],['engine','tradeoff'])
+
+    def test_primary_success_does_not_call_gemini(self):
+        providers=providers_for({**self.cfg,'GIGCA_GEMINI_API_KEY':'google-test'})
+        response={'choices':[{'finish_reason':'stop','message':{'content':json.dumps(self.document())}}]}
+        with patch('api.llm_explanations.request_json',return_value=response) as call:
+            rows,attempts=compose_with_fallback(providers,{'max_trip_value':{'engine':'a','tradeoff':'b'}})
+        self.assertEqual(call.call_count,1)
+        self.assertEqual(rows['max_trip_value']['provider'],'compatible')
+
+    def test_gemini_recovers_timeout_invalid_json_or_invalid_content(self):
+        providers=providers_for({**self.cfg,'GIGCA_GEMINI_API_KEY':'google-test'})
+        response=lambda text:{'choices':[{'finish_reason':'stop','message':{'content':text}}]}
+        for failure in [TimeoutError(),response('bad json'),response(json.dumps(self.document(TEXT+' Chờ 5 phút.')))]:
+            with patch('api.llm_explanations.request_json',side_effect=[failure,response(json.dumps(self.document()))]) as call:
+                rows,attempts=compose_with_fallback(providers,{'max_trip_value':{'engine':'a','tradeoff':'b'}})
+            self.assertEqual(rows['max_trip_value']['provider'],'gemini')
+            self.assertEqual(attempts[0]['status'],'failed')
+            self.assertEqual(call.call_args.args[0],'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions')
+            self.assertEqual(call.call_args.args[2]['Authorization'],'Bearer google-test')
+
+    def test_both_providers_fail_preserves_engine_and_redacts_errors(self):
+        cfg={**self.cfg,'GIGCA_GEMINI_API_KEY':'google-test'}
+        with patch('api.llm_explanations.settings',return_value=cfg), patch('api.llm_explanations.poi_context',return_value=[]), patch('api.llm_explanations.cached',side_effect=lambda k,t,f:f()), patch('api.llm_explanations.request_json',side_effect=ValueError('test-secret google-test')):
+            out=apply_explanations(copy.deepcopy(self.result))
+        self.assertEqual(out['objectives'],self.result['objectives'])
+        self.assertEqual(len(out['explanation_status']['attempts']),2)
+        self.assertNotIn('google-test',json.dumps(out['explanation_status']))
+        self.assertNotIn('test-secret',json.dumps(out['explanation_status']))
+
+    def test_google_only_configuration(self):
+        providers=providers_for({'GIGCA_GEMINI_API_KEY':'google-test'})
+        self.assertEqual([p['name'] for p in providers],['gemini'])
+
+    def test_partial_primary_only_sends_missing_objective_to_google(self):
+        providers=providers_for({**self.cfg,'GIGCA_GEMINI_API_KEY':'google-test'})
+        first=self.document()
+        second={'objectives':{'maintain_position':{'text':TEXT,'evidence_ids':['engine','tradeoff']}}}
+        response=lambda doc:{'choices':[{'finish_reason':'stop','message':{'content':json.dumps(doc)}}]}
+        facts={k:{'engine':'a','tradeoff':'b'} for k in ('max_trip_value','maintain_position')}
+        with patch('api.llm_explanations.request_json',side_effect=[response(first),response(second)]) as call:
+            rows,attempts=compose_with_fallback(providers,facts)
+        sent=json.loads(call.call_args.args[1]['messages'][1]['content'])['evidence']
+        self.assertEqual(list(sent),['maintain_position'])
+        self.assertEqual(rows['max_trip_value']['provider'],'compatible')
+        self.assertEqual(rows['maintain_position']['provider'],'gemini')
 
     def test_provider_failure_keeps_engine_summary(self):
         with patch('api.llm_explanations.settings',return_value=self.cfg), patch('api.llm_explanations.poi_context',return_value=[]), patch('api.llm_explanations.request_json',side_effect=TimeoutError), patch('api.llm_explanations.cached',side_effect=lambda k,t,f:f()):
