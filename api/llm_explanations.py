@@ -60,7 +60,8 @@ class NoRedirect(HTTPRedirectHandler):
 
 def settings():
     keys = ('GIGCA_LLM_BASE_URL', 'GIGCA_LLM_API_KEY', 'GIGCA_LLM_MODEL', 'GIGCA_LLM_EXPLANATIONS',
-            'GIGCA_GEMINI_API_KEY', 'GIGCA_GEMINI_MODEL')
+            'GIGCA_GEMINI_API_KEY', 'GIGCA_GEMINI_MODEL', 'GEMINI_API_KEY', 'GEMINI_MODEL',
+            'OPENAI_API_KEY', 'OPENAI_MODEL')
     values = {}
     path = ROOT / '.env'
     if path.is_file():
@@ -274,12 +275,18 @@ class CompositionFailed(ValueError):
 
 def providers_for(cfg):
     providers = []
+    gemini_key = cfg.get('GIGCA_GEMINI_API_KEY') or cfg.get('GEMINI_API_KEY')
+    if gemini_key:
+        providers.append({'name':'gemini', 'base':'https://generativelanguage.googleapis.com/v1beta/openai',
+                          'key':gemini_key,
+                          'model':cfg.get('GIGCA_GEMINI_MODEL') or cfg.get('GEMINI_MODEL') or 'gemini-3.8-flash'})
+    openai_key = cfg.get('OPENAI_API_KEY')
+    if openai_key:
+        providers.append({'name':'openai', 'base':'https://api.openai.com/v1', 'key':openai_key,
+                          'model':cfg.get('OPENAI_MODEL') or 'gpt-4.1-mini'})
     if cfg.get('GIGCA_LLM_API_KEY') and cfg.get('GIGCA_LLM_MODEL'):
         providers.append({'name':'compatible', 'base':cfg.get('GIGCA_LLM_BASE_URL','https://api.shopaikey.com/v1').rstrip('/'),
                           'key':cfg['GIGCA_LLM_API_KEY'], 'model':cfg['GIGCA_LLM_MODEL']})
-    if cfg.get('GIGCA_GEMINI_API_KEY'):
-        providers.append({'name':'gemini', 'base':'https://generativelanguage.googleapis.com/v1beta/openai',
-                          'key':cfg['GIGCA_GEMINI_API_KEY'], 'model':cfg.get('GIGCA_GEMINI_MODEL') or 'gemini-3.8-flash'})
     return providers
 
 

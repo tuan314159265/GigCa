@@ -21,7 +21,9 @@ class Handler(DashboardHandler):
             if method in ('POST','PATCH'):
                 try:
                     length=int(self.headers.get('Content-Length','0'))
-                    max_size = 1_048_576 if path == '/api/v1/me/log-imports/preview' else 65536 if path == '/api/v1/cameras/near-route' else 16384
+                    max_size = (1_048_576 if path == '/api/v1/me/log-imports/preview' else
+                                65536 if path == '/api/v1/cameras/near-route' else
+                                32768 if path == '/api/v1/chat' else 16384)
                     if not 0<length<=max_size:raise ValueError()
                     payload=json.loads(self.rfile.read(length))
                     if not isinstance(payload,dict):raise ValueError()
@@ -88,6 +90,10 @@ class Handler(DashboardHandler):
                 else:raise ApiError(404,'not_found','Endpoint không tồn tại.')
             elif path=='/api/v1/recommendations' and method=='POST':
                 result=service.run(payload.get('session_id'),token,payload,self.headers.get('Idempotency-Key'))
+            elif path=='/api/v1/chat' and method=='POST':
+                service.me(token)
+                from api.driver_chat import answer
+                result=answer(payload)
             elif (m:=re.fullmatch('/api/v1/recommendations/([^/]+)',path)) and method=='GET':
                 sid=parse_qs(urlsplit(self.path).query).get('session_id',[''])[0]
                 result=service.get(m[1],sid,token)

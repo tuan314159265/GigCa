@@ -14,25 +14,13 @@ type State = {
   database: boolean;
   researchAvailable: boolean;
   capabilitiesError: string;
+  initialize: () => void;
   run: (input: DriverInput) => Promise<boolean>;
   retry: () => Promise<boolean>;
 };
 const Context = createContext<State | null>(null);
 export function GigcaProvider({ children }: { children: ReactNode }) {
-  const [input, setInput] = useState<DriverInput>(
-    previewOnly
-      ? initialInput
-      : {
-          ...initialInput,
-          context: {
-            ...initialInput.context,
-            idle_duration_min: 15,
-            horizon_min: 60,
-            current_lat: NaN,
-            current_lng: NaN,
-          },
-        },
-  );
+  const [input, setInput] = useState<DriverInput>(initialInput);
   const [result, setResult] = useState<Recommendation | null>(previewOnly ? previewRecommendation : null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -40,8 +28,31 @@ export function GigcaProvider({ children }: { children: ReactNode }) {
   const [tomtom, setTomtom] = useState(false);
   const [researchAvailable, setResearchAvailable] = useState(false);
   const [capabilitiesError, setCapabilitiesError] = useState("");
+  const initialized = useRef(false);
   const requestId = useRef(0);
   const lastRequested = useRef(input);
+  const initialize = useCallback(() => {
+    if (previewOnly || initialized.current) return;
+    initialized.current = true;
+    setInput((current) => ({
+      ...current,
+      context: { ...current.context, idle_duration_min: 15, horizon_min: 60, current_lat: NaN, current_lng: NaN },
+    }));
+    const controller = new AbortController();
+    void api<{ tomtom: boolean; database: boolean; research_demo: boolean; data_mode: string }>("/api/capabilities", {
+      signal: controller.signal,
+    })
+      .then((x) => {
+        setTomtom(x.tomtom);
+        setDatabase(x.database);
+        setResearchAvailable(x.research_demo);
+        setInput((current) => ({ ...current, mode: x.data_mode === "live" ? "live" : "sample" }));
+      })
+      .catch((error: unknown) => {
+        if (!controller.signal.aborted)
+          setCapabilitiesError(error instanceof Error ? error.message : "Không đọc được cấu hình backend.");
+      });
+  }, []);
   const run = useCallback(async (next: DriverInput) => {
     if (previewOnly) return false;
     lastRequested.current = next;
@@ -64,24 +75,6 @@ export function GigcaProvider({ children }: { children: ReactNode }) {
   }, []);
   const retry = useCallback(() => run(lastRequested.current), [run]);
   useEffect(() => {
-    if (previewOnly) return;
-    const controller = new AbortController();
-    void api<{ tomtom: boolean; database: boolean; research_demo: boolean; data_mode: string }>("/api/capabilities", {
-      signal: controller.signal,
-    })
-      .then((x) => {
-        setTomtom(x.tomtom);
-        setDatabase(x.database);
-        setResearchAvailable(x.research_demo);
-        setInput((current) => ({ ...current, mode: x.data_mode === "live" ? "live" : "sample" }));
-      })
-      .catch((error: unknown) => {
-        if (!controller.signal.aborted)
-          setCapabilitiesError(error instanceof Error ? error.message : "Không đọc được cấu hình backend.");
-      });
-    return () => controller.abort();
-  }, []);
-  useEffect(() => {
     if (previewOnly || input.mode === "research" || !result || !Number.isFinite(input.context.current_lat)) return;
     const timer = window.setInterval(() => {
       if (!document.hidden) void run(input);
@@ -90,7 +83,7 @@ export function GigcaProvider({ children }: { children: ReactNode }) {
   }, [input, run, Boolean(result)]);
   return (
     <Context.Provider
-      value={{ input, result, busy, error, tomtom, database, researchAvailable, capabilitiesError, run, retry }}
+      value={{ input, result, busy, error, tomtom, database, researchAvailable, capabilitiesError, initialize, run, retry }}
     >
       {children}
     </Context.Provider>

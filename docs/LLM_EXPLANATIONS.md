@@ -16,6 +16,9 @@ The existing compatible-provider credentials can be reused. They stay on the bac
 Compose explicitly passes these variables; rebuild/recreate the backend after changes.
 Without credentials, when disabled, busy, timed out or invalid, the original engine summary remains.
 
+For OpenAI, set `OPENAI_API_KEY`; `OPENAI_MODEL` defaults to `gpt-4.1-mini`. The API key is
+separate from a ChatGPT subscription and API usage is billed separately.
+
 ## Grounding and prompt
 
 `SYSTEM_PROMPT` (driver-natural-poi-v4) asks for a natural Vietnamese paragraph,
@@ -56,18 +59,19 @@ frontend reads the existing `plan.summary` field with no new UI required.
 
 Tests: `python -B -m unittest api.tests.test_llm_explanations -v`.
 
-## Google Gemini fallback
+## Google Gemini (primary)
 
 Set `GIGCA_GEMINI_API_KEY` to a Google AI Studio **Gemini** key (a Maps key alone is not sufficient).
 `GIGCA_GEMINI_MODEL` defaults to `gemini-3.8-flash`; select a model available to your project.
 Official integration: https://ai.google.dev/gemini-api/docs/openai .
 Fixed Google endpoint: `https://generativelanguage.googleapis.com/v1beta/openai/chat/completions`.
 
-Order: configured compatible provider -> configured Gemini -> original engine summary.
-If only Gemini is configured, it is called directly. Each provider is attempted once, timeout 12 s;
+Order: configured Gemini -> configured compatible provider -> original engine summary.
+Gemini is tried first for the driver chatbot and grounded explanations. If Gemini is unavailable,
+the compatible provider can act as a fallback. Each provider is attempted once, timeout 12 s;
 there is no extra retry. Invalid JSON, truncated output, validation errors and network failures
 trigger the next provider. Valid objectives from the first provider are retained; only missing
-objectives are requested from Gemini. Same grounding checks apply to both providers.
+objectives are requested from the next configured provider. Same grounding checks apply to both providers.
 Metadata includes sanitized provider/model/status/reason per attempt, never keys or raw errors.
 Successful results are cached 5 minutes, fingerprinted by provider configuration and credential hash;
 failed attempts are not cached. Gemini quota/billing belongs to the Google project.

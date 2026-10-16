@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useGigca } from "../../_components/gigca/gigca-provider";
 import { previewOnly } from "../../_components/gigca/preview";
-import type { DriverInput } from "../../_components/gigca/types";
+import { initialInput, type DriverInput } from "../../_components/gigca/types";
 import { LocationSearch } from "./location-search";
 
 function mainInput(value: DriverInput): DriverInput {
@@ -22,7 +22,10 @@ function mainInput(value: DriverInput): DriverInput {
 
 export function DriverForm() {
   const { input, run, busy } = useGigca();
-  const [draft, setDraft] = useState(() => mainInput(input));
+  const [draft, setDraft] = useState<DriverInput>(() => ({
+    ...mainInput(initialInput),
+    context: { ...initialInput.context, current_lat: Number.NaN, current_lng: Number.NaN },
+  }));
   const [gpsError, setGpsError] = useState("");
   const [locating, setLocating] = useState(false);
   useEffect(() => setDraft(mainInput(input)), [input]);

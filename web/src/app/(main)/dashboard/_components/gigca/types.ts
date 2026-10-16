@@ -51,6 +51,7 @@ export interface Place {
   parking_allowed?: boolean;
 }
 export interface Recommendation {
+  direction_priority?: { objective: Objective; rank: number; rankable: boolean; reason?: string }[] | null;
   input_used?: { horizon_min?: number };
   research_driver_id?: string;
   origin_used?: { lat: number; lng: number };

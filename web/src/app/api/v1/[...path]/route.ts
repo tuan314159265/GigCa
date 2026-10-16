@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 import { AUTH_COOKIE } from "@/lib/auth";
 
@@ -13,7 +13,7 @@ async function proxy(request: NextRequest, context: { params: Promise<{ path: st
   if (
     !path.length ||
     path.some((part) => !/^[a-zA-Z0-9_-]+$/.test(part)) ||
-    !["auth", "me", "sessions", "recommendations", "research", "cameras"].includes(path[0])
+    !["auth", "me", "sessions", "recommendations", "research", "cameras", "chat"].includes(path[0])
   ) {
     return failure("Endpoint không tồn tại.", 404);
   }
@@ -40,7 +40,10 @@ async function proxy(request: NextRequest, context: { params: Promise<{ path: st
   if (token && !authenticating) headers.Authorization = `Bearer ${token}`;
   const idem = request.headers.get("Idempotency-Key");
   if (idem) headers["Idempotency-Key"] = idem;
-  const maxSize = endpoint === "me/log-imports/preview" ? 1_048_576 : endpoint === "cameras/near-route" ? 65536 : 16384;
+  let maxSize = 16384;
+  if (endpoint === "me/log-imports/preview") maxSize = 1_048_576;
+  else if (endpoint === "cameras/near-route") maxSize = 65536;
+  else if (endpoint === "chat") maxSize = 32768;
   let body: string | undefined;
   if (request.method !== "GET") {
     const length = Number(request.headers.get("content-length") || 0);

@@ -51,8 +51,9 @@ không đầy đủ; app báo thiếu dữ liệu, không tự tạo tuyến ho�
 | `GIGCA_MODEL_HOST_DIR` | Thư mục model bind readonly vào Docker |
 | `GIGCA_SESSION_DB` | SQLite local; Docker dùng named volume riêng |
 | `GIGCA_LLM_EXPLANATIONS` | Bật/tắt diễn giải bằng LLM |
-| `GIGCA_LLM_BASE_URL`, `GIGCA_LLM_API_KEY`, `GIGCA_LLM_MODEL` | Provider tương thích OpenAI, tùy chọn |
-| `GIGCA_GEMINI_API_KEY`, `GIGCA_GEMINI_MODEL` | Google Gemini dự phòng cho giải thích, tùy chọn |
+| `GIGCA_GEMINI_API_KEY`, `GIGCA_GEMINI_MODEL` | Google AI Studio Gemini, ưu tiên cho chatbot và giải thích |
+| `OPENAI_API_KEY`, `OPENAI_MODEL` | OpenAI API cho chatbot/giải thích, dùng dự phòng sau Gemini |
+| `GIGCA_LLM_BASE_URL`, `GIGCA_LLM_API_KEY`, `GIGCA_LLM_MODEL` | Provider tương thích OpenAI, dùng dự phòng nếu Gemini lỗi |
 | `GIGCA_FRONTEND_PORT` | Cổng web, mặc định 3000 |
 
 Thời tiết dùng Open-Meteo không cần key trong adapter hiện tại. Các dịch vụ ngoài có quota,

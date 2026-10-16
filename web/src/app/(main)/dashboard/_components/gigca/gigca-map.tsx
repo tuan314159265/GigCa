@@ -251,7 +251,7 @@ export function GigcaMap({ selected, focusedPlace }: { selected?: Objective; foc
           <Button
             size="sm"
             variant="outline"
-            disabled={!tomtom || previewOnly || result?.snapshot.mode === "research"}
+            disabled={!ready || !tomtom || previewOnly || result?.snapshot.mode === "research"}
             aria-pressed={traffic}
             onClick={() => setTraffic(!traffic)}
           >
@@ -262,7 +262,7 @@ export function GigcaMap({ selected, focusedPlace }: { selected?: Objective; foc
             size="icon-sm"
             variant="outline"
             aria-label="Về vị trí của tôi"
-            disabled={!Number.isFinite(lat) || !Number.isFinite(lng)}
+            disabled={!ready || !Number.isFinite(lat) || !Number.isFinite(lng)}
             onClick={() => map.current?.setView([lat, lng], previewOnly ? 14 : 18, { animate: false })}
           >
             <LocateFixed />
