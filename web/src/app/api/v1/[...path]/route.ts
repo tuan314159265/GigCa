@@ -13,7 +13,7 @@ async function proxy(request: NextRequest, context: { params: Promise<{ path: st
   if (
     !path.length ||
     path.some((part) => !/^[a-zA-Z0-9_-]+$/.test(part)) ||
-    !["auth", "me", "sessions", "recommendations", "research", "cameras"].includes(path[0])
+    !["auth", "me", "sessions", "recommendations", "research", "cameras", "traffic"].includes(path[0])
   ) {
     return failure("Endpoint không tồn tại.", 404);
   }

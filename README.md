@@ -1,185 +1,204 @@
-# GigCa — gợi ý khu vực chờ cho tài xế
+# GigCa
 
-GigCa kết hợp bản đồ, thời tiết, giao thông và mô hình học máy để gợi ý khu vực chờ/nghỉ.
-Frontend Next.js 16 / React 19; backend Python 3.12; tài khoản và lịch sử riêng lưu SQLite.
-Bản này sử dụng **model chung huấn luyện trên dữ liệu mô phỏng**, chưa cá nhân hóa theo lịch sử tài xế.
-POI và LLM hỗ trợ diễn giải; chưa tham gia xếp hạng của model.
+**Choose the best way to drive.** Web hỗ trợ tài xế cân nhắc nơi chờ, di chuyển, nghỉ và điều kiện mưa/giao thông tại TP.HCM.
 
-## Chạy từ bản clone bằng Docker
+Next.js/React · Python 3.12 · SQLite · Docker Compose · TomTom · Open-Meteo.
+ML chung học trên **dữ liệu mô phỏng**, chưa cá nhân hóa theo lịch sử tài xế. LLM chỉ diễn giải, không thay kết quả engine.
 
-Cần Git, Python 3.12 (chỉ thư viện chuẩn cho bước khôi phục), Docker Desktop đang chạy Linux containers.
-Chạy trong thư mục chứa README này:
+## Chạy bằng Docker
 
-```powershell
+Yêu cầu: Git, Python 3.12 (khôi phục artifact chỉ cần thư viện chuẩn), Docker Desktop với Linux containers.
+
+~~~powershell
 git clone --branch feat/gigca-integrated-v1 https://github.com/tuan314159265/GigCa.git
 cd GigCa
 python scripts/restore_release.py
 Copy-Item .env.example .env
-```
+~~~
 
-Mở `.env`, điền `API_TOMTOM`. Không cần key LLM để chạy engine.
-Model mở rộng đã được cấu hình mặc định, không cần sinh dữ liệu hay train lại.
+Điền API_TOMTOM trong .env rồi chạy:
 
-```powershell
+~~~powershell
+docker compose -f compose.app.yaml up -d --build
+docker compose -f compose.app.yaml ps
+~~~
+
+Mở [đăng ký](http://127.0.0.1:3000/auth/register), đăng nhập, vào
+[/dashboard/gigca](http://127.0.0.1:3000/dashboard/gigca).
+Chọn GPS hoặc nhập địa chỉ/tọa độ, đặt tùy chọn, bấm **Tính gợi ý** rồi chọn một trong bốn hướng.
+Không cần sinh dữ liệu hoặc train lại model.
+
+Bật thêm API nghiên cứu với dataset riêng:
+
+~~~powershell
 docker compose -f compose.app.yaml -f compose.research.yaml up -d --build
-docker compose -f compose.app.yaml -f compose.research.yaml ps
-```
+~~~
 
-Mở http://127.0.0.1:3000/auth/register tạo tài khoản; đăng nhập tại `/auth/login`;
-ứng dụng chính tại `/dashboard/gigca`. Cho phép quyền vị trí hoặc tìm địa chỉ/nhập tọa độ,
-nhập tùy chọn rồi bấm **Tính gợi ý**, sau đó chọn một trong bốn mục tiêu.
-`compose.research.yaml` chỉ bật API nghiên cứu với dataset riêng; không nhập dữ liệu mô phỏng vào tài khoản.
-Có thể bỏ override này nếu chỉ cần dashboard thông thường.
+Research không nhập nhật ký mô phỏng vào tài khoản. compose.yaml là PostGIS/ETL tùy chọn,
+**không phải** file khởi động web app.
 
-Camera là tùy chọn, tải catalog công khai khi cần (không cần TomTom key):
+## Bốn hướng
 
-```powershell
+| Hướng | Ưu tiên thực tế |
+|---|---|
+| Cuốc giá trị cao | Trung vị năng suất chu kỳ ML cao nhất trong phạm vi di chuyển |
+| Giữ vị trí tốt | P(nhận trong 10 phút)% − 1,5 × phút chờ − 2 × km chuyển vùng; giới hạn 0–100 |
+| Nghỉ ngơi | POI nghỉ có routing hợp lệ; mức xác minh, thời gian tới và loại điểm |
+| Né mưa & kẹt xe | Quy tắc theo dự báo, mức chịu mưa và traffic có dữ liệu |
+
+### Điểm đến live
+
+- Lấy ứng viên theo GPS/địa chỉ đã chọn. Điểm neo chỉ kiểm tra miền model, không là điểm đến mặc định.
+- Ưu tiên đại học/cao đẳng, trung tâm thương mại, chợ công cộng, bệnh viện, tòa nhà thương mại/công nghiệp.
+  Phân loại từ TomTom; quy tắc ưu tiên do engine đặt, không phải điểm “nổi tiếng”.
+- Không có công trình phù hợp thì dùng POI địa phương dự phòng. Provider có thể phân loại sai;
+  có bộ lọc bổ sung cho các cửa hàng bị gắn nhầm thành mall/tòa nhà.
+- Lấy mẫu ở tâm và bốn hướng; tối đa 24 ứng viên phân bố theo hướng/khoảng cách, cache 5 phút.
+  Tối đa 5 request tìm công trình, thêm tối đa 5 request khi cần tìm địa điểm dự phòng.
+- Lọc tọa độ, trùng lặp, ngân sách di chuyển và miền ML. Đây là mẫu giới hạn, không phải kiểm kê
+  toàn bộ địa điểm hay dữ liệu nhu cầu hành khách trực tiếp.
+- Provider lỗi thì chỉ đánh giá vị trí hiện tại và báo thiếu nguồn; không âm thầm về điểm neo.
+- POI live cách vài trăm mét vẫn có khoảng cách/thời gian/chi phí ước tính; chính vị trí hiện tại là 0 km.
+
+POI–thời điểm chỉ điều chỉnh gần hòa: hướng thu nhập xét trong 1% baseline, bonus utility tối đa 0,5%;
+hướng giữ vị trí xét trong 1 điểm, điều chỉnh tối đa ±0,5 điểm. Không thay tiền/xác suất/khoảng ML.
+Các cửa sổ giờ đi lại là giả thuyết thủ công, không phải lịch tan học/tan ca được xác minh.
+
+### Giao thông, camera, diễn giải
+
+Khi chọn ở lại, app hiện các đường lấy mẫu quanh GPS. Chi tiết traffic/camera cập nhật khoảng
+30 giây khi đang hiển thị. Mẫu giao thông không chứng minh trạng thái toàn tuyến.
+
+Camera tùy chọn, tải catalog công khai bằng:
+
+~~~powershell
 python scripts/fetch_public_cameras.py
-```
+~~~
 
-Nguồn camera có thể thay đổi hoặc từ chối truy cập. Không có camera không chặn luồng gợi ý.
-Không lưu ảnh camera vào repo. Không có key TomTom thì tìm địa điểm, tuyến và traffic trực tiếp
-không đầy đủ; app báo thiếu dữ liệu, không tự tạo tuyến hoặc giao thông thông thoáng.
+Ảnh là snapshot, không phải live video; thời điểm tải không xác nhận thời điểm chụp.
+Nguồn có thể gián đoạn; không có camera không chặn engine. Không lưu ảnh vào Git.
+
+Giải thích dùng provider tương thích OpenAI → Google Gemini → lý do engine.
+Chỉ diễn giải loại POI, dự báo và traffic có bằng chứng; không khẳng định đông khách hoặc lịch tan học.
+Không cần key LLM để tính gợi ý.
 
 ## Cấu hình
 
+Sao chép .env.example; không commit .env/key thật.
+
 | Biến | Vai trò |
 |---|---|
-| `API_TOMTOM` | Search/geocoding, routing, nền bản đồ và traffic |
-| `GIGCA_DATA_MODE=live` | Dữ liệu provider, không tự thay bằng fixture |
-| `GIGCA_MAIN_MODEL_DIR` | Thư mục model khi chạy Python local |
-| `GIGCA_MODEL_HOST_DIR` | Thư mục model bind readonly vào Docker |
-| `GIGCA_SESSION_DB` | SQLite local; Docker dùng named volume riêng |
-| `GIGCA_LLM_EXPLANATIONS` | Bật/tắt diễn giải bằng LLM |
-| `GIGCA_LLM_BASE_URL`, `GIGCA_LLM_API_KEY`, `GIGCA_LLM_MODEL` | Provider tương thích OpenAI, tùy chọn |
-| `GIGCA_GEMINI_API_KEY`, `GIGCA_GEMINI_MODEL` | Google Gemini dự phòng cho giải thích, tùy chọn |
-| `GIGCA_FRONTEND_PORT` | Cổng web, mặc định 3000 |
+| API_TOMTOM | Search, POI, routing, tiles, traffic |
+| GIGCA_DATA_MODE | Mặc định live; thiếu dữ liệu không tự thay bằng fixture |
+| GIGCA_LIVE_CANDIDATES | true: điểm đến API; false: catalog cũ để đối chiếu |
+| GIGCA_POI_RANKING | Bật/tắt điều chỉnh POI–thời điểm nhỏ |
+| GIGCA_LLM_EXPLANATIONS | Bật/tắt diễn giải LLM |
+| GIGCA_LLM_BASE_URL / GIGCA_LLM_API_KEY / GIGCA_LLM_MODEL | Provider tương thích OpenAI; đặt model được hỗ trợ |
+| GIGCA_GEMINI_API_KEY / GIGCA_GEMINI_MODEL | Google dự phòng; chọn model khả dụng cho tài khoản |
+| GIGCA_MAIN_MODEL_DIR | Model khi chạy Python native |
+| GIGCA_MODEL_HOST_DIR | Thư mục model mount readonly vào Docker |
+| GIGCA_SESSION_DB | SQLite native; Docker dùng volume riêng |
+| GIGCA_FRONTEND_PORT | Cổng web, mặc định 3000 |
+| NEXT_PUBLIC_GIGCA_PREVIEW | false cho live; thay đổi cần build frontend lại |
 
-Thời tiết dùng Open-Meteo không cần key trong adapter hiện tại. Các dịch vụ ngoài có quota,
-điều kiện sử dụng và giới hạn vùng phủ riêng. Không đưa key vào frontend hoặc commit `.env`.
-Sau đổi key/cấu hình backend: `docker compose -f compose.app.yaml -f compose.research.yaml up -d --force-recreate backend`.
-Sau sửa source: thêm `--build`. Frontend build flag cần build lại frontend.
+Open-Meteo không cần key trong adapter. Quota/chi phí/quyền sử dụng theo từng provider.
+Key nằm ở backend, không đưa vào frontend. Gemini có tích hợp dự phòng; khả dụng phụ thuộc key/model của bạn.
 
-## Dữ liệu và trọng số đã đóng gói
+## Model và dữ liệu đi kèm
 
-`artifacts/research/` chứa hai archive khoảng 11 MB tổng cộng và manifest SHA256:
+[artifacts/research](artifacts/research/README.md) chứa dataset/model (~11 MB) và manifest SHA256.
+Script restore xác minh archive và từng member, giải nén vào .cache, không ghi đè file khác nội dung.
 
-- `hcmc-expanded-32.zip`: đúng dataset mở rộng đã chốt, 32 tài xế ảo / 16 nhóm hành vi,
-  120 ngày đến 14/10/2026, 47 điểm neo thuộc TP.HCM trước sáp nhập; không Dĩ An.
-  Có 25.235 chuyến, 37.098 đợt chờ; nhật ký JSON/CSV, personas, kế hoạch ca,
-  coverage, checksum, prompt và phản hồi LLM được chấp nhận.
-- `logistic-hazard-quantile-gb-hcmc.zip`: `models.joblib`, catalog, report, split,
-  kết quả ghép và biểu đồ PNG/SVG/CSV. Không chứa model cũ hay kết quả search thử.
+- 32 tài xế ảo / 16 nhóm hành vi, 120 ngày đến 14/10/2026, 47 neo TP.HCM trước sáp nhập; không Dĩ An.
+- 25.235 chuyến, 37.098 đợt chờ; personas, lịch ca, audit và provenance đi kèm.
+- Logistic Hazard cho chờ; Quantile Gradient Boosting P10/P50/P90 và split conformal cho năng suất.
+- Split theo tài xế/thời gian. Test mô phỏng: MAE ~21.508 đ/giờ so baseline ~24.872;
+  độ phủ khoảng danh nghĩa 80% đạt ~79,36%. Chưa chứng minh hiệu quả với tài xế thật.
 
-`python scripts/restore_release.py` xác minh hash rồi giải nén vào `.cache/`.
-Không ghi đè file khác nội dung. `--verify-only` kiểm tra bản đã khôi phục.
-Dữ liệu trong archive hoàn toàn mô phỏng, không phải lịch sử người dùng.
-Không kèm SQLite tài khoản, API key, log cá nhân, `.venv`, `node_modules`, cache build.
+~~~powershell
+python scripts/restore_release.py --verify-only
+~~~
 
-Polygon GADM dùng kiểm tra phạm vi không được phân phối lại trong repo; nguồn và điều kiện
-ở [docs/EXPANDED_GEOGRAPHY.md](docs/EXPANDED_GEOGRAPHY.md). Không cần polygon để chạy
-model hoặc train lại trên dataset đã xuất; cần lấy hợp lệ từ nguồn khi sinh lại có kiểm tra biên.
-Tọa độ điểm neo lấy từ TomTom, không xác nhận vị trí đỗ xe; dữ liệu bên thứ ba vẫn chịu điều kiện nguồn.
+**Giới hạn:** ML hỗ trợ trong 2 km quanh neo, giờ 06–22 và mưa 0–8 mm; không phủ liên tục toàn thành phố.
+Năng suất = (tiền sau phí nền tảng − nhiên liệu chuyến) / (giờ chờ + giờ chở khách), chưa đủ đi đón/chuyển vùng.
+Không phải giá cuốc tiếp theo hoặc lợi nhuận toàn ca. Chờ giới hạn 30 phút, chưa phải thời gian còn lại
+có điều kiện sau số phút đã chờ. Khoảng cách xếp hạng là ước tính địa lý; tuyến TomTom có thể khác.
+POI/traffic chưa là features đã học. POI/neo không xác nhận chỗ đỗ hợp pháp hay chắc chắn có cuốc.
 
-## Bốn mục tiêu và cơ chế
+Polygon GADM không phân phối lại; chạy/train dataset có sẵn không cần polygon.
+Xem điều kiện nguồn ở [artifact README](artifacts/research/README.md).
 
-| Mục tiêu | Cơ chế thực tế |
-|---|---|
-| Cuốc giá trị cao | Chọn năng suất trung vị đồng/giờ cao nhất từ quantile Gradient Boosting, trong phạm vi di chuyển |
-| Giữ vị trí tốt | Logistic Hazard dự đoán xác suất nhận cuốc và chờ; điểm = P(nhận trong 10 phút)% − 1,5 × phút chờ − 2 × km di chuyển, giới hạn 0–100 |
-| Nghỉ ngơi | Điểm nghỉ có routing hợp lệ; ưu tiên đã xác minh, tới nhanh, loại điểm phù hợp |
-| Né mưa & kẹt xe | Quy tắc dựa trên dự báo mưa, mức chịu mưa và traffic có dữ liệu |
+## Phát triển native
 
-Nhãn năng suất = (tiền sau phí nền tảng − nhiên liệu chuyến) / (giờ chờ + giờ chở khách).
-Đây là năng suất một chu kỳ, không phải báo giá cuốc tiếp theo; chưa tính đầy đủ đi đón/chuyển vùng.
-Khoảng cách chuyển vùng trong xếp hạng ML là ước tính địa lý; tuyến TomTom hiển thị sau đó
-không phải đầu vào chi phí chính của model hiện tại.
-Model chờ dùng horizon giới hạn 30 phút, không phải thời gian chờ còn lại sau số phút đã chờ.
+Python 3.12, Node.js 22; restore artifact và tạo .env trước.
 
-Features hiện tại: thời điểm, cuối tuần, tọa độ tương đối và mưa. POI chưa là feature.
-Bản mở rộng vẫn giới hạn vị trí trong 2 km quanh điểm neo, giờ train 06–22 và miền mưa 0–8 mm;
-47 điểm neo không có nghĩa phủ liên tục toàn thành phố. Thiếu điều kiện thì trả lý do, không ép dự đoán.
-
-Model gồm Logistic Hazard và ba Gradient Boosting quantile (10/50/90%), hiệu chỉnh conformal.
-Chia theo tài xế và thời gian: train, validation, calibration, test; không trộn ngẫu nhiên từng chuyến.
-Test mô phỏng: cycle MAE khoảng 21.508 đ/giờ, độ phủ khoảng 79,36% cho khoảng danh nghĩa 80%;
-không suy ra độ chính xác với tài xế thật. Xem report đã đóng gói và [docs/MAIN_MODEL.md](docs/MAIN_MODEL.md).
-
-## Train lại và biểu đồ
-
-Không cần gọi API khi train lại dataset đã khôi phục. Python phải khớp dependency của artifact:
-
-```powershell
+~~~powershell
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe -m experiments.synthetic train-base .cache/synthetic/hcmc-expanded-32/contextual-seed7 --output .cache/models/logistic-hazard-quantile-gb-hcmc-retrained --plots
-```
-
-Chọn output mới để giữ bản chính. Trọng số ở `models.joblib`, metrics ở `report.json`, biểu đồ ở `plots/`.
-Đổi hai biến đường dẫn model trong `.env` nếu muốn kích hoạt bản train mới.
-Learning curve của model chờ là các lần fit trên tập con, không phải loss theo epoch.
-Chi tiết: [experiments/synthetic/TRAIN_BASE.md](experiments/synthetic/TRAIN_BASE.md),
-[docs/CYCLE_MATCHING.md](docs/CYCLE_MATCHING.md), [experiments/synthetic/RESEARCH_METHOD_V2.md](experiments/synthetic/RESEARCH_METHOD_V2.md).
-
-## Chạy native không dùng Docker
-
-Khôi phục artifact, tạo `.env` và cài Python như trên. Mở hai terminal:
-
-```powershell
 .\.venv\Scripts\python.exe -m api.v1_server
-```
+~~~
 
-```powershell
+Terminal thứ hai:
+
+~~~powershell
 cd web
 Copy-Item .env.example .env.local
 npm ci
 npm run dev
-```
+~~~
 
-Node.js 22; frontend trỏ backend `http://127.0.0.1:8000` qua BFF.
-Linux/macOS dùng `cp`, `.venv/bin/python` tương ứng. Build frontend production: `npm run build`.
+BFF trỏ backend http://127.0.0.1:8000. Linux/macOS dùng cp và .venv/bin/python.
+Train/sinh dữ liệu: [experiments/synthetic](experiments/synthetic/README.md).
 
-## Kiểm thử
+## Kiểm tra
 
-```powershell
+~~~powershell
 .\.venv\Scripts\python.exe -B -m unittest discover -s api/tests -q
 .\.venv\Scripts\python.exe -B -m unittest discover -s engine/tests -q
 .\.venv\Scripts\python.exe -B -m unittest discover -s experiments/synthetic/tests -q
 cd web
 npx tsc --noEmit
 npm run build
-```
+node scripts/test-route-presentation.cjs
+node scripts/test-visible-poll.cjs
+node scripts/test-weather-timeline.cjs
+~~~
 
-Các bài test dùng fixture/mock không cần key provider thật. Kiểm tra provider riêng:
-`python scripts/check_demo_providers.py`; không đưa output có thông tin cấu hình lên Git.
+Unit tests dùng mock/fixture. Provider thật kiểm tra riêng bằng python scripts/check_demo_providers.py;
+không công khai thông tin cấu hình/key từ máy cá nhân.
 
-## Lưu trữ và dừng app
+## Cập nhật, dừng, lưu dữ liệu
 
-SQLite tài khoản, hồ sơ, lịch sử cá nhân và phiên chạy nằm trong Docker volume `gigca_sessions`.
-Model/dataset mount readonly, tách khỏi database. Mỗi tài khoản chỉ truy cập lịch sử của mình;
-synthetic research API không thêm chuyến vào lịch sử cá nhân. Đăng ký mới tự lưu vào DB.
+Sau sửa source: docker compose -f compose.app.yaml up -d --build.
+Sau chỉ đổi key/cấu hình: docker compose -f compose.app.yaml up -d --force-recreate backend.
+Nếu bật research, thêm -f compose.research.yaml vào các lệnh tương ứng.
 
-```powershell
-docker compose -f compose.app.yaml -f compose.research.yaml stop
-docker compose -f compose.app.yaml -f compose.research.yaml start
-# Hoặc xóa container nhưng giữ volume:
-docker compose -f compose.app.yaml -f compose.research.yaml down
-```
+~~~powershell
+docker compose -f compose.app.yaml stop
+docker compose -f compose.app.yaml start
+# Xóa container nhưng giữ dữ liệu:
+docker compose -f compose.app.yaml down
+~~~
 
-Không thêm `-v` nếu cần giữ dữ liệu. SQLite hiện tại phù hợp demo một backend;
-PostGIS trong `compose.yaml` là hạ tầng data riêng, chưa thay DB tài khoản bằng Neon/PostgreSQL.
+**Không thêm -v nếu muốn giữ tài khoản/lịch sử.** SQLite ở volume gigca_sessions, tách model/dataset readonly.
+Volume không thay thế backup; sao lưu riêng trước khi chuyển máy.
+BFF giữ token trong cookie HttpOnly, API kiểm tra chủ sở hữu lịch sử.
+SQLite/ThreadingHTTPServer hiện phù hợp demo một backend, chưa có benchmark production.
 
-## Kiến trúc và tài liệu
+## Cấu trúc
 
-- `web/`: dashboard navy, auth, BFF giữ token trong cookie HttpOnly, bản đồ và chi tiết tuyến.
-- `api/`: API v1, tài khoản/import, provider proxy, model đã lưu, camera, giải thích LLM.
-- `engine/`: feature, ghép chu kỳ, model ML, scorers và quy tắc an toàn.
-- `data/`: adapter/ETL, schema, import nhật ký; `contracts/`, `config/`: giao diện và tham số.
-- `experiments/synthetic/`: sinh personas qua LLM, mô phỏng, audit, train và report.
-- `scripts/`: restore release, thu thập catalog và công cụ kiểm tra.
+~~~text
+api/                    API, auth, provider, inference, điểm đến live, camera, LLM
+web/                    Next.js, BFF, dashboard, bản đồ và theme
+engine/                 ML, scorers, quy tắc, kiểm thử
+data/                   Collector, adapter, importer, fixture, PostGIS/ETL tùy chọn
+config/                 Tham số engine và POI policy
+contracts/              Schema đầu vào
+experiments/synthetic/  Sinh, audit, train, đánh giá mô phỏng
+artifacts/research/     Dataset/model đóng gói, manifest hash
+scripts/                Restore, fetch, công cụ kiểm tra
+~~~
 
-API: [docs/DRIVER_ACCOUNTS_API.md](docs/DRIVER_ACCOUNTS_API.md).
-Camera: [docs/TRAFFIC_CAMERAS.md](docs/TRAFFIC_CAMERAS.md).
-LLM: [docs/LLM_EXPLANATIONS.md](docs/LLM_EXPLANATIONS.md).
-Quy tắc và nguồn: [RULES.md](RULES.md), [data/README.md](data/README.md).
-Các tài liệu v1/legacy được giữ để tham khảo; đường dẫn artifact và cách chạy hiện hành theo README này.
+Hướng dẫn module: [API](api/README.md), [Engine](engine/README.md), [Data](data/README.md),
+[Frontend](web/README.md). Giữ LICENSE frontend và attribution bản đồ.
+Không đưa report/pitch, ghi chú agent, secrets, database tài khoản hoặc build output vào repo.

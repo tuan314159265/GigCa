@@ -64,6 +64,64 @@ class MainModelTests(unittest.TestCase):
         out=self.apply(ctx=replace(self.ctx,max_reposition_km=0))
         self.assertEqual([c.area_id for c in out.objectives['max_trip_value'].candidates],['model_current'])
 
+    def test_live_destinations_replace_named_anchors_without_changing_model_money(self):
+        live = {'id':'live_test','name':'Địa điểm API','lat':10.775,'lng':106.699,'candidate_source':'tomtom_live'}
+        with patch('api.main_model.load_saved_model',return_value=(self.model,self.report,self.catalog)), \
+             patch('api.live_candidates.discover',return_value=([live],{'status':'ok'})):
+            out=apply_main_model(self.base,self.data,self.ctx,self.prefs,use_live_candidates=True)
+        self.assertEqual({a['id'] for a in out.ml_insights['areas']},{'model_current','live_test'})
+        self.assertEqual(out.ml_insights['candidate_discovery']['status'],'ok')
+        self.assertEqual(out.objectives['max_trip_value'].candidates[0].yield_vnd_per_hour,50000)
+        self.assertNotIn('a',[c.area_id for c in out.objectives['max_trip_value'].candidates])
+        candidate=next(c for c in out.objectives['max_trip_value'].candidates if c.area_id=='live_test')
+        self.assertGreater(candidate.reposition_km,0)
+        self.assertGreater(candidate.reposition_min,0)
+        current=next(c for c in out.objectives['max_trip_value'].candidates if c.area_id=='model_current')
+        self.assertEqual(current.reposition_km,0)
+
+    def test_live_provider_failure_does_not_silently_reuse_fixed_destinations(self):
+        with patch('api.main_model.load_saved_model',return_value=(self.model,self.report,self.catalog)), \
+             patch('api.live_candidates.discover',side_effect=OSError('timeout')):
+            out=apply_main_model(self.base,self.data,self.ctx,self.prefs,use_live_candidates=True)
+        self.assertEqual([a['id'] for a in out.ml_insights['areas']],['model_current'])
+        self.assertEqual(out.ml_insights['candidate_discovery']['status'],'provider_unavailable')
+
+    def test_poi_changes_both_rankings_without_inflating_ml_money(self):
+        target={'id':'near','name':'Trường gần đây','lat':self.ctx.current_lat+.001,'lng':self.ctx.current_lng}
+        self.catalog['areas']=[target]
+        origin={'id':'model_current','name':'Vị trí hiện tại','lat':self.ctx.current_lat,'lng':self.ctx.current_lng}
+        context=lambda score:{'score':score,'components':[],'policy_version':'test','available':True}
+        with patch('api.main_model.load_saved_model',return_value=(self.model,self.report,self.catalog)), patch('api.poi_policy.build_contexts',return_value=([origin,target],{'model_current':context(0),'near':context(90)},True)):
+            out=apply_main_model(self.base,self.data,self.ctx,self.prefs,use_poi=True)
+        for key in ('max_trip_value','maintain_position'):
+            self.assertEqual(out.objectives[key].candidates[0].area_id,'near')
+            self.assertEqual(out.objectives[key].plan.key_metrics['yield_vnd_per_hour'],50000)
+            self.assertEqual(out.objectives[key].plan.key_metrics['ranking_method'],'ml_poi_secondary_tiebreak')
+        self.assertEqual(out.objectives['max_trip_value'].candidates[0].yield_low_vnd_per_hour,20000)
+
+    def test_poi_cannot_reverse_clear_ml_income_advantage_or_force_far_move(self):
+        target={'id':'far','name':'Khu vực khác','lat':self.ctx.current_lat+.007,'lng':self.ctx.current_lng}
+        self.catalog['areas']=[target]
+        class DifferentCycle:
+            def predict(_,dt,lat,lng,rain):
+                median=60000 if lat>self.ctx.current_lat+.003 else 50000
+                return {'low':20000,'median':median,'high':80000}
+        self.model['cycle_model']=DifferentCycle()
+        origin={'id':'model_current','name':'Vị trí hiện tại','lat':self.ctx.current_lat,'lng':self.ctx.current_lng}
+        context=lambda score:{'score':score,'components':[],'available':True}
+        with patch('api.main_model.load_saved_model',return_value=(self.model,self.report,self.catalog)), patch('api.poi_policy.build_contexts',return_value=([origin,target],{'model_current':context(100),'far':context(0)},True)):
+            out=apply_main_model(self.base,self.data,self.ctx,self.prefs,use_poi=True)
+        self.assertEqual(out.objectives['max_trip_value'].candidates[0].area_id,'far')
+        self.assertEqual(out.objectives['maintain_position'].candidates[0].area_id,'model_current')
+        self.assertEqual(len(out.objectives['max_trip_value'].candidates),2)
+
+    def test_poi_provider_failure_keeps_original_candidate_pool_and_rank(self):
+        with patch('api.main_model.load_saved_model',return_value=(self.model,self.report,self.catalog)), patch('api.poi_policy.build_contexts',return_value=([],{},False)):
+            out=apply_main_model(self.base,self.data,self.ctx,self.prefs,use_poi=True)
+        self.assertEqual(out.objectives['maintain_position'].candidates[0].area_id,'model_current')
+        self.assertEqual(len(out.objectives['maintain_position'].candidates),2)
+        self.assertFalse(out.ml_insights['poi_ranking']['enabled'])
+
     def test_dashboard_uses_saved_model_and_ignores_personal_training_records(self):
         from api.dashboard import recommend
         from api.tests.test_live import LiveTests
@@ -72,6 +130,7 @@ class MainModelTests(unittest.TestCase):
         from data.live_collector import _cache
         _cache.clear()
         with patch('api.main_model.load_saved_model',return_value=(self.model,self.report,self.catalog)), \
+             patch('api.live_candidates.discover',return_value=([],{'status':'no_supported_candidates'})), \
              patch('data.live_collector.fetch_json',side_effect=provider.response), \
              patch('api.provider_proxy.read_tomtom_key',return_value='test'), \
              patch('data.live_collector.datetime') as clock:

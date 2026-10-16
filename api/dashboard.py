@@ -84,7 +84,9 @@ def recommend(payload: dict, *, include_snapshot: bool = False, personal_input: 
     data = load_for_engine(snapshot)
     from api.main_model import apply_main_model
     ctx = DriverContext(**values)
-    output = apply_main_model(run_driver_engine(data, ctx, prefs), data, ctx, prefs)
+    output = apply_main_model(run_driver_engine(data, ctx, prefs), data, ctx, prefs,
+        use_poi=mode=='live' and os.environ.get('GIGCA_POI_RANKING','false').lower()=='true',
+        use_live_candidates=mode=='live' and os.environ.get('GIGCA_LIVE_CANDIDATES','true').lower()=='true')
     result = asdict(output)
     result["snapshot"] = {"id": data.snapshot_id, "mode": mode, "as_of": data.generated_at,
                           "sources": snapshot.get("data_status", []),
@@ -179,7 +181,7 @@ def load_local_settings():
         return
     for line in path.read_text(encoding="utf-8").splitlines():
         name, sep, value = line.strip().partition("=")
-        if sep and name.strip() in {"GIGCA_DATABASE_URL", "GIGCA_AREA_ID", "GIGCA_DATA_MODE", "GIGCA_SESSION_DB", "GIGCA_MAIN_MODEL_DIR", "SSL_CERT_FILE", "GIGCA_RESEARCH_DEMO", "GIGCA_RESEARCH_DATASET", "GIGCA_API_HOST", "GIGCA_API_PORT"}:
+        if sep and name.strip() in {"GIGCA_DATABASE_URL", "GIGCA_AREA_ID", "GIGCA_DATA_MODE", "GIGCA_SESSION_DB", "GIGCA_MAIN_MODEL_DIR", "GIGCA_POI_RANKING", "GIGCA_LIVE_CANDIDATES", "SSL_CERT_FILE", "GIGCA_RESEARCH_DEMO", "GIGCA_RESEARCH_DATASET", "GIGCA_API_HOST", "GIGCA_API_PORT"}:
             value = value.strip().strip("\"'")
             if value:
                 os.environ.setdefault(name.strip(), value)

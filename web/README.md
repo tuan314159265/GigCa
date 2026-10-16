@@ -1,10 +1,28 @@
 # GigCa frontend
 
-Frontend chính của GigCa, dựa trên StudioAdmin Logistics. Giữ component shadcn/UI và LICENSE template.
+Next.js 16 / React 19 / TypeScript / Tailwind 4, Leaflet, shadcn/Radix.
+Theme xanh #00BF63, trắng và vàng #FFBD59. Kế thừa StudioAdmin; giữ [LICENSE](LICENSE) và attribution bản đồ.
 
-- FE: thư mục này; chạy `npm ci`, rồi `npm run dev -- --hostname 127.0.0.1 --port 3000`.
-- BE: `../api/`; chạy `python -m api.v1_server` từ root repo.
-- Đặt NEXT_PUBLIC_GIGCA_PREVIEW=false trong .env.local để nhận dữ liệu theo GPS; true để preview.
-- Cấu hình key provider trong .env ở root repo, không đặt trong frontend.
+Chạy backend theo [README chính](../README.md), rồi với Node.js 22:
 
-Xem [hướng dẫn repo](../docs/REPOSITORY_GUIDE.md), [luồng live](../docs/LIVE_RUN.md). Các trang demo upstream đã được xóa; chỉ giữ trang GigCa và thư viện component/layout dùng chung. Bản gốc nằm ngoài repo tại studio-admin-original.
+~~~powershell
+Copy-Item .env.example .env.local
+npm ci
+npm run dev
+~~~
+
+GIGCA_API_URL mặc định http://127.0.0.1:8000. NEXT_PUBLIC_GIGCA_PREVIEW=false cho live;
+preview chỉ dùng fixture, đăng nhập vẫn cần backend. Key provider chỉ nằm ở backend.
+
+Routes: /auth/register, /auth/login, /dashboard/gigca; các trang chi tiết map, conditions, sources.
+BFF giữ token trong cookie HttpOnly. Production Docker theo Compose ở root.
+
+~~~powershell
+npx tsc --noEmit
+npm run build
+node scripts/test-route-presentation.cjs
+node scripts/test-visible-poll.cjs
+node scripts/test-weather-timeline.cjs
+~~~
+
+Không commit .env.local, .next, node_modules hoặc tsbuildinfo.

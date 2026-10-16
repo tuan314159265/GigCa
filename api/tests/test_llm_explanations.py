@@ -2,7 +2,7 @@ import copy
 import json
 import unittest
 from unittest.mock import patch
-from api.llm_explanations import apply_explanations, validate_selection, evidence_for, classified_poi, poi_context, poi_group, compose_with_fallback, providers_for, CompositionFailed
+from api.llm_explanations import apply_explanations, validate_selection, evidence_for, classified_poi, poi_context, poi_group, explanation_seed, compose_with_fallback, providers_for, CompositionFailed
 
 TEXT='Trong các điểm đang so sánh, khu vực này có năng suất dự kiến tốt nhất. Bạn cần cân nhắc quãng đường di chuyển trước khi tới điểm chờ.'
 class ExplanationTests(unittest.TestCase):
@@ -81,8 +81,44 @@ class ExplanationTests(unittest.TestCase):
             rows,attempts=compose_with_fallback(providers,facts)
         sent=json.loads(call.call_args.args[1]['messages'][1]['content'])['evidence']
         self.assertEqual(list(sent),['maintain_position'])
+        payload=json.loads(call.call_args.args[1]['messages'][1]['content'])
+        self.assertEqual(list(payload['response_template']['objectives']),['maintain_position'])
+        self.assertEqual(call.call_args.args[1]['response_format'],{'type':'json_object'})
         self.assertEqual(rows['max_trip_value']['provider'],'compatible')
         self.assertEqual(rows['maintain_position']['provider'],'gemini')
+
+    def test_known_poi_citation_can_be_resolved_when_provider_omits_it(self):
+        facts={'max_trip_value':{'engine':'a','tradeoff':'b','poi_school':'Có 3 trường học. Địa điểm: Trường A; Trường B. Có thể mô tả gần nhiều.'}}
+        text='Khu vực này gần nhiều trường học, trong đó có Trường A. Bạn cần cân nhắc quãng đường di chuyển trước khi tới điểm chờ.'
+        out=validate_selection(self.document(text),facts)
+        self.assertIn('poi_school',out['max_trip_value']['evidence_ids'])
+
+    def test_weather_and_traffic_are_grounded_and_origin_scoped(self):
+        result=copy.deepcopy(self.result)
+        result['weather']=[{'precipitation_probability_pct':80,'precipitation_mm':3}]
+        result['objectives']['safety_comfort']={'plan':{'key_metrics':{'traffic_edges_used':1,
+            'traffic_segments_by_congestion':[{'class':'congested'}]}}}
+        facts=evidence_for(result,'max_trip_value',[])
+        self.assertIn('quanh vị trí hiện tại',facts['traffic_context'])
+        self.assertIn('khả năng gặp mưa',facts['weather_context'])
+        with self.assertRaises(ValueError):
+            validate_selection(self.document(TEXT+' Toàn tuyến đường đang ùn tắc.'),{'max_trip_value':facts})
+        with self.assertRaises(ValueError):
+            validate_selection(self.document(TEXT+' Hiện tại trời mưa.'),{'max_trip_value':{'engine':'a','tradeoff':'b'}})
+
+    def test_shopping_words_do_not_require_weather_evidence(self):
+        text='Khu vực này có trung tâm thương mại để khách mua sắm. Bạn cần cân nhắc quãng đường di chuyển trước khi tới điểm chờ.'
+        facts={'max_trip_value':{'engine':'a','tradeoff':'b','poi_shopping':'Có một trung tâm thương mại.'}}
+        self.assertIn('max_trip_value',validate_selection(self.document(text),facts))
+
+    def test_general_area_explanation_does_not_send_poi_names(self):
+        result=copy.deepcopy(self.result)
+        result['objectives']['max_trip_value']['plan']['summary']='Gần Trường Tên Riêng.'
+        result['objectives']['max_trip_value']['plan']['target_location']='Trường Tên Riêng'
+        context=[{'category':'school','label':'trường học','pois':[{'name':'Trường Tên Riêng','distance_m':100}]}]
+        facts=evidence_for(result,'max_trip_value',context)
+        self.assertNotIn('Trường Tên Riêng',json.dumps(facts,ensure_ascii=False))
+        self.assertIn('trường học',explanation_seed(facts))
 
     def test_provider_failure_keeps_engine_summary(self):
         with patch('api.llm_explanations.settings',return_value=self.cfg), patch('api.llm_explanations.poi_context',return_value=[]), patch('api.llm_explanations.request_json',side_effect=TimeoutError), patch('api.llm_explanations.cached',side_effect=lambda k,t,f:f()):
@@ -135,6 +171,6 @@ class ExplanationTests(unittest.TestCase):
         group={'category':'school','label':'trường học','pois':[{'name':'Trường A','distance_m':200}]}
         facts=evidence_for(self.result,'max_trip_value',[group])
         self.assertIn('không mô tả tập trung nhiều',facts['poi_school'])
-        self.assertIn('Trường A',facts['poi_school'])
+        self.assertNotIn('Trường A',facts['poi_school'])
 
 if __name__=='__main__': unittest.main()

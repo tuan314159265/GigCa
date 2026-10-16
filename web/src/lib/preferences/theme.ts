@@ -41,9 +41,9 @@ export const THEME_PRESET_OPTIONS = [
     primary: { light: "#A855F7", dark: "#A855F7" },
   },
   {
-    label: "Navy",
-    value: "navy",
-    primary: { light: "#0754B8", dark: "#8CB9F4" },
+    label: "GigCa Green",
+    value: "gigca",
+    primary: { light: "#00BF63", dark: "#65D99A" },
   },
 ] as const;
 

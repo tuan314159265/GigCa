@@ -25,10 +25,9 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   const setPreference = usePreferencesStore((state) => state.setPreference);
   const synced = usePreferencesStore((state) => state.isSynced);
   useEffect(() => {
-    if (!synced || localStorage.getItem("gigca-navy-layout-v2")) return;
-    setPreference("theme_preset", "navy");
-    setPreference("theme_mode", "light");
-    localStorage.setItem("gigca-navy-layout-v2", "true");
+    if (!synced || localStorage.getItem("gigca-green-theme-v1")) return;
+    setPreference("theme_preset", "gigca");
+    localStorage.setItem("gigca-green-theme-v1", "true");
   }, [synced, setPreference]);
   return (
     <Sidebar {...props} variant="sidebar" collapsible="offcanvas" className="gigca-rail">

@@ -37,6 +37,10 @@ class Handler(DashboardHandler):
             elif path=='/api/v1/auth/logout' and method=='POST':result=service.logout(token)
             elif path=='/api/v1/me' and method=='GET':result=service.me(token)
             elif path=='/api/v1/me/data-status' and method=='GET':result=service.data_status(token)
+            elif path=='/api/v1/traffic/nearby' and method=='GET':
+                service.me(token)
+                from api.nearby_traffic import nearby_traffic
+                result=nearby_traffic(query.get('lat',[None])[0],query.get('lng',[None])[0])
             elif path=='/api/v1/cameras/near-route' and method=='POST':
                 service.me(token)
                 from api.traffic_cameras import near_route

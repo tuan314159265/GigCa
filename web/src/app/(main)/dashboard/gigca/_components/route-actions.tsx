@@ -12,7 +12,7 @@ export function RouteActions({ selected }: { selected: Objective }) {
   const streets = route ? routeStreetSequence(route) : [];
   if (!target) return null;
   return (
-    <section aria-label="Hành động và tuyến đường" className="border-primary border-l-4">
+    <section aria-label="Hành động và tuyến đường" className="gigca-actions border-primary border-l-4">
       <Card>
         <CardHeader>
           <div className="flex flex-wrap items-center justify-between gap-3">
@@ -23,7 +23,7 @@ export function RouteActions({ selected }: { selected: Objective }) {
               </span>
             </CardTitle>
             {route && (
-              <Badge variant="default">
+              <Badge variant="default" className="gigca-action-distance">
                 {(route.summary.lengthInMeters / 1000).toLocaleString("vi-VN", { maximumFractionDigits: 1 })} km ·{" "}
                 {Math.ceil(route.summary.travelTimeInSeconds / 60)} phút
               </Badge>

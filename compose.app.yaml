@@ -5,6 +5,8 @@ services:
       dockerfile: api/Dockerfile
     environment:
       API_TOMTOM: ${API_TOMTOM:-}
+      GIGCA_POI_RANKING: ${GIGCA_POI_RANKING:-true}
+      GIGCA_LIVE_CANDIDATES: ${GIGCA_LIVE_CANDIDATES:-true}
       GIGCA_DATA_MODE: ${GIGCA_DATA_MODE:-live}
       GIGCA_LLM_EXPLANATIONS: ${GIGCA_LLM_EXPLANATIONS:-false}
       GIGCA_LLM_BASE_URL: ${GIGCA_LLM_BASE_URL:-https://api.shopaikey.com/v1}

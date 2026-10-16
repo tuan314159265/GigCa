@@ -38,3 +38,23 @@ out/
 # Local agent installations are not application source
 web/.agents/
 web/skills-lock.json
+
+# Local documentation drafts and authoring outputs (not required to run GigCa)
+docs/
+doc/
+output/
+tmp/
+RULES.md
+**/AGENTS.md
+web/CONTRIBUTING.md
+engine/spec.md
+engine/FORMULAS_AND_DATA.md
+engine/UPGRADE_V2.md
+experiments/synthetic/RESEARCH_METHOD_V2.md
+experiments/synthetic/SEARCH_PARAMS.md
+experiments/synthetic/personas.assistant.json
+**/.agents/
+**/.codex/
+**/.gitkeep
+!data/raw/.gitkeep
+!data/processed/.gitkeep

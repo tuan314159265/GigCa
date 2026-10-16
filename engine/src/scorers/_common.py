@@ -26,7 +26,7 @@ def reposition_for(straight_m: float, params: dict[str, float] | None = None) ->
         detour_factor=p.get("detour_factor", GEO_CFG["detour_factor"]),
         speed_kmh=p.get("speed_kmh", GEO_CFG["reposition_speed_kmh"]),
         cost_vnd_per_km=p.get("cost_vnd_per_km", GEO_CFG["reposition_cost_vnd_per_km"]),
-        at_area_radius_m=GEO_CFG["at_area_radius_m"],
+        at_area_radius_m=p.get("at_area_radius_m", GEO_CFG["at_area_radius_m"]),
     )
 
 

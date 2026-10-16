@@ -12,12 +12,16 @@ import { numberText, type Objective } from "./types";
 import { groupRouteRoads, routeRoads } from "./routes";
 import { useSelectedRoute } from "./use-selected-route";
 import { weatherTimeline } from "./weather-timeline";
+import { useNearbyTraffic } from "./use-nearby-traffic";
 import { TrafficCameraPanel } from "./traffic-camera-panel";
 
 export function ConditionsPanel({ selected = "max_trip_value", compact = false }: { selected?: Objective; compact?: boolean }) {
-  const { result, input } = useGigca();
-  const { route, message: routeMessage } = useSelectedRoute(selected);
-  const roads = route ? groupRouteRoads(routeRoads(route)) : [];
+  const { result, input, tomtom } = useGigca();
+  const { route, message: routeMessage, atDestination } = useSelectedRoute(selected);
+  const nearbyMode = atDestination && result?.snapshot.mode === "live";
+  const nearby = useNearbyTraffic(Boolean(nearbyMode && tomtom), input.context.current_lat, input.context.current_lng);
+  const trafficMessage = nearbyMode ? (tomtom ? nearby.message : "Chưa cấu hình nguồn giao thông.") : routeMessage;
+  const roads = nearbyMode ? groupRouteRoads(nearby.data?.roads ?? []) : route ? groupRouteRoads(routeRoads(route)) : [];
   const [detailId, setDetailId] = useState<string | null>(null);
   const roadKey = (road: (typeof roads)[number]) => (road.name === "Đoạn đường chưa có tên" ? road.id : road.name);
   const detail = roads.find((road) => roadKey(road) === detailId);
@@ -59,7 +63,7 @@ export function ConditionsPanel({ selected = "max_trip_value", compact = false }
       </div>
       <Surface className={compact ? "border-t pt-4" : undefined}>
         <CardHeader>
-          <CardTitle>Giao thông trên tuyến đang chọn</CardTitle>
+          <CardTitle>{nearbyMode ? "Giao thông quanh vị trí hiện tại" : "Giao thông trên tuyến đang chọn"}</CardTitle>
         </CardHeader>
         <CardContent>
           {roads.length > 0 ? (
@@ -97,13 +101,16 @@ export function ConditionsPanel({ selected = "max_trip_value", compact = false }
           ) : (
             <Empty>
               <EmptyHeader>
-                <EmptyTitle>{routeMessage || "Chưa có đoạn đường"}</EmptyTitle>
+                <EmptyTitle>{trafficMessage || "Chưa có đoạn đường"}</EmptyTitle>
               </EmptyHeader>
             </Empty>
           )}
-          {roads.length > 0 && routeMessage && (
+          {nearbyMode && nearby.data?.fetched_at && roads.length > 0 && (
+            <p className="mt-3 text-xs text-muted-foreground">TomTom · Mẫu đường trong phạm vi 500 m · Cập nhật {new Date(nearby.data.fetched_at).toLocaleTimeString("vi-VN")}</p>
+          )}
+          {roads.length > 0 && trafficMessage && (
             <p role="status" className="mt-3">
-              {routeMessage}
+              {trafficMessage}
             </p>
           )}
         </CardContent>
@@ -128,7 +135,7 @@ export function ConditionsPanel({ selected = "max_trip_value", compact = false }
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Đoạn trên tuyến</TableHead>
+                  <TableHead>{nearbyMode ? "Đoạn lấy mẫu" : "Đoạn trên tuyến"}</TableHead>
                   <TableHead>Tốc độ</TableHead>
                   <TableHead>Tình trạng</TableHead>
                   <TableHead>Chậm</TableHead>

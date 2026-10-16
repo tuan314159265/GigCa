@@ -65,7 +65,8 @@ Chỉ nạp joblib do chính mình tạo hoặc nguồn tin cậy; dùng cùng p
 
 ## Phạm vi
 
-Đây là model chung **synthetic research**, chưa tự bật cho tài khoản thật hoặc nối dashboard.
+Đây là model chung **synthetic research**. Dashboard nạp artifact đã chốt qua cấu hình;
+train một output mới không tự thay model đang phục vụ và không cá nhân hóa tài khoản.
 Gate không đạt thì vẫn lưu ứng viên để phân tích, không coi là model đủ điều kiện chạy.
 Ngay cả gate đạt, cần kiểm tra dữ liệu thật, phạm vi vị trí/thời gian và dữ liệu thiếu trước
 khi dùng ngoài demo. Không thêm lịch sử giả vào tài khoản thật.
