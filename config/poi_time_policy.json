@@ -1,0 +1,202 @@
+{
+  "version": "poi-time-secondary-tiebreak-v2",
+  "status": "manual_hypotheses_not_fitted",
+  "radius_m": 600,
+  "max_areas": 8,
+  "position_bonus_points": 0.5,
+  "income_context_fraction": 0.005,
+  "groups": {
+    "school": {
+      "weight": 3,
+      "windows": [
+        [
+          6.5,
+          7.5,
+          0.8
+        ],
+        [
+          11,
+          13,
+          0.8
+        ],
+        [
+          16,
+          17.5,
+          1
+        ]
+      ],
+      "otherwise": 0.1,
+      "weekend_factor": 0.2
+    },
+    "office": {
+      "weight": 2.5,
+      "windows": [
+        [
+          6.5,
+          7.5,
+          0.8
+        ],
+        [
+          7.5,
+          10,
+          0.5
+        ],
+        [
+          11,
+          14,
+          0.6
+        ],
+        [
+          16,
+          17.5,
+          1
+        ],
+        [
+          17.5,
+          20,
+          0.5
+        ]
+      ],
+      "otherwise": 0.15,
+      "weekend_factor": 0.3
+    },
+    "industrial": {
+      "weight": 2.5,
+      "windows": [
+        [
+          6.5,
+          7.5,
+          0.6
+        ],
+        [
+          16,
+          17.5,
+          0.8
+        ]
+      ],
+      "otherwise": 0.2,
+      "weekend_factor": 0.6
+    },
+    "shopping": {
+      "weight": 2.8,
+      "windows": [
+        [
+          10,
+          16,
+          0.5
+        ],
+        [
+          16,
+          22,
+          1
+        ]
+      ],
+      "otherwise": 0.1,
+      "weekend_factor": 1.15
+    },
+    "market": {
+      "weight": 2,
+      "windows": [
+        [
+          6,
+          11,
+          1
+        ],
+        [
+          11,
+          18,
+          0.5
+        ]
+      ],
+      "otherwise": 0.1,
+      "weekend_factor": 1
+    },
+    "transport": {
+      "weight": 2,
+      "windows": [
+        [
+          6,
+          10,
+          0.8
+        ],
+        [
+          16,
+          21,
+          1
+        ]
+      ],
+      "otherwise": 0.4,
+      "weekend_factor": 1
+    },
+    "hospital": {
+      "weight": 1.5,
+      "windows": [
+        [
+          6,
+          18,
+          0.8
+        ]
+      ],
+      "otherwise": 0.3,
+      "weekend_factor": 0.8
+    },
+    "residential": {
+      "weight": 1.2,
+      "windows": [
+        [
+          6,
+          10,
+          1
+        ],
+        [
+          16,
+          22,
+          0.5
+        ]
+      ],
+      "otherwise": 0.3,
+      "weekend_factor": 1
+    },
+    "food": {
+      "weight": 0.8,
+      "windows": [
+        [
+          11,
+          14,
+          0.8
+        ],
+        [
+          17,
+          22,
+          1
+        ]
+      ],
+      "otherwise": 0.2,
+      "weekend_factor": 1
+    },
+    "cafe": {
+      "weight": 0.3,
+      "windows": [
+        [
+          7,
+          22,
+          0.5
+        ]
+      ],
+      "otherwise": 0.1,
+      "weekend_factor": 1
+    }
+  },
+  "reference_commute_windows": [
+    [
+      6.5,
+      7.5
+    ],
+    [
+      16,
+      17.5
+    ]
+  ],
+  "income_near_tie_fraction": 0.01,
+  "position_near_tie_points": 1
+}

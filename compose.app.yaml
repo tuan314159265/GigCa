@@ -1,0 +1,53 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    environment:
+      API_TOMTOM: ${API_TOMTOM:-}
+      GIGCA_POI_RANKING: ${GIGCA_POI_RANKING:-true}
+      GIGCA_LIVE_CANDIDATES: ${GIGCA_LIVE_CANDIDATES:-true}
+      GIGCA_DATA_MODE: ${GIGCA_DATA_MODE:-live}
+      GIGCA_LLM_EXPLANATIONS: ${GIGCA_LLM_EXPLANATIONS:-false}
+      GIGCA_LLM_BASE_URL: ${GIGCA_LLM_BASE_URL:-https://api.shopaikey.com/v1}
+      GIGCA_LLM_API_KEY: ${GIGCA_LLM_API_KEY:-}
+      GIGCA_LLM_MODEL: ${GIGCA_LLM_MODEL:-}
+      GIGCA_GEMINI_API_KEY: ${GIGCA_GEMINI_API_KEY:-}
+      GIGCA_GEMINI_MODEL: ${GIGCA_GEMINI_MODEL:-gemini-3.8-flash}
+      GIGCA_SESSION_DB: /app/.cache/backend.sqlite3
+      GIGCA_API_HOST: 0.0.0.0
+      GIGCA_MAIN_MODEL_DIR: /app/main-model
+      GIGCA_CAMERA_CATALOG: /app/cameras/hcmc-public-cameras.json
+    volumes:
+      - gigca_sessions:/app/.cache
+      - ${GIGCA_MODEL_HOST_DIR:-./.cache/models/logistic-hazard-quantile-gb-hcmc}:/app/main-model:ro
+      - ./data/raw/cameras:/app/cameras:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+  frontend:
+    environment:
+      GIGCA_API_URL: http://backend:8000
+    build:
+      context: ./web
+      args:
+        NEXT_PUBLIC_GIGCA_PREVIEW: ${NEXT_PUBLIC_GIGCA_PREVIEW:-false}
+        GIGCA_API_URL: http://backend:8000
+    ports:
+      - "127.0.0.1:${GIGCA_FRONTEND_PORT:-3000}:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+volumes:
+  gigca_sessions:

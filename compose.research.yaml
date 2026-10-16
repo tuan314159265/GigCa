@@ -1,0 +1,8 @@
+# Optional local research dataset; no synthetic records are imported into account DB.
+services:
+  backend:
+    environment:
+      GIGCA_RESEARCH_DEMO: "true"
+      GIGCA_RESEARCH_DATASET: /app/research/contextual-seed7
+    volumes:
+      - ./.cache/synthetic/hcmc-expanded-32:/app/research:ro

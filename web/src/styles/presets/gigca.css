@@ -1,0 +1,160 @@
+/*
+label: GigCa Green
+value: gigca
+*/
+
+:root[data-theme-preset="gigca"] {
+  --radius: 4px;
+  --card: #FFFFFF;
+  --card-foreground: #172B22;
+  --popover: #FFFFFF;
+  --popover-foreground: #172B22;
+  --primary: #00BF63;
+  --primary-foreground: #123D2B;
+  --secondary: #E8F7EE;
+  --secondary-foreground: #145232;
+  --muted: #EDF3EF;
+  --muted-foreground: #617168;
+  --accent: #E8F7EE;
+  --accent-foreground: #087F46;
+  --destructive: #D64545;
+  --border: #DCE6DF;
+  --input: #B4C8BB;
+  --ring: #087F46;
+  --chart-1: #087F46;
+  --chart-2: #D99A27;
+  --chart-3: #359C8B;
+  --chart-4: #617168;
+  --chart-5: #00BF63;
+  --sidebar: #00BF63;
+  --sidebar-foreground: #123D2B;
+  --sidebar-primary: #FFBD59;
+  --sidebar-primary-foreground: #172B22;
+  --sidebar-accent: #FFBD59;
+  --sidebar-accent-foreground: #172B22;
+  --sidebar-border: #00A957;
+  --sidebar-ring: #123D2B;
+  --background: #F5F8F6;
+  --foreground: #172B22;
+  --shadow-2xs: 0px 1px 3px 0px hsl(0 0% 0% / 0.05);
+  --shadow-xs: 0px 1px 3px 0px hsl(0 0% 0% / 0.05);
+  --shadow-sm: 0px 1px 3px 0px hsl(0 0% 0% / 0.1), 0px 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --shadow: 0px 1px 3px 0px hsl(0 0% 0% / 0.1), 0px 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --shadow-md: 0px 1px 3px 0px hsl(0 0% 0% / 0.1), 0px 2px 4px -1px hsl(0 0% 0% / 0.1);
+  --shadow-lg: 0px 1px 3px 0px hsl(0 0% 0% / 0.1), 0px 4px 6px -1px hsl(0 0% 0% / 0.1);
+  --shadow-xl: 0px 1px 3px 0px hsl(0 0% 0% / 0.1), 0px 8px 10px -1px hsl(0 0% 0% / 0.1);
+  --shadow-2xl: 0px 1px 3px 0px hsl(0 0% 0% / 0.25);
+  --primary-hover: #24CE7B;
+  --heading: #172B22;
+  --location: #087F46;
+  --header-background: #00BF63;
+  --header-foreground: #123D2B;
+  --brand: #00BF63;
+  --highlight: #FFBD59;
+  --action-surface: #FFF0D3;
+  --action-icon: #805100;
+}
+
+.dark:root[data-theme-preset="gigca"] {
+  --background: #0D1913;
+  --foreground: #E8F3EB;
+  --card: #15271D;
+  --card-foreground: #E8F3EB;
+  --popover: #15271D;
+  --popover-foreground: #E8F3EB;
+  --primary: #65D99A;
+  --primary-foreground: #10271A;
+  --secondary: #203C2B;
+  --secondary-foreground: #E8F3EB;
+  --muted: #1D3226;
+  --muted-foreground: #ADBFB2;
+  --accent: #234832;
+  --accent-foreground: #A3EBC0;
+  --destructive: #F08080;
+  --border: #365442;
+  --input: #486A54;
+  --ring: #65D99A;
+  --chart-1: #65D99A;
+  --chart-2: #FFBD59;
+  --chart-3: #70C6B7;
+  --chart-4: #ADBFB2;
+  --chart-5: #00BF63;
+  --sidebar: #102D20;
+  --sidebar-foreground: #E8F3EB;
+  --sidebar-primary: #FFBD59;
+  --sidebar-primary-foreground: #172B22;
+  --sidebar-accent: #28533A;
+  --sidebar-accent-foreground: #F3FAF5;
+  --sidebar-border: #365442;
+  --sidebar-ring: #65D99A;
+  --shadow-2xs: 0px 1px 3px 0px hsl(0 0% 0% / 0.05);
+  --shadow-xs: 0px 1px 3px 0px hsl(0 0% 0% / 0.05);
+  --shadow-sm: 0px 1px 3px 0px hsl(0 0% 0% / 0.1), 0px 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --shadow: 0px 1px 3px 0px hsl(0 0% 0% / 0.1), 0px 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --shadow-md: 0px 1px 3px 0px hsl(0 0% 0% / 0.1), 0px 2px 4px -1px hsl(0 0% 0% / 0.1);
+  --shadow-lg: 0px 1px 3px 0px hsl(0 0% 0% / 0.1), 0px 4px 6px -1px hsl(0 0% 0% / 0.1);
+  --shadow-xl: 0px 1px 3px 0px hsl(0 0% 0% / 0.1), 0px 8px 10px -1px hsl(0 0% 0% / 0.1);
+  --shadow-2xl: 0px 1px 3px 0px hsl(0 0% 0% / 0.25);
+  --radius: 4px;
+  --primary-hover: #8DE5B5;
+  --heading: #E8F3EB;
+  --location: #65D99A;
+  --header-background: #102D20;
+  --header-foreground: #E8F3EB;
+  --brand: #00BF63;
+  --highlight: #FFBD59;
+  --action-surface: #30291A;
+  --action-icon: #FFBD59;
+}
+
+:root[data-theme-preset="gigca"] [data-slot="button"][data-variant="default"]:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+}
+
+/* GigCa brand palette: green, white and warm yellow; semantic traffic colors are independent. */
+:root[data-theme-preset="gigca"] .gigca-content :is(h1, h2, [data-slot="card-title"]) {
+  color: var(--heading);
+}
+:root[data-theme-preset="gigca"] .gigca-destination {
+  color: var(--location);
+}
+:root[data-theme-preset="gigca"] .gigca-content h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+:root[data-theme-preset="gigca"] .gigca-header {
+  background: var(--header-background);
+  color: var(--header-foreground);
+}
+:root[data-theme-preset="gigca"] .gigca-header [data-slot="button"][data-variant="ghost"]:hover {
+  background: var(--primary-hover);
+  color: var(--header-foreground);
+}
+
+:root[data-theme-preset="gigca"] .gigca-header { background: var(--header-background); }
+:root[data-theme-preset="gigca"] .gigca-header [data-slot="button"][data-variant="default"] {
+  background: var(--sidebar-border); color: var(--header-foreground);
+}
+:root[data-theme-preset="gigca"] [data-slot="sidebar-menu-button"] { font-size: 0.75rem; }
+:root[data-theme-preset="gigca"] .gigca-content .text-muted-foreground { color: var(--muted-foreground); }
+
+:root[data-theme-preset="gigca"] .gigca-map { --gigca-map-foreground: var(--foreground); }
+
+:root[data-theme-preset="gigca"] .gigca-header { border-bottom: 2px solid var(--highlight); }
+:root[data-theme-preset="gigca"] .gigca-actions { border-inline-start-color: var(--highlight); }
+:root[data-theme-preset="gigca"] .gigca-actions [data-slot="card"] { background: var(--action-surface); }
+:root[data-theme-preset="gigca"] .gigca-actions [data-slot="card-title"] svg { color: var(--action-icon); }
+:root[data-theme-preset="gigca"] .gigca-action-distance { background: var(--highlight); color: var(--sidebar-primary-foreground); }
+:root[data-theme-preset="gigca"] [data-slot="sidebar-header"] svg { color: var(--brand); }
+
+/* Bright brand surfaces, readable green text, and more visible warm accents. */
+:root[data-theme-preset="gigca"] .text-primary { color: var(--location); }
+:root[data-theme-preset="gigca"] .gigca-direction-cards[data-ready="true"] [data-slot="toggle-group-item"][data-state="on"],
+:root[data-theme-preset="gigca"] .gigca-direction-switch [data-slot="toggle-group-item"][data-state="on"] {
+  background: var(--highlight);
+  color: var(--sidebar-primary-foreground);
+  border-color: var(--highlight);
+}
+:root[data-theme-preset="gigca"] .gigca-header { border-bottom-width: 4px; }
+:root[data-theme-preset="gigca"] .gigca-destination { border-inline-start-color: var(--highlight); }
+:root[data-theme-preset="gigca"] [data-slot="sidebar-header"] svg { color: var(--sidebar-foreground); }
